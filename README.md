@@ -1,0 +1,1 @@
+# django_online_shop_and_blog
