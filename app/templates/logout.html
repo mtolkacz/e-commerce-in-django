@@ -1,0 +1,14 @@
+{% extends "base_template.html" %}
+{% block title %}Hello Page{% endblock %}
+{% block content %}
+{% load static %}
+<section id="form"><!--form-->
+		<div class="container">
+			<div class="row">
+				<h3>Thanks for spending some quality time with the Web site today.</h3>
+				<a href="{% url 'login' %}"><i class="fa fa-user"></i> Log in again</a>
+			</div>
+		</div>
+	</section>
+
+{% endblock %}
