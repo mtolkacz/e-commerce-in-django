@@ -6,13 +6,13 @@
 <section id="form"><!--form-->
 		<div class="container">
 			<div class="row">
+				{% for message in messages %}
+				{{ message }}
+				{% endfor %}
 				<div class="col-sm-4 col-sm-offset-1">
 					<div class="login-form"><!--login form-->
 						<h2>Login to your account</h2>
-						{% for message in messages %}
-						{{ message }}
-						{% endfor %}
-						<form action="login" method="POST">
+						<form method="POST">
                             {% csrf_token %}
 							{{ login_form }}
 							<span>
@@ -28,16 +28,13 @@
 				</div>
 				<div class="col-sm-4">
 					<div class="signup-form"><!--sign up form-->
-						{% if registered %}
-						<h2>Thank you for registering!</h2>
-						{% else %}
 						<h2>New User Signup!</h2>
-						<form action="register" method="POST">
+						<form method="POST">
 							{% csrf_token %}
 							{{ registration_form }}
 							<button type="submit" class="btn btn-default" name="register">Signup</button>
 						</form>
-						{% endif %}
+
 					</div><!--/sign up form-->
 				</div>
 			</div>
