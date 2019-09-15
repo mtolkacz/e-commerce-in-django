@@ -1,9 +1,18 @@
+from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from .forms import LoginForm
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib import messages
 from django.views.decorators.http import require_http_methods
+import os
+
+
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+
+
+def test(request):
+    return HttpResponse(EMAIL_HOST_USER)
 
 
 # Multiple view for signing in and registration
@@ -13,6 +22,10 @@ def login(request):
     # If user is already singed in redirect to index view
     if request.user.is_authenticated:
         return redirect('index')
+
+    # Create multiple forms for signing in and registration
+    login_form = LoginForm()
+    registration_form = UserCreationForm()
 
     # Go to login and register logic section if method is POST
     if request.method == 'POST':
@@ -70,11 +83,6 @@ def login(request):
 
                 # Load successful registration view
                 return redirect('successful_registration')
-
-    # Create multiple forms for signing in and registration if method is GET
-    elif request.method == 'GET':
-        login_form = LoginForm()
-        registration_form = UserCreationForm()
 
     # Load login view with forms and display form messages
     return render(request, 'login.html',

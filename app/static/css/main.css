@@ -1492,6 +1492,48 @@ h2.title {
   margin-top: 23px;
 }
 
+.fb a, .google a, .username a {
+    color: #FFFFFF;
+}
+
+.fb a:hover, .google a:hover, .username a:hover {
+    color: #333;
+}
+
+button, .social  {
+  border: medium none;
+  border-radius: 0;
+  display: block;
+  font-family: 'Roboto', sans-serif;
+  padding: 6px 25px;
+  color: #FFFFFF;
+}
+
+button:hover, .social:hover {
+    color: #333;
+}
+
+.fb {
+  background: #3b66c4;
+}
+.fb:hover {
+  background: #fafafa;
+}
+
+.google {
+  background: #d04332;
+}
+.google:hover {
+  background: #fafafa;
+}
+
+.username {
+  background: #FE980F;
+}
+.username:hover {
+  background: #fafafa;
+}
+
 .login-form form button, .signup-form form button {
   background: #FE980F;
   border: medium none;

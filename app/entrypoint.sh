@@ -13,6 +13,6 @@ fi
 python manage.py migrate
 python manage.py collectstatic --no-input --clear
 # python manage.py rebuild_index
-python manage.py update_index
+# python manage.py update_index
 
 exec "$@"

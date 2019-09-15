@@ -24,8 +24,15 @@ services:
     volumes:
       - static_volume:/usr/src/app/static
       - media_volume:/usr/src/app/media
+      - ./nginx/localhost.crt:/etc/nginx/localhost.crt
+      - ./nginx/localhost.key:/etc/nginx/localhost.key
+      - ./nginx/localhost.conf:/etc/nginx/localhost.conf
+      - ./nginx/dhparam.pem:/etc/nginx/dhparam.pem
+      #- ./data/certbot/conf:/etc/letsencrypt
+      #- ./data/certbot/www:/var/www/certbot
     ports:
-      - 1337:80
+      - "80:80"
+      - "443:443"
     depends_on:
       - web
   elasticsearch:
@@ -35,7 +42,6 @@ services:
       - "9300:9300"
     volumes:
           - esdata:/usr/share/elasticsearch/data
-
 volumes:
   postgres_data:
   esdata:

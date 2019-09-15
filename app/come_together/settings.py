@@ -12,9 +12,9 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 
 import os
 
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-PROJECT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-BASE_DIR = os.path.dirname(PROJECT_DIR)
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
@@ -22,10 +22,26 @@ BASE_DIR = os.path.dirname(PROJECT_DIR)
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ.get('SECRET_KEY', 'foo')
 
+LOGIN_URL = 'login'
+LOGIN_REDIRECT_URL = 'index'
+LOGOUT_URL = 'logout'
+LOGOUT_REDIRECT_URL = 'logout'
+
+
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SECURE_SSL_REDIRECT = True    # The SecurityMiddleware redirects all non-HTTPS requests to HTTPS
+SESSION_COOKIE_SECURE = True  # Cookies will only be sent via HTTPS connection
+SESSION_COOKIE_AGE = 3600     # The age of session cookies, in seconds. Set to 1 hour.
+CSRF_COOKIE_SECURE = True     # CSRF cookies will only be sent via HTTPS connection
+SECURE_HSTS_SECONDS = 3600
+
+SOCIAL_AUTH_FACEBOOK_KEY = '646654445823903'  # App ID
+SOCIAL_AUTH_FACEBOOK_SECRET = '08de8fcbd0741fb17be508388d82296f'  # App Secret
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = int(os.environ.get('DEBUG', default=1))
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['localhost']
 
 
 # Application definition
@@ -37,6 +53,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'sslserver',
+    'social_django',
     'accounts',
     'blog',
     'articles',
@@ -53,6 +71,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'social_django.middleware.SocialAuthExceptionMiddleware',
 ]
 
 ROOT_URLCONF = 'come_together.urls'
@@ -68,13 +87,21 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'social_django.context_processors.backends',
+                'social_django.context_processors.login_redirect',
             ],
         },
     },
 ]
 
-WSGI_APPLICATION = 'come_together.wsgi.application'
+AUTHENTICATION_BACKENDS = (
+    'social_core.backends.google.GoogleOAuth2',
+    'social_core.backends.facebook.FacebookOAuth2',
+    'django.contrib.auth.backends.ModelBackend',
+)
 
+
+WSGI_APPLICATION = 'come_together.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
@@ -82,7 +109,7 @@ WSGI_APPLICATION = 'come_together.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': os.environ.get('SQL_ENGINE', 'django.db.backends.sqlite3'),
-        'NAME': os.environ.get('SQL_DATABASE', os.path.join(PROJECT_DIR, 'db.sqlite3')),
+        'NAME': os.environ.get('SQL_DATABASE', os.path.join(BASE_DIR, 'db.sqlite3')),
         'USER': os.environ.get('SQL_USER', 'michal'),
         'PASSWORD': os.environ.get('SQL_PASSWORD', 'michal'),
         'HOST': os.environ.get('SQL_HOST', 'localhost'),
@@ -126,17 +153,15 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
-STATIC_URL = '/static/'
-
 # Custom static files for every apps at the project level
 STATICFILES_DIRS = (
-   os.path.join(PROJECT_DIR, 'static/'),
+     os.path.join(BASE_DIR, 'static/'),
 )
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(PROJECT_DIR, 'media')
+STATIC_URL = '/static/'
+# STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 
-# The age of session cookies, in seconds. Set to 1 hour.
-SESSION_COOKIE_AGE = 3600
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 HAYSTACK_CONNECTIONS = {
     'default': {
