@@ -4,8 +4,8 @@
 **************************/
 /*@import url(http://fonts.googleapis.com/css?family=Roboto:400,300,400italic,500,700,100);*/
 @import url(https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,900);
-@import url(http://fonts.googleapis.com/css?family=Open+Sans:400,800,300,600,700);
-@import url(http://fonts.googleapis.com/css?family=Abel);
+@import url(https://fonts.googleapis.com/css?family=Open+Sans:400,800,300,600,700);
+@import url(https://fonts.googleapis.com/css?family=Abel);
 
 body {
   color: #fafafa;
@@ -69,81 +69,20 @@ a#scrollUp i{
 *******Header CSS******
 **************************/
 
-.header_top {
-  background: none repeat scroll 0 0 #FFF; /*--#FFFdb4437*/
-}
-
-.contactinfo ul li:first-child{
-    margin-left: -15px;
-}
-
-.contactinfo ul li a{
-  font-size: 12px;
-  color: #696763;
-  font-family: 'Roboto', sans-serif;
-}
-
-
-.contactinfo ul li a:hover{
-	background:inherit;
-}
-
-
-.social-icons ul li a {
-  border: 0 none;
-  border-radius: 0;
-  color: #696763;
-  padding:0px;
-}
-
-
-.social-icons ul li{
-	display:inline-block;
-}
-
-.social-icons ul li a i {
-  padding: 11px 15px;
-   transition: all 0.9s ease 0s;
-  -moz-transition: all 0.9s ease 0s;
-  -webkit-transition: all 0.9s ease 0s;
-  -o-transition: all 0.9s ease 0s;
-}
-
-.social-icons ul li a i:hover{
-  color: #fff;
-   transition: all 0.9s ease 0s;
-  -moz-transition: all 0.9s ease 0s;
-  -webkit-transition: all 0.9s ease 0s;
-  -o-transition: all 0.9s ease 0s;
-}
-
-
-.fa-facebook:hover {
-  background: #0083C9;
-}
-
-.fa-twitter:hover  {
-	background:#5BBCEC;
-}
-
-.fa-linkedin:hover  {
-	background:#FF4518;
-}
-
-.fa-dribbble:hover  {
-	background:#90C9DC;
-}
-
-.fa-google-plus:hover  {
-	background:#CE3C2D;
+.header-middle {
+  background: #191c1d; /*#db4437;*/
+  position: fixed;
+  height: 45px;
+  z-index: 20;
+  top: 0;
+  width: 100%;
 }
 
 .header-middle .container .row {
-  border-bottom: 1px solid #f5f5f5;
   margin-left: 0;
   margin-right: 0;
-  padding-bottom: 20px;
-  padding-top: 20px;
+  padding-bottom: 3px;
+  padding-top: 3px;
 }
 
 .header-middle .container .row .col-sm-4{
@@ -200,7 +139,7 @@ a#scrollUp i{
 
 
 .shop-menu ul li a {
-  background: #222627;
+  /*background: #222627;*/
   color: #fafafa;
   font-family: 'Roboto', sans-serif;
   font-size: 14px;
@@ -210,7 +149,6 @@ a#scrollUp i{
   margin-top: 10px;
 }
 
-
 .shop-menu ul li a i{
 	margin-right:3px;
 }
@@ -218,14 +156,7 @@ a#scrollUp i{
 
 .shop-menu ul li a:hover {
 	color:#fe980f;
-	background:#222627;
-}
-
-
-.header-bottom {
-  background:#db4437;
-  padding-bottom: 15px;
-  padding-top: 15px;
+  background: None;
 }
 
 .navbar-collapse.collapse{
@@ -259,20 +190,25 @@ a#scrollUp i{
   border-bottom-color: #ffffff;
 }
 
+.titi {
+  display: inline-block; 
+}
+
 .search_box input {
-  background: #F0F0E9;
+  background: #FFFFFF;/*#F0F0E9*/
   border: medium none;
   color: #191c1d;
   font-family: 'roboto';
   font-size: 12px;
   font-weight: 300;
-  height: 35px;
+  height: 24px;
   outline: medium none;
-  padding-left: 10px;
-  width: 250px;
+  margin-top: 7px;
+  padding-left: 5px;
+  width: 295px;
   background-image: url(../images/home/searchicon.png);
   background-repeat: no-repeat;
-  background-position: 225px;
+  background-position: 272px;
 }
 
 
@@ -282,7 +218,6 @@ a#scrollUp i{
 .navbar-toggle .icon-bar {
     background-color: #fff;
 }
-
 
 .nav.navbar-nav > li:hover > ul.sub-menu{
   display: block;
@@ -313,6 +248,11 @@ ul.sub-menu {
   padding-left: 0;
 }
 
+
+.nav .navbar-nav li img{
+  display: block;
+  margin: 0 auto;
+}
 
 .navbar-nav li ul.sub-menu li{
   padding: 10px 20px 0 ;
@@ -575,7 +515,10 @@ ul.sub-menu {
 
 
 #slider {
+  padding-top: 45px;
   padding-bottom: 45px;
+  z-index: 5px;
+  top: 1;
 }
 
 .carousel-indicators li {
@@ -1201,6 +1144,9 @@ h2.title {
   right: 0;
 }
 
+.col-sm-12{
+   background: #fafafa;
+}
 
 #similar-product .carousel-inner .item{
 	padding-left:0px;
@@ -1521,7 +1467,7 @@ button:hover, .social:hover {
 }
 
 .google {
-  background: #d04332;
+  background: #00a2f0;
 }
 .google:hover {
   background: #fafafa;

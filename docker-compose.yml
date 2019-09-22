@@ -3,35 +3,34 @@ version: '3.3'
 services:
   web:
     build: ./app
-    command: python manage.py runsslserver 0.0.0.0:8000
+    command: python manage.py runsslserver 0.0.0.0:8001
     stdin_open: true
     tty: true
     volumes:
       - ./app/:/usr/src/app/
+      - /etc/localtime:/etc/localtime
+      - /etc/timezone:/etc/timezone
     ports:
-      - 8000:8000
+      - 8001:8001
+      - 587:587
+      - 465:465
+      - 25:25
     env_file: .envdev
     environment:
       - COMPOSE_HTTP_TIMEOUT=600
       - DEBUG=1
-      - SECRET_KEY=foo
       - SQL_ENGINE=django.db.backends.postgresql
-      - SQL_DATABASE=ctdb
-      - SQL_USER=michal
-      - SQL_PASSWORD=michal
       - SQL_HOST=db
       - SQL_PORT=5432
       - DATABASE=postgres
+      - TZ=Europe/Warsaw
     depends_on:
       - db
   db:
     image: postgres:11.5-alpine
     volumes:
       - postgres_data:/var/lib/postgresql/data/
-    environment:
-      - POSTGRES_USER=michal
-      - POSTGRES_PASSWORD=michal
-      - POSTGRES_DB=ctdb
+    env_file: .envdevdb
   elasticsearch:
     image: launcher.gcr.io/google/elasticsearch2
     ports:
@@ -39,7 +38,6 @@ services:
       - "9300:9300"
     volumes:
           - esdata:/usr/share/elasticsearch/data
-
 volumes:
   postgres_data:
   esdata:

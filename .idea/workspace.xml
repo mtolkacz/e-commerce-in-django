@@ -4,17 +4,21 @@
     <list default="true" id="5b893caf-c4ff-41f0-8695-7db86d1470a7" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/app/Dockerfile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Dockerfile.prod" beforeDir="false" afterPath="$PROJECT_DIR$/app/Dockerfile.prod" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/Pipfile" beforeDir="false" afterPath="$PROJECT_DIR$/app/Pipfile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/accounts/forms.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/accounts/forms.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/accounts/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/accounts/urls.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/accounts/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/accounts/views.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/come_together/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/come_together/settings.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/come_together/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/come_together/urls.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/come_together/wsgi.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/come_together/wsgi.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/entrypoint.sh" beforeDir="false" afterPath="$PROJECT_DIR$/app/entrypoint.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/products/templates/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/app/products/templates/index.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/static/css/main.css" beforeDir="false" afterPath="$PROJECT_DIR$/app/static/css/main.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/static/css/responsive.css" beforeDir="false" afterPath="$PROJECT_DIR$/app/static/css/responsive.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/templates/base_template.html" beforeDir="false" afterPath="$PROJECT_DIR$/app/templates/base_template.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/templates/login.html" beforeDir="false" afterPath="$PROJECT_DIR$/app/templates/login.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker-compose.prod.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.prod.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/templates/logout.html" beforeDir="false" afterPath="$PROJECT_DIR$/app/templates/logout.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/templates/successful_register.html" beforeDir="false" afterPath="$PROJECT_DIR$/app/templates/successful_register.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/nginx/nginx.conf" beforeDir="false" afterPath="$PROJECT_DIR$/nginx/nginx.conf" afterDir="false" />
     </list>
@@ -27,8 +31,8 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="Python Script" />
         <option value="HTML File" />
+        <option value="Python Script" />
       </list>
     </option>
   </component>
@@ -41,20 +45,20 @@
   <component name="PropertiesComponent">
     <property name="DefaultHtmlFileTemplate" value="HTML File" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/app/templates" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="run.code.analysis.last.selected.profile" value="aDefault" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
   <component name="RecentsManager">
-    <key name="CopyFile.RECENT_KEYS">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/app/accounts" />
+      <recent name="$PROJECT_DIR$/app" />
+      <recent name="$PROJECT_DIR$" />
+      <recent name="$PROJECT_DIR$/app/come_together" />
       <recent name="$PROJECT_DIR$/app/templates" />
     </key>
-    <key name="MoveFile.RECENT_KEYS">
+    <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/app/templates" />
-      <recent name="$PROJECT_DIR$/app/templates/registration" />
-      <recent name="$PROJECT_DIR$/app/products/templates" />
-      <recent name="$PROJECT_DIR$/app/static" />
-      <recent name="$PROJECT_DIR$/app/blog/templates" />
     </key>
   </component>
   <component name="RunDashboard">
@@ -69,7 +73,49 @@
       </list>
     </option>
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="Python.email">
+    <configuration name="email" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="come_together" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/app" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/app/accounts/emailct.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="send_email" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="come_together" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/app" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/app/send_email.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <configuration name="views" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="come_together" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -93,6 +139,8 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.email" />
+        <item itemvalue="Python.send_email" />
         <item itemvalue="Python.views" />
       </list>
     </recent_temporary>
@@ -115,7 +163,9 @@
       <map>
         <entry key="MAIN">
           <value>
-            <State />
+            <State>
+              <option name="COLUMN_ORDER" />
+            </State>
           </value>
         </entry>
       </map>

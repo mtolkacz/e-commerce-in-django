@@ -14,8 +14,8 @@
 				<div class="col-sm-4 col-sm-offset-1">
 					<div class="login-form"><!--login form-->
 						<h2>Login to your account</h2>
-						<a href="#"><button class="google">
-							Login with Google
+						<a href="{% url 'social:begin' 'twitter' %}"><button class="google">
+							Login with Twitter
 						</button></a> <br> <a href="{% url 'social:begin' 'facebook' %}"><button class="fb">
 							Login with Facebook
 						</button></a><br><button class="username" name="login" onclick="showDiv()">Login with username</button>

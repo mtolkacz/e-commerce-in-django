@@ -3,3 +3,5 @@
 *.envdev
 *.sqlite3
 .env*
+*.envpostfix
+send_email.py

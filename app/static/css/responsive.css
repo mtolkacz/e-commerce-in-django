@@ -215,16 +215,7 @@ ul.sub-menu{
   box-shadow: none;
 }
 
-.header-bottom{
-	position: relative;
-}
 
-.header-bottom .col-sm-3 {
-	display: inline-block;
-	position: absolute;
-	left: 0;
-	top: 38px;
-}
 
 #slider-carousel .item{
 	padding-left: 0;
