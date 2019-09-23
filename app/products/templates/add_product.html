@@ -1,0 +1,27 @@
+{% extends "base_template.html" %}
+{% block title %}Hello Page{% endblock %}
+{% block content %}
+{% load static %}
+
+<section id="form"><!--form-->
+		<div class="container">
+            <div class="companyinfo">
+				<h1><span>Add new product</span></h1>
+                <h2><span>{% for message in messages %}
+				{{ message }}
+				{% endfor %}</span></h2>
+			</div>
+			<div class="row">
+				<div class="col-sm-4 col-sm-offset-1">
+                    <div class="login-form">
+                        <form method="POST">
+                            {% csrf_token %}
+                            {{ product_form }}
+                            <button type="submit" class="btn btn-default" name="addproduct">Add product</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+</section>
+{% endblock %}
