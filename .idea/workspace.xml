@@ -2,14 +2,45 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="5b893caf-c4ff-41f0-8695-7db86d1470a7" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/app/media/pic_folder/1.jpg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/media/pic_folder/1_4uy8iZf.jpg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/media/pic_folder/1_JnAOPHd.jpg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/media/pic_folder/1_jdqX3Ym.jpg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/media/pic_folder/1_nFJs8Zr.jpg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/media/pic_folder/1_xlLgOXf.jpg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/media/pic_folder/2.jpg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/media/pic_folder/3.jpg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/media/pic_folder/3_bXmtqn3.jpg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/media/pic_folder/4.jpg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/media/pic_folder/5.jpg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/media/pic_folder/5_8QB5uzU.jpg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/media/pic_folder/6.jpg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/media/pic_folder/6_LNAYXNl.jpg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/media/pic_folder/7.jpg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/media/pic_folder/7_4x53xRB.jpg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/media/pic_folder/8.jpg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/media/pic_folder/9.jpg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/products/migrations/0002_auto_20190928_1211.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/products/migrations/0003_remove_product_category.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/products/migrations/0004_product_category.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/products/migrations/0005_auto_20190928_1455.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Pipfile" beforeDir="false" afterPath="$PROJECT_DIR$/app/Pipfile" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/accounts/forms.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/accounts/forms.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/app/Dockerfile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/articles/migrations/0001_initial.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/articles/migrations/0001_initial.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/blog/migrations/0001_initial.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/blog/migrations/0001_initial.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/come_together/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/come_together/settings.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/come_together/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/come_together/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/products/forms.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/products/forms.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/products/migrations/0001_initial.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/products/migrations/0001_initial.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/products/migrations/0002_auto_20190923_2224.py" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/app/products/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/products/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/products/templates/add_product.html" beforeDir="false" afterPath="$PROJECT_DIR$/app/products/templates/add_product.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/products/templates/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/app/products/templates/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/products/templates/test.html" beforeDir="false" afterPath="$PROJECT_DIR$/app/products/templates/test.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/products/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/products/urls.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/products/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/products/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/templates/login.html" beforeDir="false" afterPath="$PROJECT_DIR$/app/templates/login.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/static/css/main.css" beforeDir="false" afterPath="$PROJECT_DIR$/app/static/css/main.css" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -32,6 +63,7 @@
   <component name="ProjectId" id="1QWqBRFYBGQGSOBjDasLUueSKBL" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="PropertiesComponent">
+    <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
     <property name="DefaultHtmlFileTemplate" value="HTML File" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/app/products/templates" />

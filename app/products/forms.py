@@ -1,12 +1,12 @@
 from django import forms
-from .models import Product
+from .models import Product, Category
 
 
 class ProductForm(forms.ModelForm):
-    name = forms.CharField(max_length=100, widget=forms.TextInput())
-    description = forms.CharField(max_length=300, widget=forms.TextInput())
-    price = forms.DecimalField(max_digits=14, decimal_places=2)
+    category_name = forms.ModelChoiceField(queryset=Category.objects.all(),
+                                           to_field_name='name',
+                                           empty_label='Select category')
 
     class Meta:
         model = Product
-        fields = ['name', 'description', 'price']
+        fields = ['name', 'description', 'price', 'category_name', 'image']

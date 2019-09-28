@@ -831,11 +831,15 @@ h2.title {
   font-family: 'Roboto', sans-serif;
   font-size: 14px;
   font-weight: 400;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   color: #B3AFA8;/*#696763;*/
 }
 
 .productinfo img{
-  width: 100%;
+  width: 268px;
+  height: 248px;
 }
 
 .productinfo{
@@ -891,6 +895,9 @@ h2.title {
   font-size: 14px;
   font-weight: 400;
   color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 
@@ -1409,9 +1416,9 @@ h2.title {
 
 
 .login-form form input, .signup-form form input {
-  background: #F0F0E9;
-  border: medium none;
-  color: #696763;
+/*  background: #F0F0E9;*/  
+border: medium none;
+  /*color: #696763;*/
   display: block;
   font-family: 'Roboto', sans-serif;
   font-size: 14px;

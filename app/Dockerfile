@@ -6,9 +6,10 @@ ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
 RUN apk update \
-    && apk add --virtual build-deps gcc python3-dev musl-dev \
-    && apk add postgresql-dev \
-    && pip install psycopg2 \
+    && apk add --no-cache --virtual build-deps gcc python3-dev musl-dev build-base linux-headers \
+    && apk add postgresql-dev \ 
+    && apk add --no-cache jpeg-dev zlib-dev libjpeg \
+    && pip install psycopg2 Pillow \
     && apk del build-deps 
 
 RUN pip install --upgrade pip
