@@ -19,6 +19,8 @@
     <script src="{% static 'js/html5shiv.js' %}"></script>
     <script src="{% static 'js/respond.min.js' %}"></script>
     <![endif]-->
+	<script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
+    <script src="{% static 'js/jquery.js' %}"></script>
     <link rel="apple-touch-icon-precomposed" sizes="144x144" href="{% static 'images/ico/apple-touch-icon-144-precomposed.png' %}">
     <link rel="apple-touch-icon-precomposed" sizes="114x114" href="{% static 'images/ico/apple-touch-icon-114-precomposed.png' %}">
     <link rel="apple-touch-icon-precomposed" sizes="72x72" href="{% static 'images/ico/apple-touch-icon-72-precomposed.png' %}">
@@ -46,16 +48,16 @@
 									{% if backends.associated %}
 										{% for ass in backends.associated %}
 										  {% if ass.provider == 'facebook' %}
-											<li style="padding-left: 15px;padding-right: 0px"><a href="#"><img src="{{ass.extra_data.picture.data.url}}" alt="" width="25" height="25" style="border-radius: 50%"> </a></li>
-											<li style="padding-left: 8px;padding-right: 15px"><a href="#">{{ ass.extra_data.name }}</a></li>
+											<li style="padding-left: 15px;padding-right: 0px"><a href="{% url 'profile' %}"><img src="{{ass.extra_data.picture.data.url}}" alt="" width="25" height="25" style="border-radius: 50%"> </a></li>
+											<li style="padding-left: 8px;padding-right: 15px"><a href="{% url 'profile' %}">{{ ass.extra_data.name }}</a></li>
 										  {% endif %}
 										{% endfor %}
 									{% else %}
-										<li><a href="#"><i class="fa fa-user"></i> {{ user.username }}</a></li>
+										<li><a href="{% url 'profile' %}"><i class="fa fa-user"></i> {{ user.username }}</a></li>
 									{% endif %}
 								{% endif %}
-								<li><a href="checkout.html"><i class="fa fa-crosshairs"></i> Checkout</a></li>
-								<li><a href="cart.html"><i class="fa fa-shopping-cart"></i> Cart</a></li>
+								<!-- <li><a href="checkout.html"><i class="fa fa-crosshairs"></i> Checkout</a></li> -->
+								<li><a href="{% url 'checkout' %}"><i class="fa fa-shopping-cart"></i> Cart</a></li>
 								{% if user.is_authenticated %}
 									<li><a href="{% url 'logout' %}"><i class="fa fa-user"></i> Logout</a></li>
 								{% else %}
@@ -232,9 +234,6 @@
 
 	</footer><!--/Footer-->
 
-
-
-    <script src="{% static 'js/jquery.js' %}"></script>
 	<script src="{% static 'js/bootstrap.min.js' %}"></script>
 	<script src="{% static 'js/jquery.scrollUp.min.js' %}"></script>
 	<script src="{% static 'js/price-range.js' %}"></script>

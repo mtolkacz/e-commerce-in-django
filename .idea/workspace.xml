@@ -2,47 +2,27 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="5b893caf-c4ff-41f0-8695-7db86d1470a7" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/app/media/pic_folder/1.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/media/pic_folder/1_4uy8iZf.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/media/pic_folder/1_JnAOPHd.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/media/pic_folder/1_jdqX3Ym.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/media/pic_folder/1_nFJs8Zr.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/media/pic_folder/1_xlLgOXf.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/media/pic_folder/2.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/media/pic_folder/3.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/media/pic_folder/3_bXmtqn3.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/media/pic_folder/4.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/media/pic_folder/5.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/media/pic_folder/5_8QB5uzU.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/media/pic_folder/6.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/media/pic_folder/6_LNAYXNl.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/media/pic_folder/7.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/media/pic_folder/7_4x53xRB.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/media/pic_folder/8.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/media/pic_folder/9.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/products/migrations/0002_auto_20190928_1211.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/products/migrations/0003_remove_product_category.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/products/migrations/0004_product_category.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/products/migrations/0005_auto_20190928_1455.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/accounts/templates/profile.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/cart/forms.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/templates/checkout.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/app/Dockerfile" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/articles/migrations/0001_initial.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/articles/migrations/0001_initial.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/blog/migrations/0001_initial.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/blog/migrations/0001_initial.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/accounts/forms.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/accounts/forms.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/accounts/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/accounts/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/accounts/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/accounts/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/accounts/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/accounts/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/cart/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/cart/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/cart/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/cart/views.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/come_together/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/come_together/settings.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/come_together/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/come_together/urls.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/products/forms.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/products/forms.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/products/migrations/0001_initial.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/products/migrations/0001_initial.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/products/migrations/0002_auto_20190923_2224.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/products/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/products/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/products/templates/add_product.html" beforeDir="false" afterPath="$PROJECT_DIR$/app/products/templates/add_product.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/entrypoint.sh" beforeDir="false" afterPath="$PROJECT_DIR$/app/entrypoint.sh" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/products/templates/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/app/products/templates/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/products/templates/test.html" beforeDir="false" afterPath="$PROJECT_DIR$/app/products/templates/test.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/products/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/products/urls.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/products/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/products/views.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/static/css/main.css" beforeDir="false" afterPath="$PROJECT_DIR$/app/static/css/main.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/static/js/main.js" beforeDir="false" afterPath="$PROJECT_DIR$/app/static/js/main.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/templates/base_template.html" beforeDir="false" afterPath="$PROJECT_DIR$/app/templates/base_template.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
     </list>
-    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -51,8 +31,8 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="HTML File" />
         <option value="Python Script" />
+        <option value="HTML File" />
       </list>
     </option>
   </component>
@@ -62,38 +42,32 @@
   </component>
   <component name="ProjectId" id="1QWqBRFYBGQGSOBjDasLUueSKBL" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showExcludedFiles" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
   <component name="PropertiesComponent">
     <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
     <property name="DefaultHtmlFileTemplate" value="HTML File" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/app/products/templates" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/app/cart/templates" />
     <property name="run.code.analysis.last.selected.profile" value="aDefault" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
   <component name="RecentsManager">
-    <key name="CopyFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/app/products/templates" />
-      <recent name="$PROJECT_DIR$/app/templates" />
-    </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/app/templates" />
+      <recent name="$PROJECT_DIR$/app/accounts/templates" />
       <recent name="$PROJECT_DIR$/app/accounts" />
       <recent name="$PROJECT_DIR$/app" />
       <recent name="$PROJECT_DIR$" />
-      <recent name="$PROJECT_DIR$/app/come_together" />
-      <recent name="$PROJECT_DIR$/app/templates" />
     </key>
-  </component>
-  <component name="RunDashboard">
-    <option name="ruleStates">
-      <list>
-        <RuleState>
-          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
-        </RuleState>
-        <RuleState>
-          <option name="name" value="StatusDashboardGroupingRule" />
-        </RuleState>
-      </list>
-    </option>
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/app/cart/templates" />
+      <recent name="$PROJECT_DIR$/app/templates" />
+      <recent name="$PROJECT_DIR$/app/products/templates" />
+    </key>
   </component>
   <component name="RunManager" selected="Python.email">
     <configuration name="email" type="PythonConfigurationType" factoryName="Python" temporary="true">
@@ -167,6 +141,18 @@
       </list>
     </recent_temporary>
   </component>
+  <component name="ServiceViewManager">
+    <option name="viewStates">
+      <list>
+        <serviceView>
+          <treeState>
+            <expand />
+            <select />
+          </treeState>
+        </serviceView>
+      </list>
+    </option>
+  </component>
   <component name="SvnConfiguration">
     <configuration />
   </component>
@@ -192,6 +178,29 @@
         </entry>
       </map>
     </option>
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="2046" y="362" key="com.intellij.ide.util.TipDialog" timestamp="1577402389308">
+      <screen x="1440" y="0" width="1920" height="1080" />
+    </state>
+    <state x="2046" y="362" key="com.intellij.ide.util.TipDialog/1440.0.1920.1080/0.180.1440.900@1440.0.1920.1080" timestamp="1577402389308" />
+    <state x="641" y="380" key="com.intellij.ide.util.TipDialog/51.27.1869.1053@51.27.1869.1053" timestamp="1577366643656" />
+    <state x="1082" y="162" width="731" height="781" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser" timestamp="1577310135937">
+      <screen x="51" y="27" width="1869" height="1053" />
+    </state>
+    <state x="1082" y="162" width="731" height="781" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser/51.27.1869.1053@51.27.1869.1053" timestamp="1577310135937" />
+    <state x="70" y="202" width="1370" height="878" key="dock-window-1" timestamp="1577446772245">
+      <screen x="0" y="180" width="1440" height="900" />
+    </state>
+    <state x="70" y="202" width="1370" height="878" key="dock-window-1/1440.0.1920.1080/0.180.1440.900@1440.0.1920.1080" timestamp="1577446772245" />
+    <state x="2072" y="156" width="707" height="792" key="find.popup" timestamp="1577747079116">
+      <screen x="1440" y="0" width="1920" height="1080" />
+    </state>
+    <state x="2072" y="156" width="707" height="792" key="find.popup/1440.0.1920.1080/0.180.1440.900@1440.0.1920.1080" timestamp="1577747079116" />
+    <state x="2088" y="257" width="672" height="678" key="search.everywhere.popup" timestamp="1577658054173">
+      <screen x="1440" y="0" width="1920" height="1080" />
+    </state>
+    <state x="2088" y="257" width="672" height="678" key="search.everywhere.popup/1440.0.1920.1080/0.180.1440.900@1440.0.1920.1080" timestamp="1577658054173" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

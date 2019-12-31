@@ -3,13 +3,11 @@ version: '3.3'
 services:
   web:
     build: ./app
-    command: python manage.py runsslserver 0.0.0.0:8001
+    command: python manage.py runsslserver 0.0.0.0:8001 --settings=come_together.settings
     stdin_open: true
     tty: true
     volumes:
       - ./app/:/usr/src/app/
-      - /etc/localtime:/etc/localtime
-      - /etc/timezone:/etc/timezone
     ports:
       - 8001:8001
       - 587:587
@@ -18,7 +16,6 @@ services:
       - COMPOSE_HTTP_TIMEOUT=600
       - SQL_ENGINE=django.db.backends.postgresql
       - DATABASE=postgres
-      - TZ=Europe/Warsaw
     depends_on:
       - db
   db:

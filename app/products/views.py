@@ -2,12 +2,10 @@ from django.shortcuts import render, redirect
 from .forms import ProductForm
 from django.contrib import messages
 from .models import Product, Category
-
-
-def index(request):
-    products = Product.objects.all()
-    products_dict = {'products': products}
-    return render(request, 'index.html', products_dict)
+from django.views.generic.detail import DetailView
+from django.views import generic
+from django.views.generic import TemplateView
+from django.utils import timezone
 
 
 def add(request):
@@ -27,3 +25,9 @@ def add(request):
                           {'product_form': product_form})
 
     return redirect('index')
+
+
+class Show(generic.ListView):
+    model = Product
+    queryset = Product.objects.all()
+    template_name = 'show.html'

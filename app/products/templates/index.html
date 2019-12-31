@@ -222,13 +222,13 @@
 											<img src="{{ item.image.url }}" alt="" />
 											<h2>{{ item.price }}</h2>
 											<p maxlength="36">{{ item.name }}</p>
-											<a href="#" class="btn btn-default add-to-cart"><i class="fa fa-shopping-cart"></i>Add to cart</a>
+											<a href="{% url 'add_to_cart' item.id %}" class="btn btn-default add-to-cart"><i class="fa fa-shopping-cart"></i>Add to cart</a>
 										</div>
 										<div class="product-overlay">
 											<div class="overlay-content">
 												<h2>{{ item.price }}</h2>
 												<p>{{ item.name }}</p>
-												<a href="#" class="btn btn-default add-to-cart"><i class="fa fa-shopping-cart"></i>Add to cart</a>
+												<a href="{% url 'add_to_cart' item.id %}" class="btn btn-default add-to-cart"><i class="fa fa-shopping-cart"></i>Add to cart</a>
 											</div>
 										</div>
 								</div>

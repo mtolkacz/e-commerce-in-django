@@ -1,0 +1,27 @@
+{% extends "base_template.html" %}
+{% block title %}Profile{% endblock %}
+{% block content %}
+{% load static %}
+
+<section id="form"><!--form-->
+		<div class="container">
+			<div class="row">
+				<h1>Profile</h1>
+				{% if backends.associated %}
+					{% for ass in backends.associated %}
+						{% if ass.provider == 'facebook' %}
+							<p><img src="{{ ass.extra_data.picture.data.url }}" style="border-radius: 50%"/></p>
+						{% endif %}
+					{% endfor %}
+				{% endif %}
+				<p>Username: {{ user }}</p>
+				<p>Description: {{ user.description }}</p>
+				<p>City: {{ user.city }}</p>
+				<p>Website: {{ user.website }}</p>
+				<p>Phone: {{ user.phone }}</p>
+				<p>Mail: {{ user.email }}</p>
+			</div>
+		</div>
+	</section><!--/form-->
+
+{% endblock %}
