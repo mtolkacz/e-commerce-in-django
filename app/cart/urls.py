@@ -10,4 +10,5 @@ urlpatterns = [
     # re_path('^payment/(?P<cart_id>[-\w]+)/$', process_payment, name='process_payment'),
     re_path('^update-transaction/(?P<cart_id>[-\w]+)/$', update_transaction_records, name='update_records'),
     path('success/', success, name='success'),
+    path('ajax/calculate_item_in_cart/', calculate_item_in_cart, name='calculate_item_in_cart')
 ]

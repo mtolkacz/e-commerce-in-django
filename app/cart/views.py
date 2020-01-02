@@ -8,6 +8,7 @@ import datetime
 from .extras import generate_order_id
 from django.contrib import messages
 from .forms import OrderForm
+from django.http import JsonResponse
 
 
 def get_user_pending_cart(request):
@@ -81,6 +82,25 @@ def checkout(request):
 
 
 @login_required()
+def calculate_item_in_cart(request):
+    existing_cart = get_user_pending_cart(request)
+    item_id = request.GET.get('item_id', None)
+    new_cart_value = request.GET.get('cart_value', None)
+    old_item = OrderItem.objects.get(pk=item_id)
+    old_item_amount = old_item.amount
+    OrderItem.objects.filter(pk=item_id).update(amount=new_cart_value)
+    new_item = OrderItem.objects.get(pk=item_id)
+
+    data = {
+        'old': old_item_amount,
+        'new': new_item.amount,
+        'item_total_value': str(new_item.get_item_total()),
+        'cart_total_value': str(existing_cart.get_cart_total()),
+    }
+    return JsonResponse(data)
+
+
+@login_required()
 def process_payment(request, cart_id):
     return redirect(reverse('cart:update_records',
                             kwargs={
@@ -99,9 +119,12 @@ def update_transaction_records(request, cart_id):
     order_items = order_to_purchase.items.all()
     order_items.update(is_completed=True, date_completed=datetime.datetime.now())
 
-    return redirect(reverse('cart:success'))
+    return redirect(reverse('success'))
 
 
 @login_required()
 def success(request):
-    return render(request, 'cart:success.html', {})
+    return render(request, 'success.html', {})
+
+
+
