@@ -1,18 +1,23 @@
 from django.shortcuts import render, get_object_or_404, redirect, reverse
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
+from django.urls import reverse_lazy
 from products.models import Product
 from accounts.models import UserProfile
-from .models import OrderItem, Order
+from .models import *
 import datetime
 from .extras import generate_order_id
 from django.contrib import messages
 from .forms import OrderForm
-from django.http import JsonResponse
+from django.http import JsonResponse, Http404, HttpResponseRedirect
 
 
+# return user order object in cart if exists
 def get_user_pending_cart(request):
+
+    # get current logged-in user object otherwise return AnonymousUser
+    # raise HTTP error code 404 if object exist
     user = get_object_or_404(UserProfile, user=request.user)
+
     order = Order.objects.filter(owner=user, is_ordered=False)
     if order.exists():
         return order[0]
@@ -22,26 +27,29 @@ def get_user_pending_cart(request):
 
 @login_required()
 def add_to_cart(request, **kwargs):
-    user = get_object_or_404(UserProfile, user=request.user)
-
     product = Product.objects.filter(id=kwargs.get('item_id', "")).first()
+    user = get_object_or_404(UserProfile, user=request.user)
+    if product:
+        existing_cart = get_user_pending_cart(request)
+        if existing_cart:
+            order_item = existing_cart.items.filter(product=product).first()
+            if order_item:
+                order_item.amount = order_item.amount + 1
+                order_item.save()
+            else:
+                order_item, status = OrderItem.objects.get_or_create(product=product, owner=user)
+                if status:
+                    existing_cart.items.add(order_item)
+                    existing_cart.save()
+        else:
 
-    order_item, status = OrderItem.objects.get_or_create(product=product)
-
-    # increment product amount if already exist in cart
-    if not status:
-        order_item.amount = order_item.amount + 1
-        order_item.save()
-
-    # create order if product is new
-    else:
-        user_cart, status = Order.objects.get_or_create(owner=user, is_ordered=False)
-        user_cart.items.add(order_item)
-        if status:
+            user_cart, status = Order.objects.get_or_create(owner=user, is_ordered=False)
             user_cart.ref_code = generate_order_id()
-            user_cart.save()
-
-    messages.info(request, "Product {} added to cart".format(product.name))
+            if status:
+                order_item = OrderItem.objects.create(product=product, owner=user)
+                user_cart.items.add(order_item)
+                user_cart.save()
+        messages.info(request, "Product {} added to cart".format(product.name))
     return redirect(reverse('checkout'))
 
 
@@ -65,10 +73,9 @@ def order_summary(request, **kwargs):
 
 @login_required()
 def checkout(request):
-    # return render(request, 'checkout.html')
     order = get_user_pending_cart(request)
-    items = order.items.all()
-    cart_item_form = OrderForm(initial={'amount': items[0].amount})
+    items = 0 if isinstance(order, int) else order.get_cart_items()
+    cart_item_form = 0 if isinstance(items, int) else OrderForm(initial={'amount': items[0].amount})
 
     if request.method == 'POST':
         cart_item_form = OrderForm(request.POST)
@@ -83,20 +90,55 @@ def checkout(request):
 
 @login_required()
 def calculate_item_in_cart(request):
-    existing_cart = get_user_pending_cart(request)
     item_id = request.GET.get('item_id', None)
     new_cart_value = request.GET.get('cart_value', None)
-    old_item = OrderItem.objects.get(pk=item_id)
-    old_item_amount = old_item.amount
-    OrderItem.objects.filter(pk=item_id).update(amount=new_cart_value)
-    new_item = OrderItem.objects.get(pk=item_id)
 
-    data = {
-        'old': old_item_amount,
-        'new': new_item.amount,
-        'item_total_value': str(new_item.get_item_total()),
-        'cart_total_value': str(existing_cart.get_cart_total()),
-    }
+    # return if parameters not passed
+    if item_id is None and new_cart_value is None:
+        return redirect('checkout')
+
+    # create empty dictionary for JsonResponse data
+    data = {}
+
+    try:
+        # check if new cart value and item_id are integers
+        value = int(new_cart_value)
+        item_id = int(item_id)
+
+        # get current logged-in user order and order items objects in cart
+        updated_item = OrderItem.objects.get(pk=item_id)
+        # updated_item = OrderItem.objects.filter(pk=item_id)
+
+        # get current logged-in user order
+        existing_cart = get_user_pending_cart(request)
+
+    # render checkout site if request's arguments aren't integers
+    # or if order or order item objects don't exist
+    except (ValueError, Order.DoesNotExist, OrderItem.DoesNotExist) as e:
+        return HttpResponseRedirect(reverse_lazy('checkout'))
+
+    # check if value is in the right range
+    if 0 < value <= MAX_ITEMS_IN_CART:
+        try:
+            success = OrderItem.objects.filter(pk=item_id).update(amount=value)
+            data['success'] = success
+            updated_item = OrderItem.objects.get(pk=item_id)
+
+            # after successful update more data for JsonResponse
+            if success:
+                data['item_total_value'] = str(updated_item.get_item_total())
+                data['cart_total_value'] = str(existing_cart.get_cart_total())
+
+            # otherwise, raise an exception that cannot update record in database
+            else:
+                raise Http404('Cannot update OrderItem in database')
+        except Http404 as error:
+            return
+    else:
+        print('Incorrect product amount (max {} items)'.format(MAX_ITEMS_IN_CART))
+        messages.error(request, 'Incorrect product amount (max {} items)'.format(MAX_ITEMS_IN_CART))
+        data['success'] = False
+
     return JsonResponse(data)
 
 

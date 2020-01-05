@@ -38,10 +38,12 @@ setTimeout(function() {
 var max_items_in_cart = 30
 
 function increaseValue(item_id) {
+    console.log("Test increase1");
     var cart_value = parseInt(document.getElementById('item'+item_id).value, 10);
     cart_value = isNaN(cart_value) ? 0 : cart_value;
     cart_value > max_items_in_cart-1 ? cart_value = max_items_in_cart : cart_value++;
     if (document.getElementById('item'+item_id).value == cart_value){
+        console.log("Test increase2");
         return
     }
     if (cart_value == 2){
@@ -49,10 +51,11 @@ function increaseValue(item_id) {
                 document.getElementById('apiece_value'+item_id).innerText = document.getElementById('item_total_value'+item_id).innerText + ' apiece'
         }
         else {
-            console.log("Test increase");
+            console.log("Test increase3");
         }
     }
     document.getElementById('item'+item_id).value = cart_value;
+    console.log(cart_value);
     calculate_cart(cart_value, item_id);
 }
 
@@ -93,6 +96,11 @@ function updateValue(item_id) {
     calculate_cart(cart_value, item_id);
 }
 
+function increaseNoParse(item_id) {
+    calculate_cart(cart_value, item_id);
+}
+
+
 function calculate_cart(cart_value, item_id)
 {
     $.ajax({
@@ -103,10 +111,17 @@ function calculate_cart(cart_value, item_id)
         },
         dataType: 'json',
         success: function (data) {
-
-            if(data.item_total_value) {
-                document.getElementById("item_total_value"+item_id).innerText = data.item_total_value
-                document.getElementById("cart_total_value").innerText = data.cart_total_value
+            if(data.success){
+                if(data.item_total_value) {
+                    document.getElementById("item_total_value"+item_id).innerText = data.item_total_value
+                }
+                if(data.cart_total_value) {
+                    document.getElementById("cart_total_value").innerText = data.cart_total_value
+                }
+            }
+            else {
+                console.log("No success");
+                //window.location.replace("/cart/");
             }
         }
     });
