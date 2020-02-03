@@ -7,9 +7,9 @@
 		<div class="container">
 			<div class="row">
 				<h1>Your cart</h1>
-				{% if order.ref_code %}
+				{% if order.id %}
 
-				<div class="companyinfo" >
+				<div class="companyinfo" id="cart_head">
 					<h2>
 						{% if messages %}
 							<span >
@@ -20,13 +20,12 @@
 						{% endif %}
 					</h2>
 				</div>
-				<br>
 				<div class="cart_summary" id="cart_summary">
 					<form method="POST" id="post-form">
 						{% csrf_token %}
-						<table>
+						<table id="cart_table">
 						{% for item in order.get_cart_items %}
-							<tr>
+							<tr id="cart_row{{ item.id }}">
 								<td><img src="{{ item.product.image.url }}"/></td>
 								<td>{{ item.product.name }}</td>
 								<td>
@@ -38,7 +37,7 @@
 								{% else %}
 								    <td class="cart_summary_money"><div id="item_total_value{{ item.id }}">{{ item.product.price }}</div><span id="apiece_value{{ item.id }}"></span></td>
 								{% endif %}
-								<td></td>
+								<td><a id="delete_item" title="Click to delete item from cart" href="#" onclick="removeItem({{ item.id }}); return false;">Delete item</a></td>
 							</tr>
 							{% endfor %}
 							<tr>
@@ -54,6 +53,7 @@
 				{% else %}
 				<p>Your cart is empty</p>
 				{% endif %}
+				<p id="deleted_cart"></p>
 			</div>
 		</div>
 	</section>

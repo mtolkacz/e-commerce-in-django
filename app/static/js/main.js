@@ -38,20 +38,15 @@ setTimeout(function() {
 var max_items_in_cart = 30
 
 function increaseValue(item_id) {
-    console.log("Test increase1");
     var cart_value = parseInt(document.getElementById('item'+item_id).value, 10);
     cart_value = isNaN(cart_value) ? 0 : cart_value;
     cart_value > max_items_in_cart-1 ? cart_value = max_items_in_cart : cart_value++;
     if (document.getElementById('item'+item_id).value == cart_value){
-        console.log("Test increase2");
         return
     }
     if (cart_value == 2){
         if(document.getElementById('apiece_value'+item_id).innerText == ''){
                 document.getElementById('apiece_value'+item_id).innerText = document.getElementById('item_total_value'+item_id).innerText + ' apiece'
-        }
-        else {
-            console.log("Test increase3");
         }
     }
     document.getElementById('item'+item_id).value = cart_value;
@@ -69,9 +64,6 @@ function decreaseValue(item_id) {
     if (cart_value == 1){
         if(document.getElementById('apiece_value'+item_id).innerText != ''){
                 document.getElementById('apiece_value'+item_id).innerText = ''
-        }
-        else {
-            console.log("Test decrease");
         }
     }
     document.getElementById('item'+item_id).value = cart_value;
@@ -96,15 +88,19 @@ function updateValue(item_id) {
     calculate_cart(cart_value, item_id);
 }
 
-function increaseNoParse(item_id) {
-    calculate_cart(cart_value, item_id);
+function removeItem(item_id)
+{
+    $("#cart_table").on("click", "#delete_item", function() {
+        $(this).closest("tr").remove();
+    });
+    delete_from_cart(item_id)
 }
 
 
 function calculate_cart(cart_value, item_id)
 {
     $.ajax({
-        url: '/cart/ajax/calculate_item_in_cart/',
+        url: '/cart/calculate/',
         data: {
             'cart_value': cart_value,
             'item_id': item_id
@@ -119,9 +115,32 @@ function calculate_cart(cart_value, item_id)
                     document.getElementById("cart_total_value").innerText = data.cart_total_value
                 }
             }
-            else {
+            else if (data.remove_cart){
                 console.log("No success");
                 //window.location.replace("/cart/");
+            }
+        }
+    });
+}
+
+function delete_from_cart(item_id)
+{
+    $.ajax({
+        url: '/cart/delete_item/',
+        data: {
+            'item_id': item_id,
+        },
+        dataType: 'json',
+        success: function (data) {
+            if(data.success){
+                console.log("Success");
+            }
+            else if (data.remove_cart){
+                document.getElementById("deleted_cart").style.display = "block";
+                $("#cart_head").remove();
+                $("#cart_summary").remove();
+                document.getElementById("deleted_cart").innerText = "Your cart is empty"
+                console.log("Removed cart");
             }
         }
     });

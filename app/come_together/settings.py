@@ -20,6 +20,8 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ.get('SECRET_KEY', 'foooooooooooooooooooo')
 
+AUTH_USER_MODEL = 'accounts.User'  # changes the built-in user model to ours
+
 LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'index'
 LOGOUT_URL = 'logout'
@@ -52,7 +54,7 @@ SOCIAL_AUTH_FACEBOOK_EXTRA_DATA = [                 # add this
 ]
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = int(os.getenv('DEBUG', default=1))
+DEBUG = int(os.getenv('DEBUG', 1))
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
@@ -60,9 +62,9 @@ ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 # Application definition
 INSTALLED_APPS = [
     'django.contrib.admin',
-    'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
+    'django.contrib.auth',
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'sslserver',

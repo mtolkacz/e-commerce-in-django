@@ -1,3 +1,4 @@
+from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect
 from .forms import LoginForm, RegisterForm
 from django.contrib.sites.shortcuts import get_current_site
@@ -8,8 +9,16 @@ from django.contrib.auth import authenticate, login as auth_login, logout as aut
 from django.contrib import messages
 from django.views.decorators.http import require_http_methods
 from django.template.loader import render_to_string
-from django.contrib.auth.models import User
 from .emailct import Email
+from .models import User
+
+
+def test2(request):
+    return render(request, 'test2.html', {})
+
+
+def test(request):
+    return render(request, 'test.html', {})
 
 
 # Multiple view for signing in and registration
@@ -56,6 +65,11 @@ def login(request):
                             # Set a custom expiration for the session to 0.
                             # The session will expire on browser close.
                             request.session.set_expiry(0)
+
+                        next_url = request.GET.get('next')
+                        if next_url:
+                            return HttpResponseRedirect(next_url)
+
                         # Go to index view
                         return redirect('index')
                     else:
@@ -87,7 +101,7 @@ def login(request):
                 # Email class includes custom predefined SMTP settings
                 registration_email = Email()
                 receiver = registration_form.cleaned_data.get('email')
-                subject = 'Activate your Come Together account'
+                subject = 'Activate your Gallop account'
                 message = render_to_string('activate.html', {
                     'user': user,
                     'domain': current_site.domain,
@@ -114,9 +128,7 @@ def login(request):
 def logout(request):
     if request.user.is_authenticated:
         auth_logout(request)
-        return render(request, 'logout.html')
-    else:
-        return redirect('index')
+    return redirect('index')
 
 
 def profile(request):

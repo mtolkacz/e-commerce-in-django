@@ -1,12 +1,15 @@
 from django.db import models
+from django.conf import settings
 from products.models import Product, Category
-from accounts.models import UserProfile
+from django.contrib.auth import get_user_model
 
+
+User = get_user_model()
 MAX_ITEMS_IN_CART = 30
 
 
 class OrderItem(models.Model):
-    owner = models.ForeignKey(UserProfile, on_delete=models.CASCADE, null=True)
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
     product = models.ForeignKey(Product, on_delete=models.PROTECT, null=True)
     is_ordered = models.BooleanField(default=False)
     date_added = models.DateTimeField(auto_now=True)
@@ -21,10 +24,9 @@ class OrderItem(models.Model):
 
 
 class Order(models.Model):
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
     ref_code = models.CharField(max_length=20)
-    owner = models.ForeignKey(UserProfile, on_delete=models.CASCADE, null=True)
     is_ordered = models.BooleanField(default=False)
-    # items = models.ForeignKey(OrderItem, on_delete=models.CASCADE, null=True)
     items = models.ManyToManyField(OrderItem)
     # payment_details = models.ForeignKey(Payment, null=True)
     date_ordered = models.DateTimeField(auto_now=True)

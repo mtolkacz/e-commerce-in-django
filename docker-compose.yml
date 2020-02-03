@@ -23,6 +23,15 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     env_file: .envdevdb
+  pgadmin:
+    image: dpage/pgadmin4
+    depends_on:
+      - db
+    env_file: .pgadmindev
+    volumes:
+      - pgadmin:/root/.pgadmin
+    ports:
+      - "5050:8001"
   elasticsearch:
     image: launcher.gcr.io/google/elasticsearch2
     ports:
@@ -33,3 +42,4 @@ services:
 volumes:
   postgres_data:
   esdata:
+  pgadmin:
