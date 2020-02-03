@@ -9,3 +9,4 @@ send_email.py
 /backups
 /come_together - backup 2020-01-06
 /postgres_data
+*.idea
