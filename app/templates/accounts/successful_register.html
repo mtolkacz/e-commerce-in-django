@@ -1,0 +1,16 @@
+{% extends "base_template.html" %}
+{% block title %}Hello Page{% endblock %}
+{% block content %}
+{% load static %}
+
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-md-12 text-center">
+                <span class="display-4 d-block">Thank you for registering!</span>
+                <div class="mb-4 lead">Account created successfully.</div>
+				<a href="{% url 'index'%}">Go to home page</a><br>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

@@ -64,7 +64,7 @@ def order_summary(request, **kwargs):
     context = {
         'cart': existing_cart
     }
-    return render(request, 'order_summary.html', context)
+    return render(request, 'cart/order_summary.html', context)
 
 
 @login_required()
@@ -81,7 +81,7 @@ def checkout(request):
         'items': items,
         'cart_item_form': cart_item_form,
     }
-    return render(request, 'checkout.html', context)
+    return render(request, 'cart/checkout.html', context)
 
 
 @login_required()
@@ -201,7 +201,7 @@ def update_transaction_records(request, cart_id):
 
 @login_required()
 def success(request):
-    return render(request, 'success.html', {})
+    return render(request, 'cart/success.html', {})
 
 
 

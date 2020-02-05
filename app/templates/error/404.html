@@ -1,0 +1,16 @@
+{% extends "base_template.html" %}
+{% block title %}gallop - 404 page not found{% endblock %}
+{% block content %}
+{% load static %}
+
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-md-12 text-center">
+                <span class="display-1 d-block">404</span>
+                <div class="mb-4 lead">The page you are looking for was not found.</div>
+                <a href="{% url 'index'%}">Back to home page</a><br>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

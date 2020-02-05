@@ -16,6 +16,7 @@ RUN pip install --upgrade pip
 RUN pip install pipenv
 COPY ./Pipfile /usr/src/app/Pipfile
 RUN pipenv install --skip-lock --system --dev
+RUN pip install django-crispy-forms==1.8.1
 
 COPY ./entrypoint.sh /usr/src/app/entrypoint.sh
 
