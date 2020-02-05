@@ -9,16 +9,10 @@ from django.contrib.auth import authenticate, login as auth_login, logout as aut
 from django.contrib import messages
 from django.views.decorators.http import require_http_methods
 from django.template.loader import render_to_string
-from .emailct import Email
+from .email import Email
 from .models import User
-
-
-def test2(request):
-    return render(request, 'test2.html', {})
-
-
-def test(request):
-    return render(request, 'test.html', {})
+import smtplib
+from django.http import Http404
 
 
 # Multiple view for signing in and registration
@@ -102,24 +96,30 @@ def login(request):
                 registration_email = Email()
                 receiver = registration_form.cleaned_data.get('email')
                 subject = 'Activate your Gallop account'
-                message = render_to_string('activate.html', {
+                message = render_to_string('accounts/activate.html', {
                     'user': user,
                     'domain': current_site.domain,
-                    # Return a bytestring version of user.pk and encode a bytestring to a base64 string for use in
-                    # URLs, stripping any trailing equal signs.
+                    # Return a bytestring version of user.pk and encode a bytestring to a base64 string
+                    # for use in URLs, stripping any trailing equal signs.
                     'uid': urlsafe_base64_encode(force_bytes(user.pk)),
                     # Generate user token
                     'token': account_activation_token.make_token(user)
                 })
 
                 # Send e-mail with activation link through SSL
-                registration_email.send(receiver, subject, message)
+                try:
+                    registration_email.send(receiver, subject, message)
+                    # Add feedback message to user to check mailbox
+                    messages.success(request, 'Please confirm your email address to complete the registration.')
+                except smtplib.SMTPRecipientsRefused:
+                    raise Http404("SMTPRecipientsRefused")  # TODO - add loging and admin notofication
+                except smtplib.SMTPAuthenticationError:
+                    import os
+                    raise Http404("SMTPAuthenticationError" + os.getenv('EMAIL_HOST_PASSWORD'))  # TODO - add loging and admin notofication
 
-                # Add feedback message to user to check mailbox
-                messages.success(request, 'Please confirm your email address to complete the registration.')
 
     # Load login view with forms and display form messages
-    return render(request, 'login.html',
+    return render(request, 'accounts/login.html',
                   {'login_form': login_form,
                    'registration_form': registration_form})
 
@@ -133,7 +133,7 @@ def logout(request):
 
 def profile(request):
     if request.user.is_authenticated:
-        return render(request, 'profile.html')
+        return render(request, 'accounts/profile.html')
     else:
         return redirect('login')
 
@@ -167,6 +167,6 @@ def successful_registration(request):
     registered = request.session.get('registered')
     if registered:
         del request.session['registered']
-        return render(request, 'successful_register.html')
+        return render(request, 'accounts/successful_register.html')
     else:
         return redirect('index')

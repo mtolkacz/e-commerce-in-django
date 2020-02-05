@@ -21,19 +21,24 @@ then
 	then
 		last_backup_file="$(ls backups -t | grep -i 'prod' | head -n1)"
 	else
-		last_backup_file="$(ls backups -t | grep -i 'dev' | head -n1)"	
+		last_backup_file="$(ls backups -t | grep -i 'devo' | head -n1)"	
 	fi
-
-	cat backups/$last_backup_file | docker exec -i $postgres_container_id psql -d ctdbdev -U michal
 	
-	if [ "$ENV" = "prod" ]
+	if [ $last_backup_file ]
 	then
-		new_backup_file="$(ls backups -t | grep -i 'prod' | head -n1)"
-	else
-		new_backup_file="$(ls backups -t | grep -i 'dev' | head -n1)"	
-	fi
+		cat backups/$last_backup_file | docker exec -i $postgres_container_id psql -d ctdbdev -U michal
+		
+		if [ "$ENV" = "prod" ]
+		then
+			new_backup_file="$(ls backups -t | grep -i 'prod' | head -n1)"
+		else
+			new_backup_file="$(ls backups -t | grep -i 'dev' | head -n1)"	
+		fi
 
-	echo "\nDatabase has been restored from: \nbackups/${new_backup_file}\n"
+		echo "\nDatabase has been restored from: \nbackups/${new_backup_file}\n"
+	else
+		echo "\nNo backup detected. Check backup directory.\n"
+	fi
 else
 	echo "Postgres container not found"
 fi

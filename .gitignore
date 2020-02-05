@@ -4,9 +4,7 @@
 *.pgadmindev
 *.sqlite3
 .env*
-send_email.py
 ./backups
 /backups
-/come_together - backup 2020-01-06
 /postgres_data
 /.idea

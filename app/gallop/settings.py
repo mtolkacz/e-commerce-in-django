@@ -20,7 +20,8 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ.get('SECRET_KEY', 'foooooooooooooooooooo')
 
-AUTH_USER_MODEL = 'accounts.User'  # changes the built-in user model to ours
+# Custom user model
+AUTH_USER_MODEL = 'accounts.User'
 
 LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'index'
@@ -55,6 +56,7 @@ SOCIAL_AUTH_FACEBOOK_EXTRA_DATA = [                 # add this
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = int(os.getenv('DEBUG', 1))
+# DEBUG = 0  # todo Change debug to 0 for testing purposes
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
@@ -80,6 +82,7 @@ INSTALLED_APPS = [
 ]
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

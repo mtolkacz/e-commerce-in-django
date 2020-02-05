@@ -16,6 +16,8 @@ postgres_container_id="$(docker container ls | grep -i 'postgres' | sed -e 's/^\
 if [ $postgres_container_id ]
 then
 	echo "\nPostgres container id: ${postgres_container_id}"
+
+	# get latest file of last backup
 	if [ "$ENV" = "prod" ]
 	then
 		last_backup_file="$(ls backups -t | grep -i 'prod' | head -n1)"
@@ -23,6 +25,9 @@ then
 		last_backup_file="$(ls backups -t | grep -i 'dev' | head -n1)"	
 	fi
 	project="$(basename $PWD)"
+	
+	mkdir -p backups
+
 	docker exec -t $postgres_container_id pg_dumpall -c -U $USER > backups/${project}_${ENV}_`date +%d-%m-%Y_%H_%M_%S`.sql
 	if [ "$ENV" = "prod" ]
 	then

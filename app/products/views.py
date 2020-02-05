@@ -2,10 +2,7 @@ from django.shortcuts import render, redirect
 from .forms import ProductForm
 from django.contrib import messages
 from .models import Product, Category
-from django.views.generic.detail import DetailView
 from django.views import generic
-from django.views.generic import TemplateView
-from django.utils import timezone
 
 
 def add(request):
