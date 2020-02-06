@@ -3,6 +3,7 @@ from djmoney.models.fields import MoneyField
 from django.utils.html import mark_safe
 from django.core.validators import MaxValueValidator, MinValueValidator
 from accounts.models import User
+from ckeditor.fields import RichTextField
 
 
 class Department(models.Model):
@@ -50,7 +51,7 @@ class Brand(models.Model):
 class Product(models.Model):
     name = models.CharField(max_length=100, default='New product')
     brand = models.ForeignKey(Brand, on_delete=models.PROTECT, null=True)
-    description = models.TextField(max_length=1500, null=True)
+    description = RichTextField()
     price = MoneyField(max_digits=14, decimal_places=2, default_currency='USD')
     department = models.ForeignKey(Department, on_delete=models.PROTECT, null=True)
     subdepartment = models.ForeignKey(Subdepartment, on_delete=models.PROTECT, null=True)

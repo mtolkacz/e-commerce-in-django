@@ -6,7 +6,6 @@ class ProductAdmin(admin.ModelAdmin):
     model = Product
     list_display = ['name',
                     'get_brand_name',
-                    'description',
                     'price',
                     'get_department_name',
                     'get_subdepartment_name',

@@ -21,7 +21,7 @@ then
 	then
 		last_backup_file="$(ls backups -t | grep -i 'prod' | head -n1)"
 	else
-		last_backup_file="$(ls backups -t | grep -i 'devo' | head -n1)"	
+		last_backup_file="$(ls backups -t | grep -i 'dev' | head -n1)"	
 	fi
 	
 	if [ $last_backup_file ]

@@ -17,6 +17,7 @@ RUN pip install pipenv
 COPY ./Pipfile /usr/src/app/Pipfile
 RUN pipenv install --skip-lock --system --dev
 RUN pip install django-crispy-forms==1.8.1
+RUN pip install django-ckeditor==5.9.0
 
 COPY ./entrypoint.sh /usr/src/app/entrypoint.sh
 

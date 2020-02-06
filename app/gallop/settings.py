@@ -63,12 +63,12 @@ ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
 # Application definition
 INSTALLED_APPS = [
+    'django.contrib.staticfiles',
     'django.contrib.admin',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.auth',
     'django.contrib.messages',
-    'django.contrib.staticfiles',
     'sslserver',
     'social_django',
     'accounts',
@@ -79,6 +79,7 @@ INSTALLED_APPS = [
     'products',
     'djmoney',
     'crispy_forms',
+    'ckeditor',
 ]
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
