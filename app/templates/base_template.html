@@ -19,7 +19,6 @@
 </head>
 
 <body>
-    <!-- ##### Header Area Start ##### -->
     <header class="header_area">
         <div class="classy-nav-container breakpoint-off d-flex align-items-center justify-content-between">
             <!-- Classy Menu -->
@@ -203,7 +202,7 @@
                         {% endif %}
                     </a>
                     <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu">
-                        <a class="dropdown" href="{% url 'logout' %}">Logout</a>
+                        <a class="dropdown" href="{% url 'profile' %}">Profile</a>
                         <a class="dropdown" href="{% url 'logout' %}">Logout</a>
                         <a class="dropdown" href="{% url 'logout' %}">Logout</a>
                         <a class="dropdown" href="{% url 'logout' %}">Logout</a>
@@ -219,7 +218,8 @@
 
         </div>
     </header>
-    <!-- ##### Header Area End ##### -->
+
+    {% include "cart/right_side.html" %}
 
    {% block content %}
         Body content

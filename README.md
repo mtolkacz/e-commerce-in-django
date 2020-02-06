@@ -52,12 +52,19 @@ SOCIAL_AUTH_FACEBOOK_SECRET
 SOCIAL_AUTH_TWITTER_KEY
 SOCIAL_AUTH_TWITTER_SECRET
 ```
-.envdevdb
+- .envdevdb
 ```
 POSTGRES_USER
 POSTGRES_PASSWORD
 POSTGRES_DB
 ```
+- .pgadmindev
+```
+PGADMIN_DEFAULT_EMAIL
+PGADMIN_DEFAULT_PASSWORD
+PGADMIN_LISTEN_PORT
+```
+
 **Running docker**
 ###### prod<br>
 `docker-compose -f docker-compose.prod.yml up --build`<br>

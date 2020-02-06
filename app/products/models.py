@@ -1,6 +1,8 @@
 from django.db import models
 from djmoney.models.fields import MoneyField
 from django.utils.html import mark_safe
+from django.core.validators import MaxValueValidator, MinValueValidator
+from accounts.models import User
 
 
 class Department(models.Model):
@@ -35,9 +37,20 @@ class Category(models.Model):
         return self.name
 
 
+class Brand(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+
+    def __unicode__(self):
+        return '%s' % self.name
+
+    def __str__(self):
+        return self.name
+
+
 class Product(models.Model):
     name = models.CharField(max_length=100, default='New product')
-    description = models.CharField(max_length=300, null=True)
+    brand = models.ForeignKey(Brand, on_delete=models.PROTECT, null=True)
+    description = models.TextField(max_length=1500, null=True)
     price = MoneyField(max_digits=14, decimal_places=2, default_currency='USD')
     department = models.ForeignKey(Department, on_delete=models.PROTECT, null=True)
     subdepartment = models.ForeignKey(Subdepartment, on_delete=models.PROTECT, null=True)
@@ -58,4 +71,10 @@ class Product(models.Model):
                ', Price: ' + str(self.price) + \
                ', Category: ' + str(self.category) + \
                ', Image: ' + str(self.image)
+
+
+class ProductRating(models.Model):
+    user = models.ForeignKey(User, on_delete=models.PROTECT, null=True)
+    rating = models.IntegerField(default=1, validators=[MaxValueValidator(5), MinValueValidator(1)])
+    product = models.ForeignKey(Product, on_delete=models.PROTECT, null=True)
 
