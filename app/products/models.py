@@ -55,10 +55,10 @@ class Product(models.Model):
     department = models.ForeignKey(Department, on_delete=models.PROTECT, null=True)
     subdepartment = models.ForeignKey(Subdepartment, on_delete=models.PROTECT, null=True)
     category = models.ForeignKey(Category, on_delete=models.PROTECT, null=True)
-    image = models.ImageField(upload_to='pic_folder/', default='pic_folder/None/no-img.jpg')
+    thumbnail = models.ImageField(upload_to='pic_folder/', default='pic_folder/None/no-img.jpg')
 
     def image_tag(self):
-        return mark_safe('<img src="/media/%s" width="80" height="80" />' % self.image)
+        return mark_safe('<img src="/media/%s" width="80" height="80" />' % self.thumbnail)
 
     image_tag.short_description = 'Image'
 
@@ -70,11 +70,22 @@ class Product(models.Model):
                ', Description: ' + self.description + \
                ', Price: ' + str(self.price) + \
                ', Category: ' + str(self.category) + \
-               ', Image: ' + str(self.image)
+               ', Image: ' + str(self.thumbnail)
+
+
+class ProductImage(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, null=True)
+    image = models.ImageField(upload_to='pic_folder/', default='pic_folder/None/no-img.jpg')
+
+    def image_tag(self):
+        return mark_safe('<img src="/media/%s" width="80" height="80" />' % self.image)
+
+    image_tag.short_description = 'Image'
 
 
 class ProductRating(models.Model):
     user = models.ForeignKey(User, on_delete=models.PROTECT, null=True)
     rating = models.IntegerField(default=1, validators=[MaxValueValidator(5), MinValueValidator(1)])
+    review = models.TextField(max_length=2000, null=True)
     product = models.ForeignKey(Product, on_delete=models.PROTECT, null=True)
 
