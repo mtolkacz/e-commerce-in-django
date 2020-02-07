@@ -1,10 +1,23 @@
+# environment variables for docker compose
 *.env
 *.env.db
 *.envdev
-*.pgadmindev
-*.sqlite3
 .env*
+*.pgadmindev
+
+# SQLite3 files
+*.sqlite3
+
+# postgres backups
 ./backups
 /backups
+
+# data preparation dictonary
+/raw_data
+
+# html templates backup
+/app/templates/backup/
+
+# other
 /postgres_data
 /.idea
