@@ -11,7 +11,7 @@ class ProductSerializer(serializers.ModelSerializer):
     # override to
     def to_representation(self, instance):
         data = super().to_representation(instance)
-        data['product_image'] = instance.show_images()
-        data['current_price'] = instance.current_price()
+        # data['product_image'] = instance.show_images()
+        # data['current_price'] = instance.current_price()
         return data
 
