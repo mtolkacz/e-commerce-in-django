@@ -12,10 +12,6 @@ services:
       - 8001:8001
       - 587:587
     env_file: .envdev
-    environment:
-      - COMPOSE_HTTP_TIMEOUT=600
-      - SQL_ENGINE=django.db.backends.postgresql
-      - DATABASE=postgres
     depends_on:
       - db
   db:
