@@ -62,25 +62,32 @@ ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
 
 # Application definition
-INSTALLED_APPS = [
-    'django.contrib.staticfiles',
+DJANGO_APPS = (
     'django.contrib.admin',
+    'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
-    'django.contrib.auth',
     'django.contrib.messages',
+    'django.contrib.staticfiles',
+)
+THIRD_PARTY_APPS = (
     'sslserver',
     'social_django',
+    'djmoney',
+    'crispy_forms',
+    'ckeditor',
+)
+LOCAL_APPS = (
     'accounts',
     'blog',
     'articles',
     'cart',
     'comments',
     'products',
-    'djmoney',
-    'crispy_forms',
-    'ckeditor',
-]
+)
+
+INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
+
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
