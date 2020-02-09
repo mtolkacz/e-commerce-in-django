@@ -63,6 +63,20 @@ class Product(models.Model):
 
     image_tag.short_description = 'Image'
 
+    # todo to consider if need to add "get" to the below methods names
+
+    def brand_name(self):
+        return self.brand.name
+
+    def department_name(self):
+        return self.department.name
+
+    def subdepartment_name(self):
+        return self.subdepartment.name
+
+    def category_name(self):
+        return self.category.name
+
     def __str__(self):
         return self.name
 
