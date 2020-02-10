@@ -71,11 +71,13 @@ DJANGO_APPS = (
     'django.contrib.staticfiles',
 )
 THIRD_PARTY_APPS = (
-    'sslserver',
-    'social_django',
-    'djmoney',
-    'crispy_forms',
-    'ckeditor',
+    'sslserver',        # AN SSL-ENABLED DEVELOPMENT SERVER FOR DJANGO
+    'social_django',    # SOCIAL MEDIA USER AUTHENTIFICATION
+    'djmoney',          # PRODUCT PRICE MONEY FIELD IN MODEL
+    'crispy_forms',     # HANDLING BOOTSTRAP4 IN DJANGO FORMS
+    'ckeditor',         # HTML EDITOR FOR TEXT FIELDS (e.g. product's description)
+    'rest_framework',   # REST API FRAMEWORK FOR DJANGO
+    'django_filters',   # REST API FILTER BACKEND
 )
 LOCAL_APPS = (
     'accounts',
