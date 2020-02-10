@@ -17,6 +17,7 @@ django-money = "==0.15"
 djangorestframework = "==3.11.0"
 django-crispy-forms="==1.8.1"
 django-ckeditor="==5.9.0"
+python-memcached="==1.59"
 
 [requires]
 python_version = "3.7"

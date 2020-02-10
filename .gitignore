@@ -4,6 +4,11 @@
 *.envdev
 .env*
 *.pgadmindev
+/env/
+scripts/pgadmin_servers.json
+env/dev/pgadmin_servers.json
+/pgpassfile
+/pgpassfiledev
 
 # SQLite3 files
 *.sqlite3
