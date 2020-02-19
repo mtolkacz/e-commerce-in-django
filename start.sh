@@ -9,19 +9,19 @@ done
 
 key=""
 
-echo "\nThis command will restore database. Are you sure?"
-read key
+# echo "\nThis command will restore database. Ctrl + C to cancel, any key to start"
+# read key
 
 if [ "$ENV" = "prod" ]
 then
-  docker-compose -f $(dirname $PWD)/docker-compose.prod.yml up -d
+  # docker-compose -f $(dirname $PWD)/docker-compose.prod.yml up -d
   sleep 10
-  sh $(dirname $PWD)/scripts/restore.sh -e prod -u michal -d ctdb
+  # sh $(dirname $PWD)/scripts/restore.sh -e prod -u michal -d ctdb
 elif [ "$ENV" = "dev" ]
 then
   docker-compose up -d
-  sleep 10
-  sh $(dirname $PWD)/scripts/restore.sh -e dev -u michal -d ctdbdev
+  # sleep 10
+  # sh $(dirname $PWD)/scripts/restore.sh -e dev -u michal -d ctdbdev
 else
   echo "Incorrect environment"
 fi
