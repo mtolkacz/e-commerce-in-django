@@ -106,8 +106,6 @@ function removeItem(item_id)
     var elem = document.getElementById("row"+item_id);
     elem.parentNode.removeChild(elem);
     delete_from_cart(item_id);
-    document.getElementById('item'+item_id).value = cart_value;
-    calculate_cart(cart_value, item_id);
 }
 
 function calculate_cart(cart_value, item_id)
@@ -136,46 +134,22 @@ function calculate_cart(cart_value, item_id)
     });
 }
 
-function getCookie(name) {
-    var cookieValue = null;
-    if (document.cookie && document.cookie != '') {
-        var cookies = document.cookie.split(';');
-        for (var i = 0; i < cookies.length; i++) {
-            var cookie = cookies[i].trim();
-            if (cookie.substring(0, name.length + 1) == (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
-            }
-        }
-    }
-    return cookieValue;
-}
-
 function add_to_cart(item_id)
 {
-    var CSRF_TOKEN = getCookie('csrftoken');
     $.ajax({
         url: '/cart/add_item/',
-        headers: {
-                        'X-CSRFTOKEN': CSRF_TOKEN
-                },
         data: {
-            'item_id': item_id
+            'item_id': item_id,
+            'ajax': True
         },
         dataType: 'json',
         success: function (data) {
             if(data.success){
                 console.log("Success");
-                console.log(data.success);
-                goToCheckout();
             }
             else {
                 console.log("Failed");
             }
-        },
-        error: function(){
-                console.log("Error!");
-                alert("You have to log in to add product to cart!");
         }
     });
 }
@@ -191,9 +165,6 @@ function delete_from_cart(item_id)
         success: function (data) {
             if(data.success){
                 console.log("Success");
-                if(data.cart_total_value) {
-                    document.getElementById("cart_total_value").innerText = data.cart_total_value
-                }
             }
             else if (data.remove_cart){
                 location.reload();

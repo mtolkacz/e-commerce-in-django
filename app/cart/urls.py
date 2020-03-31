@@ -2,7 +2,8 @@ from django.urls import path, re_path
 from .views import *
 
 urlpatterns = [
-    re_path('^add-to-cart/(?P<item_id>[-\w]+)/$', add_to_cart, name='add_to_cart'),
+    path('add_item/', add_item_to_cart, name='add_item_to_cart'),
+    # re_path('^add_item/(?P<item_id>[-\w]+)/$', add_item_to_cart, name='add_item_to_cart'),
     # re_path('^item/delete/(?P<item_id>[-\w]+)/$', delete_from_cart, name='delete_from_cart'),
     path('order-summary/', order_summary, name='order_summary'),
     path('', checkout, name='checkout'),

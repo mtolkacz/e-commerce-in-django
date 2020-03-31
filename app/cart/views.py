@@ -31,57 +31,43 @@ def get_user_pending_cart(request):
 
 
 @login_required()
-def add_to_cart(request, **kwargs):
-    product = Product.objects.filter(id=kwargs.get('item_id', "")).first()
-    user = get_object_or_404(User, username=request.user.username)
-    if product:
+def add_item_to_cart(request):
+    # add_item_to_cart(request, **kwargs):
+    # ajax = request.GET.get('ajax', None)
+    # if ajax:
+    #     data = {'success': True}
+    #     return JsonResponse(data)
+    item_id = request.GET.get('item_id', None)
+    username = request.user.username
+    # create dictionary for JsonResponse data
+    data = {'success': False}
+
+    product = Product.objects.filter(id=item_id).first()
+    user = get_object_or_404(User, username=username)
+    if item_id and product:
         existing_cart = get_user_pending_cart(request)
         if existing_cart:
             order_item = existing_cart.items.filter(product=product).first()
             if order_item:
                 order_item.amount = order_item.amount + 1
                 order_item.save()
+                data['success'] = True
             else:
                 order_item, status = OrderItem.objects.get_or_create(product=product, owner=user)
                 if status:
                     existing_cart.items.add(order_item)
                     existing_cart.save()
+                    data['success'] = True
         else:
-
             user_cart, status = Order.objects.get_or_create(owner=user, is_ordered=False)
             user_cart.ref_code = generate_order_id()
             if status:
                 order_item = OrderItem.objects.create(product=product, owner=user)
                 user_cart.items.add(order_item)
                 user_cart.save()
-        messages.info(request, "Product {} added to cart".format(product.name))
-    return redirect(reverse('checkout'))
-
-
-@login_required()
-def order_summary(request, **kwargs):
-    existing_cart = get_user_pending_cart(request)
-    context = {
-        'cart': existing_cart
-    }
-    return render(request, 'cart/order_summary.html', context)
-
-
-@login_required()
-def checkout(request):
-    order = get_user_pending_cart(request)
-    items = 0 if isinstance(order, int) else order.get_cart_items()
-    cart_item_form = 0 if isinstance(items, int) else OrderForm(initial={'amount': items[0].amount})
-
-    if request.method == 'POST':
-        cart_item_form = OrderForm(request.POST)
-
-    context = {
-        'order': order,
-        'items': items,
-        'cart_item_form': cart_item_form,
-    }
-    return render(request, 'cart/checkout.html', context)
+                data['success'] = True
+        # messages.info(request, "Product {} added to cart".format(product.name))
+    return JsonResponse(data)
 
 
 @login_required()
@@ -101,7 +87,7 @@ def delete_item_from_cart(request):
 
     # render checkout site if request's argument isn't integer
     except ValueError as e:
-        return HttpResponseRedirect(reverse_lazy('checkout'))
+        return HttpResponseRedirect(reverse_lazy('checkout'))  # todo check if need to return JsonReponse evertime
 
     item_to_delete = OrderItem.objects.filter(pk=item_id)
     if item_to_delete.exists():
@@ -109,14 +95,15 @@ def delete_item_from_cart(request):
 
         user = get_object_or_404(User, username=request.user.username)
         other_items = OrderItem.objects.filter(owner=user).first()
+        existing_cart = get_user_pending_cart(request)
 
         if other_items:
             messages.info(request, "Item has been deleted")
             data['success'] = success
+            data['cart_total_value'] = str(existing_cart.get_cart_total())
 
         # remove cart if last product is deleted
         else:
-            existing_cart = get_user_pending_cart(request)
             remove_cart = existing_cart.delete()
             data['remove_cart'] = remove_cart
     else:
@@ -175,6 +162,32 @@ def calculate_item_in_cart(request):
         data['success'] = False
 
     return JsonResponse(data)
+
+
+@login_required()
+def order_summary(request, **kwargs):
+    existing_cart = get_user_pending_cart(request)
+    context = {
+        'cart': existing_cart
+    }
+    return render(request, 'cart/order_summary.html', context)
+
+
+@login_required()
+def checkout(request):
+    order = get_user_pending_cart(request)
+    items = 0 if isinstance(order, int) else order.get_cart_items()
+    cart_item_form = 0 if isinstance(items, int) else OrderForm(initial={'amount': items[0].amount})
+
+    if request.method == 'POST':
+        cart_item_form = OrderForm(request.POST)
+
+    context = {
+        'order': order,
+        'items': items,
+        'cart_item_form': cart_item_form,
+    }
+    return render(request, 'cart/checkout.html', context)
 
 
 @login_required()

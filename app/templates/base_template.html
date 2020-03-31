@@ -318,6 +318,13 @@
 
 	<script src="{% static 'js/main.js' %}"></script>
 
+    <script>
+    function goToCheckout()
+    {
+        window.location.replace("{% url 'checkout' %}");
+    }
+    </script>
+
 </body>
 
 </html>

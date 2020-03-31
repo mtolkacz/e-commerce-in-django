@@ -106,7 +106,7 @@
                                 <div class="hover-content">
                                     <!-- Add to Cart -->
                                     <div class="add-to-cart-btn">
-                                        <button onclick="add_to_cart({{ item.id }}); return false;" class="btn essence-btn">Add to cart</button>
+                                        <a href="{% url 'add_item_to_cart' item.id %}" class="btn essence-btn">Add to Cart</a>
                                     </div>
                                 </div>
                             </div>
