@@ -37,5 +37,10 @@ class Order(models.Model):
     def get_cart_total(self):
         return sum([item.product.price*item.amount for item in self.items.all()])
 
+    def get_cart_qty(self):
+        return self.items.all().count()
+        #return str(OrderItem.objects.filter(id=self.items).count())
+        # return self.items.all()
+
     def __str__(self):
         return '{} - {}'.format(self.owner, self.ref_code)

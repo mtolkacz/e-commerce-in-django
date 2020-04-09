@@ -86,7 +86,9 @@
                         <div class="single-product-wrapper">
                             <!-- Product Image -->
                             <div class="product-img">
-                                <img src="{{ item.thumbnail.url }}" alt="">
+                                <a href="{{ item.get_absolute_url }}">
+                                    <img src="{{ item.thumbnail.url }}" alt="">
+                                </a>
                                 <!-- Hover Thumb -->
                                 <img class="hover-img" src="img/product-img/product-2.jpg" alt="">
                                 <!-- Favourite -->
@@ -98,17 +100,10 @@
                             <div class="product-description">
                                 <span>{{ item.subdepartment.name }}</span>
                                 <a href="{{ item.get_absolute_url }}">
-                                    <h6>{{ item.name }}</h6>
+                                    <h6 style="height:55px;display:block;">{{ item.name }}</h6>
                                 </a>
                                 <p class="product-price">{{ item.price }}</p>
-
-                                <!-- Hover Content -->
-                                <div class="hover-content">
-                                    <!-- Add to Cart -->
-                                    <div class="add-to-cart-btn">
-                                        <button onclick="add_to_cart({{ item.id }}); return false;" class="btn essence-btn">Add to cart</button>
-                                    </div>
-                                </div>
+                                <button onclick="add_to_cart({{ item.id }}); return false;" class="essence-btn btn-sm">Add to cart</button>
                             </div>
                         </div>
                         {% endfor %}

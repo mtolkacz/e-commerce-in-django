@@ -44,20 +44,26 @@ def add_item_to_cart(request):
 
     product = Product.objects.filter(id=item_id).first()
     user = get_object_or_404(User, username=username)
+
     if item_id and product:
         existing_cart = get_user_pending_cart(request)
+        data['new_item'] = True
         if existing_cart:
             order_item = existing_cart.items.filter(product=product).first()
             if order_item:
                 order_item.amount = order_item.amount + 1
                 order_item.save()
+                data['new_item'] = False
                 data['success'] = True
+                data['get_cart_qty'] = existing_cart.get_cart_qty()
+                data['amount'] = str(order_item.amount)
             else:
                 order_item, status = OrderItem.objects.get_or_create(product=product, owner=user)
                 if status:
                     existing_cart.items.add(order_item)
                     existing_cart.save()
                     data['success'] = True
+                    data['get_cart_qty'] = existing_cart.get_cart_qty()
         else:
             user_cart, status = Order.objects.get_or_create(owner=user, is_ordered=False)
             user_cart.ref_code = generate_order_id()
@@ -65,8 +71,37 @@ def add_item_to_cart(request):
                 order_item = OrderItem.objects.create(product=product, owner=user)
                 user_cart.items.add(order_item)
                 user_cart.save()
+                existing_cart = user_cart
                 data['success'] = True
+                data['get_cart_qty'] = '1'
+                data['new_cart'] = True
+                data['checkout_url'] = 'https://' + str(request.get_host()) + reverse('checkout')
+
+        data['cart_total_value'] = str(existing_cart.get_cart_total())
+        data['item_id'] = order_item.id
+        if data['new_item']:
+            data['product_url'] = 'https://' + str(request.get_host()) + str(product.get_absolute_url())
+            data['product_thumbnail_url'] = 'https://' + str(request.get_host()) + str(product.thumbnail.url)
+            data['product_subdepartment_name'] = product.subdepartment.name
+            data['product_name'] = product.name
+            data['product_price'] = str(product.price)
         # messages.info(request, "Product {} added to cart".format(product.name))
+    return JsonResponse(data)
+
+
+@login_required()
+def delete_cart(request):
+
+    data = {}
+
+    existing_cart = get_user_pending_cart(request)
+
+    delete_cart_items = OrderItem.objects.filter(owner_id=existing_cart.owner_id).delete()
+    if delete_cart_items:
+        delete_cart = existing_cart.delete()
+        if delete_cart:
+            data['success'] = delete_cart
+
     return JsonResponse(data)
 
 
@@ -96,18 +131,23 @@ def delete_item_from_cart(request):
         user = get_object_or_404(User, username=request.user.username)
         other_items = OrderItem.objects.filter(owner=user).first()
         existing_cart = get_user_pending_cart(request)
+        # other_items = OrderItem.objects(order_id=existing_cart.id).first()
 
         if other_items:
             messages.info(request, "Item has been deleted")
             data['success'] = success
             data['cart_total_value'] = str(existing_cart.get_cart_total())
+            data['get_cart_qty'] = str(existing_cart.get_cart_qty())
+            data['item_qty'] = str()
 
         # remove cart if last product is deleted
         else:
             remove_cart = existing_cart.delete()
             data['remove_cart'] = remove_cart
+
     else:
         data['success'] = False
+        data['ups'] = True
     return JsonResponse(data)
 
 
