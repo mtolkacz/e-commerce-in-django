@@ -1,10 +1,17 @@
-from rest_framework.generics import ListAPIView, CreateAPIView, RetrieveUpdateDestroyAPIView
+from rest_framework.generics import ListAPIView, CreateAPIView, RetrieveUpdateDestroyAPIView, ListCreateAPIView
+from rest_framework import viewsets
+from rest_framework.views import APIView
 from .serializers import ProductSerializer, ProductImageSerializer
 from .models import Product, ProductImage
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.exceptions import ValidationError
+from rest_framework.renderers import TemplateHTMLRenderer
+from rest_framework.response import Response
+from django.shortcuts import get_object_or_404
+from django.shortcuts import redirect
+from django.http import HttpResponse
 
 
 class ProductPagination(LimitOffsetPagination):
@@ -55,6 +62,23 @@ class ProductCreate(CreateAPIView):
         except ValueError:
             raise ValidationError({'price': 'A valid number is required'})
         return super().create(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        return redirect('checkout')
+
+
+class ProductDetail(RetrieveUpdateDestroyAPIView):
+    template_name = 'products/product_api.html'
+    renderer_classes = [TemplateHTMLRenderer]
+    serializer_class = ProductSerializer
+
+    def get(self, request, pk):
+        product = get_object_or_404(Product, pk=pk)
+        serializer = ProductSerializer(product)
+        return Response({'serializer': serializer, 'object': product})
+
+    # def post(self, request, pk):
+    #     return render(request, 'checkout.html')
 
 
 class ProductRetrieveUpdateDestroy(RetrieveUpdateDestroyAPIView):

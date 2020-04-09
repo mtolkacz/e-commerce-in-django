@@ -2,7 +2,9 @@ from django.shortcuts import render, redirect
 from .forms import ProductForm
 from django.contrib import messages
 from .models import Product, Category
-from django.views import generic
+from django.views.generic import ListView, DetailView
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
 
 
 def add(request):
@@ -24,7 +26,14 @@ def add(request):
     return redirect('index')
 
 
-class Show(generic.ListView):
+class Show(ListView):
     model = Product
     queryset = Product.objects.all()
     template_name = 'show.html'
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class ProductDetailView(DetailView):
+    model = Product
+    query_pk_and_slug = True
+    template_name = 'products/product.html'

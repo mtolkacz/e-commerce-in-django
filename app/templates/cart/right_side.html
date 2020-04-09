@@ -1,48 +1,46 @@
 {% load static %}
-
     <div class="cart-bg-overlay"></div>
 
     <div class="right-side-cart-area">
 
         <!-- Cart Button -->
         <div class="cart-button">
-            <a href="#" id="rightSideCart"><img src="{% static 'img/core-img/bag.svg' %}" alt=""> <span>3</span></a>
+            <a href="#" id="rightSideCart"><img src="{% static 'img/core-img/bag.svg' %}" alt=""> <span id="right-side-get-cart-qty">{{ cart.get_cart_qty }}</span></a>
         </div>
 
         <div class="cart-content d-flex">
 
             <!-- Cart List Area -->
-            <div class="cart-list">
+            <div id="cart-list" class="cart-list" style="text-align: center">
+                {% if cart.id %}
                 <!-- Single Cart Item -->
-                <div class="single-cart-item">
-                    <a href="#" class="product-image">
-                        <img src="{% static 'img/product-img/product-1.jpg' %}" class="cart-thumb" alt="">
+                <h5 class="py-3">Summary</h5>
+                <ul class="summary-table pb-10">
+                    <li><span>TOTAL:</span> <span id="right-side-cart-total-value">{{ cart.get_cart_total }}</span></li>
+                </ul>
+                <br>
+                <div class="checkout-btn my-20">
+                    <a href="{% url 'checkout' %}" class="btn essence-btn">Cart</a>
+                </div>
+                <br>
+                {% for item in cart.get_cart_items %}
+                <div id="right-side-item{{item.id}}" class="single-cart-item">
+                    <a href="{{ item.product.get_absolute_url }}" >
+                        <img src="{{ item.product.thumbnail.url }}" class="cart-thumb" alt=""></a>
                         <!-- Cart Item Desc -->
                         <div class="cart-item-desc">
                           <span class="product-remove"><i class="fa fa-close" aria-hidden="true"></i></span>
-                            <span class="badge">Mango</span>
-                            <h6>Button Through Strap Mini Dress</h6>
-                            <p class="size">Size: S</p>
-                            <p class="color">Color: Red</p>
-                            <p class="price">$45.00</p>
+                            <span>{{ item.product.subdepartment.name }}</span>
+                            <br><h6>{{ item.product.name }}</h6>
+                            <span class="price">{{ item.product.price }}
+                                <item-price id="right-side-item-price{{ item.id }}">{% if item.amount > 1 %}x {{ item.amount }}{% endif %}</item-price>
+                            </span>
                         </div>
-                    </a>
                 </div>
-            </div>
-
-            <!-- Cart Summary -->
-            <div class="cart-amount-summary">
-
-                <h2>Summary</h2>
-                <ul class="summary-table">
-                    <li><span>subtotal:</span> <span>$274.00</span></li>
-                    <li><span>delivery:</span> <span>Free</span></li>
-                    <li><span>discount:</span> <span>-15%</span></li>
-                    <li><span>total:</span> <span>$232.00</span></li>
-                </ul>
-                <div class="checkout-btn mt-100">
-                    <a href="checkout.html" class="btn essence-btn">check out</a>
-                </div>
+                {% endfor %}
+                {% else %}
+                <br><h5>Your cart is empty</h5>
+                {% endif %}
             </div>
         </div>
     </div>

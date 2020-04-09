@@ -417,7 +417,7 @@ img {
 /* Cart Area CSS */
 .right-side-cart-area {
   position: fixed;
-  width: 670px;
+  width: 190px;
   height: 100%;
   top: 0;
   right: -800px;
@@ -428,15 +428,15 @@ img {
   transition-duration: 800ms; }
   @media only screen and (min-width: 768px) and (max-width: 991px) {
     .right-side-cart-area {
-      width: 500px;
+      width: 190px;
       right: -600px; } }
   @media only screen and (max-width: 767px) {
     .right-side-cart-area {
-      width: 270px;
+      width: 190px;
       right: -400px; } }
   @media only screen and (min-width: 576px) and (max-width: 767px) {
     .right-side-cart-area {
-      width: 400px;
+      width: 190px;
       right: -550px; } }
   .right-side-cart-area.cart-on {
     right: 0; }
@@ -483,15 +483,15 @@ img {
       @media only screen and (max-width: 767px) {
         .right-side-cart-area .cart-content .cart-list {
           -webkit-box-flex: 0;
-          -ms-flex: 0 0 100px;
-          flex: 0 0 100px;
-          width: 100px; } }
+          -ms-flex: 0 0 190px;
+          flex: 0 0 190px;
+          width: 190px; } }
       @media only screen and (min-width: 576px) and (max-width: 767px) {
         .right-side-cart-area .cart-content .cart-list {
           -webkit-box-flex: 0;
-          -ms-flex: 0 0 150px;
-          flex: 0 0 150px;
-          width: 150px; } }
+          -ms-flex: 0 0 190px;
+          flex: 0 0 190px;
+          width: 190px; } }
       .right-side-cart-area .cart-content .cart-list .single-cart-item {
         position: relative;
         z-index: 1;
@@ -626,8 +626,8 @@ img {
           font-family: "Ubuntu", sans-serif; }
       @media only screen and (max-width: 767px) {
         .right-side-cart-area .cart-content .cart-amount-summary .essence-btn {
-          min-width: 140px;
-          width: 140px;
+          min-width: 190px;
+          width: 190px;
           padding: 0 15px; } }
 
 /* :: 5.0 Welcome Area CSS */

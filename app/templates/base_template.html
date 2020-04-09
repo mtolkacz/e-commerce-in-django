@@ -179,7 +179,7 @@
                 </div>
                                 <!-- Cart Area -->
                 <div class="cart-area">
-                    <a href="#" id="essenceCartBtn"><img src="{% static 'img/core-img/bag.svg' %}" alt=""> <span>3</span></a>
+                    <a href="#" id="essenceCartBtn"><img src="{% static 'img/core-img/bag.svg' %}" alt=""> <span id="get-cart-qty">{% if cart %}{{ cart.get_cart_qty }}{% endif %}</span></a>
                 </div>
                 <!-- User Login Info -->
                 <div class="user-login-info dropdown">
@@ -317,6 +317,13 @@
     <script src="{% static 'js/active.js' %}"></script>
 
 	<script src="{% static 'js/main.js' %}"></script>
+
+    <script>
+    function goToCheckout()
+    {
+        window.location.replace("{% url 'checkout' %}");
+    }
+    </script>
 
 </body>
 
