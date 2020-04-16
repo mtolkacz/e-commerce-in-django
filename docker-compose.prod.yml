@@ -11,14 +11,14 @@ services:
       - media_volume:/usr/src/app/media
     expose:
       - 8000
-    env_file: .env
+    env_file: ./env/prod/.env
     depends_on:
       - db
   db:
     image: postgres:11.5-alpine
     volumes:
       - postgres_data:/var/lib/postgresql/data/
-    env_file: .env.db
+    env_file: ./env/prod/.env.db
   nginx:
     build: ./nginx
     volumes:

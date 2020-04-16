@@ -62,25 +62,34 @@ ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
 
 # Application definition
-INSTALLED_APPS = [
-    'django.contrib.staticfiles',
+DJANGO_APPS = (
     'django.contrib.admin',
+    'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
-    'django.contrib.auth',
     'django.contrib.messages',
-    'sslserver',
-    'social_django',
+    'django.contrib.staticfiles',
+)
+THIRD_PARTY_APPS = (
+    'sslserver',        # AN SSL-ENABLED DEVELOPMENT SERVER FOR DJANGO
+    'social_django',    # SOCIAL MEDIA USER AUTHENTIFICATION
+    'djmoney',          # PRODUCT PRICE MONEY FIELD IN MODEL
+    'crispy_forms',     # HANDLING BOOTSTRAP4 IN DJANGO FORMS
+    'ckeditor',         # HTML EDITOR FOR TEXT FIELDS (e.g. product's description)
+    'rest_framework',   # REST API FRAMEWORK FOR DJANGO
+    'django_filters',   # REST API FILTER BACKEND
+)
+LOCAL_APPS = (
     'accounts',
     'blog',
     'articles',
     'cart',
     'comments',
     'products',
-    'djmoney',
-    'crispy_forms',
-    'ckeditor',
-]
+)
+
+INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
+
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
@@ -94,6 +103,10 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'social_django.middleware.SocialAuthExceptionMiddleware',
+
+    # add caching
+    'django.middleware.cache.UpdateCacheMiddleware',
+    'django.middleware.cache.FetchFromCacheMiddleware',
 ]
 
 ROOT_URLCONF = 'gallop.urls'
@@ -111,6 +124,7 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'social_django.context_processors.backends',
                 'social_django.context_processors.login_redirect',
+                'cart.context_processors.cart_processor',
             ],
         },
     },
@@ -210,3 +224,9 @@ EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 EMAIL_PORT = os.getenv('EMAIL_PORT')
 
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+        'LOCATION': '127.0.0.1:11211',
+    }
+}

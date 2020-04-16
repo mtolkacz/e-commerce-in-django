@@ -10,7 +10,7 @@ RUN apk update \
     && apk add postgresql-dev \ 
     && apk add --no-cache jpeg-dev zlib-dev libjpeg \
     && pip install --upgrade pip \
-    && pip install psycopg2 Pillow django-sslserver>=0.21 \
+    && pip install psycopg2==2.8.4 Pillow==5.3.0 django-sslserver==0.21 \
     && apk del build-deps 
 
 RUN pip install --upgrade pip

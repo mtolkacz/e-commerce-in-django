@@ -2,6 +2,7 @@ version: '3.3'
 
 services:
   web:
+    container_name: gallop_web
     build: ./app
     command: python manage.py runsslserver 0.0.0.0:8001 --settings=gallop.settings
     stdin_open: true
@@ -11,34 +12,59 @@ services:
     ports:
       - 8001:8001
       - 587:587
-    env_file: .envdev
-    environment:
-      - COMPOSE_HTTP_TIMEOUT=600
-      - SQL_ENGINE=django.db.backends.postgresql
-      - DATABASE=postgres
+    env_file: ./env/dev/.env
     depends_on:
       - db
+    networks:
+      gallop:
+        ipv4_address: 172.18.0.2
   db:
-    image: postgres:11.5-alpine
+    container_name: gallop_db
+    image: postgres:12.1
     volumes:
       - postgres_data:/var/lib/postgresql/data/
-    env_file: .envdevdb
+    env_file: ./env/dev/.envdb
+    networks:
+      gallop:
+        ipv4_address: 172.18.0.3
   pgadmin:
+    container_name: gallop_pgadmin
     image: dpage/pgadmin4
     depends_on:
       - db
-    env_file: .pgadmindev
+    env_file: ./env/dev/.pgadmin
     volumes:
       - pgadmin:/root/.pgadmin
     ports:
       - "5050:8001"
+    networks:
+      gallop:
+        ipv4_address: 172.18.0.4
+  cache:
+    container_name: gallop_memcached
+    image: memcached
+    ports:
+      - "11211:11211"
+    entrypoint:
+     - memcached
+     - -m 256
+    networks:
+      gallop:
+        ipv4_address: 172.18.0.5
   elasticsearch:
+    container_name: gallop_elasticsearch
     image: launcher.gcr.io/google/elasticsearch2
     ports:
       - "9200:9200"
       - "9300:9300"
     volumes:
           - esdata:/usr/share/elasticsearch/data
+    networks:
+      gallop:
+        ipv4_address: 172.18.0.6
+networks:
+  gallop:
+    external: true
 volumes:
   postgres_data:
   esdata:

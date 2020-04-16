@@ -1,0 +1,102 @@
+{% extends "base_template.html" %}
+{% block title %}Gallop{% endblock %}
+{% block content %}
+{% load static %}
+
+    <section class="single_product_details_area d-flex align-items-center">
+
+        <div class="single_product_thumb clearfix">
+            <div class="product_thumbnail_slides owl-carousel">
+                {% for pic in object.images.all %}
+                <img src="{{ pic.image.url }}" alt="">
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="single_product_desc clearfix">
+            <span>{{ object.get_category_display }}</span>
+            <a href="cart.html">
+                <h2>{{ object.name }}</h2>
+            </a>
+                {% for pic in object.images.all %}
+                {{ pic.image.url }}
+                {% endfor %}
+            <p class="product-price"><span class="old-price">$65.00</span> {{ object.price }}</p>
+            <p id="product-desc" class="product-desc">{{ object.description|safe }}</p>
+
+            <form class="cart-form clearfix" method="post">
+                <div class="select-box d-flex mt-50 mb-30">
+                    <select name="select" id="productSize" class="mr-5">
+                        <option value="value">Size: XL</option>
+                        <option value="value">Size: X</option>
+                        <option value="value">Size: M</option>
+                        <option value="value">Size: S</option>
+                    </select>
+                    <select name="select" id="productColor">
+                        <option value="value">Color: Black</option>
+                        <option value="value">Color: White</option>
+                        <option value="value">Color: Red</option>
+                        <option value="value">Color: Purple</option>
+                    </select>
+                </div>
+                <div class="cart-fav-box d-flex align-items-center">
+                    <button type="submit" name="addtocart" value="5" class="btn essence-btn">Add to cart</button>
+                    <div class="product-favourite ml-4">
+                        <a href="#" class="favme fa fa-heart"></a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </section>
+    <div class="row">
+        <div class="col-12">
+            <div class="card mt-3 tab-card">
+                <div class="card-header tab-card-header">
+                    <ul class="nav nav-tabs card-header-tabs" id="myTab" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link" id="one-tab" data-toggle="tab" href="#one" role="tab"
+                               aria-controls="One" aria-selected="true">One</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="two-tab" data-toggle="tab" href="#two" role="tab"
+                               aria-controls="Two" aria-selected="false">Two</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="three-tab" data-toggle="tab" href="#three" role="tab"
+                               aria-controls="Three" aria-selected="false">Three</a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="tab-content" id="myTabContent">
+                    <div class="tab-pane fade show active p-3" id="one" role="tabpanel" aria-labelledby="one-tab">
+                        <h5 class="card-title">Tab Card One</h5>
+                        <p class="card-text">Some quick example text to build on the card title and make up the bulk of
+                            the card's content.</p>
+                        <a href="#">
+                            <button class="btn btn-primary" type="button">Go somewhere</button>
+                        </a>
+                    </div>
+                    <div class="tab-pane fade p-3" id="two" role="tabpanel" aria-labelledby="two-tab">
+                        <h5 class="card-title">Tab Card Two</h5>
+                        <p class="card-text">Some quick example text to build on the card title and make up the bulk of
+                            the card's content.</p>
+                        <a href="#">
+                            <button class="btn btn-primary" type="button">Go somewhere</button>
+                        </a>
+                    </div>
+                    <div class="tab-pane fade p-3" id="three" role="tabpanel" aria-labelledby="three-tab">
+                        <h5 class="card-title">Tab Card Three</h5>
+                        <p class="card-text">Some quick example text to build on the card title and make up the bulk of
+                            the card's content.</p>
+                        <a href="#">
+                            <button class="btn btn-primary" type="button">Go somewhere</button>
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

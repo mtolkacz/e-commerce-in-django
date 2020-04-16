@@ -1,61 +1,88 @@
 {% extends "base_template.html" %}
-{% block title %}Profile{% endblock %}
+{% block title %}Gallop{% endblock %}
 {% block content %}
 {% load static %}
 
-<section id="form"><!--form-->
-		<div class="container">
-			<div class="row">
-				<h1>Your cart</h1>
-				{% if order.id %}
+<div class="container pt-3 pb-3">
+    <div id="shopping-cart" class="card shopping-cart">
+        <div id="card-header" class="card-header bg-dark text-light">
+            <i aria-hidden="true" class="fa fa-shopping-cart"></i>
+            Shipping cart
+            <a href="{% url 'index' %}"><button class="btn btn-primary btn-sm mr-4 float-right" type="button"><span
+                    class="glyphicon glyphicon-share-alt"></span> Continue shopping
+            </button></a>
+            <div class="clearfix"></div>
+        </div>
+        {% if order.id %}
+        <div id="card-body" class="card-body">
+            <!-- PRODUCT -->
+                {% for item in order.get_cart_items %}
+                <div id="row{{ item.id }}">
+                    <div class="row my-2">
+                    <div class="col-12 col-sm-12 col-md-2 text-center">
+                        <a href="{{ item.product.get_absolute_url }}"><img alt="prewiew" class="img-responsive" height="80" src="{{ item.product.thumbnail.url }}" width="120"></a>
+                    </div>
+                    <div class="col-12 text-sm-center col-sm-12 text-md-left col-md-5 pt-3">
+                        <a href="{{ item.product.get_absolute_url }}"><span class="product-name">{{ item.product.name }}</span></a>
+                    </div>
+                    <div class="col-12 col-sm-12 text-sm-center col-md-5 row pt-3">
+                        <div class="col-4 col-sm-4 col-md-4 text-md-right" style="padding-top: 5px">
+                            {% if item.amount > 1 %}
+                            <span id="item_total_value{{ item.id }}">{{ item.get_item_total }}</span> </strong>
+                            <br><small><span id="apiece_value{{ item.id }}">{{ item.product.price }} apiece</span></small>
+                            {% else %}
+                            <span id="item_total_value{{ item.id }}">{{ item.product.price }}</span></strong>
+                            <br><small><span id="apiece_value{{ item.id }}"></span></small>
+                            {% endif %}
+                        </div>
+                        <div class="col-6 col-sm-6 col-md-6">
+                            <a href="#" onclick="decreaseValue({{ item.id }}); return false;"><i class="fas fa-minus mr-2"></i></a>
+                            <input onchange="updateValue({{ item.id }}); return false;" type="number" required
+                            size="1" min="1" max="30" value="{{ item.amount }}" id="item{{ item.id }}" style="width:40px;text-align: center; ">
+                            <a href="#" onclick="increaseValue({{ item.id }}); return false;"><i
+                                        class="fas fa-plus ml-2"></i></a><br>
+                        </div>
+                         <div class="col-2 col-sm-2 col-md-2">
+                            <a id="delete_item" title="Click to delete item from cart" href="#" onclick="removeItem({{ item.id }}); return false;">
+                                <button class="btn btn-outline-danger btn-xs" type="button">
+                                <i aria-hidden="true" class="fa fa-trash"></i>
+                                </button>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                    <hr class="my-4">
+                </div>
 
-				<div class="companyinfo" id="cart_head">
-					<h2>
-						{% if messages %}
-							<span >
-								<div id="cart_messages">{% for message in messages %}
-									{{ message }}
-									{% endfor %}</div>
-							</span>
-						{% endif %}
-					</h2>
-				</div>
-				<div class="cart_summary" id="cart_summary">
-					<form method="POST" id="post-form">
-						{% csrf_token %}
-						<table id="cart_table">
-						{% for item in order.get_cart_items %}
-							<tr id="cart_row{{ item.id }}">
-								<td><img src="{{ item.product.image.url }}"/></td>
-								<td>{{ item.product.name }}</td>
-								<td>
-								<div onclick="decreaseValue({{ item.id }})" class="btn btn-default" value="-">-</div><input onchange="updateValue({{ item.id }})" type="text" required
-		   minlength="1" maxlength="3" size="2" value="{{ item.amount }}" id="item{{ item.id }}"><div onclick="increaseValue({{ item.id }})" class="btn btn-default" value="+">+</div>
-								</td>
-								{% if item.amount > 1 %}
-								    <td class="cart_summary_money"><div id="item_total_value{{ item.id }}">{{ item.get_item_total }}</div><span id="apiece_value{{ item.id }}">{{ item.product.price }} apiece</span></td>
-								{% else %}
-								    <td class="cart_summary_money"><div id="item_total_value{{ item.id }}">{{ item.product.price }}</div><span id="apiece_value{{ item.id }}"></span></td>
-								{% endif %}
-								<td><a id="delete_item" title="Click to delete item from cart" href="#" onclick="removeItem({{ item.id }}); return false;">Delete item</a></td>
-							</tr>
-							{% endfor %}
-							<tr>
-								<td></td>
-								<td></td>
-								<td style="text-align:right;padding-right:0px;">To pay:</td>
-								<td class="cart_summary_money"><div id="cart_total_value">{{ order.get_cart_total }}</div></td>
-								<td></td>
-							</tr>
-						</table>
-					</form>
-				</div>
-				{% else %}
-				<p>Your cart is empty</p>
-				{% endif %}
-				<p id="deleted_cart"></p>
-			</div>
-		</div>
-	</section>
+            {% endfor %}
+        </div>
+        <div id="card-footer" class="card-footer">
+            <div class="coupon col-md-12 col-sm-12 no-padding-left pull-left">
+                <div class="row">
+                    <div class="col-md-3 col-sm-6 col-6 pt-2">
+                        <input class="form-control" placeholder="cupone code" type="text">
+                    </div>
+                    <div class="col-md-3 col-sm-6 col-6 pt-2">
+                        <input class="btn btn-default" type="submit" value="Use cupone">
+                    </div>
+                    <div class="col-md-3 col-sm-6 col-6 pt-2">
+                        <div class="float-right" style="margin: 5px">Total price: <b><span id="cart_total_value">{{ order.get_cart_total }}</span></b></div>
+                    </div>
+                    <div class="col-md-3 col-sm-6 col-6 pt-2">
+                         <button class="btn btn-success" type="button">Checkout</button>
+                        <a id="delete_item" title="Click to delete shipping cart" href="#" onclick="delete_cart(); return false;">
+                            <button class="btn btn-danger btn-xs float-right mr-3" type="button">
+                            <i aria-hidden="true" class="fa fa-trash"></i>
+                            </button>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <br><h5><span class="py-5 px-5">Your cart is empty</span></h5><br>
+		{% endif %}
+    </div>
+</div>
+
 {% endblock %}
-

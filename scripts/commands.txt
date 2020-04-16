@@ -1,0 +1,23 @@
+sh start.sh -e dev
+docker-compose up -d --build web
+docker container ls
+docker-compose exec web python manage.py makemigrations
+docker-compose exec web python manage.py migrate
+sh backup.sh -e dev -u michal
+sh restore.sh -e dev -u michal -d ctdbdev
+docker-compose exec web python manage.py shell
+docker-compose exec web python manage.py createsuperuser
+docker network ls
+docker network inspect gallop | grep 'Name\|IPv4'
+docker-compose exec web pip list
+gnome-terminal
+docker-compose logs --tail=\"100\" | grep -Ev \"Found another file|pgadmin|elasticsearch\"
+docker ps --format \"{{.Names}}\" | grep -i \"pgadmin\" - name of container for pgadmin
+docker image prune -a - clean up unused images
+docker container prune - clean up unused containers
+docker network inspect gallop_default
+docker network rm gallop_default
+docker network rm gallop
+docker swarm init
+docker network create -d bridge --subnet=172.18.0.0/16 gallop
+docker swarm leave --force
