@@ -199,7 +199,7 @@ function add_to_cart(item_id)
                     var cart_list = document.getElementById("cart-list");
                     if(cart_list)
                     {
-                        cart_list.innerText = ";
+                        cart_list.innerText = "";
                         cart_list.insertAdjacentHTML("beforeend", start_cart);
                     }
                 }
@@ -255,6 +255,7 @@ function add_to_cart(item_id)
         }
     });
 }
+
 
 function delete_from_cart(item_id)
 {
