@@ -293,7 +293,7 @@ function delete_from_cart(item_id)
                 {
                     var empty_cart = `
                     <div id="card-body" class="card-body">
-                        <br><h5><span class="py-5 px-5">Your cart is empty</span></h5>
+                        <br><h5><span class="py-5 px-5">Your cart is empty</span></h5><br>
                     </div>
                     `;
                     shopping_cart.insertAdjacentHTML("beforeend", empty_cart);
@@ -345,7 +345,7 @@ function delete_cart()
                     {
                         var empty_cart = `
                         <div id="card-body" class="card-body">
-                            <br><h5><span class="py-5 px-5">Your cart is empty</span></h5>
+                            <br><h5><span class="py-5 px-5">Your cart is empty</span></h5><br>
                         </div>
                         `;
                         shopping_cart.insertAdjacentHTML("beforeend", empty_cart);
