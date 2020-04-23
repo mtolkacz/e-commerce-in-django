@@ -1,9 +1,9 @@
 # environment variables for docker compose
-*.env
-*.env.db
-*.envdev
+.env
+.env.db
+.envdev
 .env*
-*.pgadmindev
+.pgadmindev
 /env/
 scripts/pgadmin_servers.json
 env/dev/pgadmin_servers.json

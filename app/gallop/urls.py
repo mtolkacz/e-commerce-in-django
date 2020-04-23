@@ -8,11 +8,11 @@ handler404 = 'gallop.views.handler404'
 
 urlpatterns = [
     path('', index, name='index'),
-    path('products/', include('products.urls')),
+    path('product/', include('products.urls')),
     path('blog/', include('blog.urls')),
     path('admin/', admin.site.urls),
     path('cart/', include('cart.urls')),
-    path('accounts/', include('accounts.urls')),
+    path('account/', include('accounts.urls')),
     path('social-auth/', include('social_django.urls', namespace="social")),
 ]
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

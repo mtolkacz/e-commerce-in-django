@@ -10,44 +10,68 @@ from django.utils.text import slugify
 
 class Department(models.Model):
     name = models.CharField(max_length=100, default="No department")
+    slug = models.SlugField(max_length=100)
 
     def __unicode__(self):
         return '%s' % self.name
 
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        value = self.name
+        self.slug = slugify(value, allow_unicode=True)
+        super().save(*args, **kwargs)
 
 
 class Subdepartment(models.Model):
     department = models.ForeignKey(Department, on_delete=models.PROTECT, null=True)
     name = models.CharField(max_length=100, default="No subdepartment")
+    slug = models.SlugField(max_length=100)
 
     def __unicode__(self):
         return '%s' % self.name
 
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        value = self.name
+        self.slug = slugify(value, allow_unicode=True)
+        super().save(*args, **kwargs)
 
 
 class Category(models.Model):
     subdepartment = models.ForeignKey(Subdepartment, on_delete=models.PROTECT, null=True)
     name = models.CharField(max_length=100, default="No category")
+    slug = models.SlugField(max_length=100)
 
     def __unicode__(self):
         return '%s' % self.name
 
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        value = self.name
+        self.slug = slugify(value, allow_unicode=True)
+        super().save(*args, **kwargs)
 
 
 class Brand(models.Model):
     name = models.CharField(max_length=100, unique=True)
+    slug = models.SlugField(max_length=100)
 
     def __unicode__(self):
         return '%s' % self.name
 
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        value = self.name
+        self.slug = slugify(value, allow_unicode=True)
+        super().save(*args, **kwargs)
 
 
 class Product(models.Model):
