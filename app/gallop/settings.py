@@ -30,11 +30,16 @@ LOGOUT_REDIRECT_URL = 'logout'
 
 # HTTPS and cookies
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-SECURE_SSL_REDIRECT = True    # The SecurityMiddleware redirects all non-HTTPS requests to HTTPS
-SESSION_COOKIE_SECURE = True  # Cookies will only be sent via HTTPS connection
-SESSION_COOKIE_AGE = 3600     # The age of session cookies, in seconds. Set to 1 hour.
-CSRF_COOKIE_SECURE = True     # CSRF cookies will only be sent via HTTPS connection
+SECURE_SSL_REDIRECT = True              # The SecurityMiddleware redirects all non-HTTPS requests to HTTPS
+SESSION_COOKIE_SECURE = True            # Cookies will only be sent via HTTPS connection
+SESSION_COOKIE_AGE = 3600               # The age of session cookies, in seconds. Set to 1 hour.
+CSRF_COOKIE_SECURE = True               # CSRF cookies will only be sent via HTTPS connection
 SECURE_HSTS_SECONDS = 3600
+
+# Expire date of session cookie will be extended after every request
+# Save session after every request
+SESSION_SAVE_EVERY_REQUEST = True
+
 
 # Twitter social auth
 SOCIAL_AUTH_TWITTER_KEY = os.getenv('SOCIAL_AUTH_TWITTER_KEY')

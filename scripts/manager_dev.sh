@@ -29,6 +29,8 @@ while [ ! $number -eq 0 ]; do
 	echo "19.cleanup unused images"
 	echo "20.cleanup unused container"
 	echo "21.gallop network detail"
+	echo "22.django test"
+	echo "23.clear expired sessions"
 	printf "\nChoose: "
     read number
     case "$number" in
@@ -73,6 +75,10 @@ while [ ! $number -eq 0 ]; do
 	20) docker container prune
 	   ;;
 	21) docker network inspect gallop
+	   ;;
+	22) docker-compose logs --tail="100" | grep -E "DJANGOTEST:|Error"
+	   ;;
+	23) docker-compose exec web python manage.py clearsessions
 	   ;;
 	0) exit 0
 	   ;;

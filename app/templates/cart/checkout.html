@@ -1,5 +1,5 @@
 {% extends "base_template.html" %}
-{% block title %}Gallop{% endblock %}
+{% block title %}Cart{% endblock %}
 {% block content %}
 {% load static %}
 
@@ -56,7 +56,7 @@
 
             {% endfor %}
         </div>
-        <div id="card-footer" class="card-footer">
+        <div id="card-footer" class="ca0rd-footer">
             <div class="coupon col-md-12 col-sm-12 no-padding-left pull-left">
                 <div class="row">
                     <div class="col-md-3 col-sm-6 col-6 pt-2">
@@ -80,7 +80,9 @@
             </div>
         </div>
         {% else %}
-        <br><h5><span class="py-5 px-5">Your cart is empty</span></h5><br>
+        <div id="card-body" class="card-body">
+            <br><h5><span class="py-5 px-5">Your cart is empty</span></h5><br>
+        </div>
 		{% endif %}
     </div>
 </div>

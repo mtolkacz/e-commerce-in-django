@@ -3,6 +3,7 @@ from cart.models import Order
 from django.shortcuts import render, get_object_or_404
 from .error_views import *
 from django.contrib.auth import get_user_model
+from django.contrib.sessions.backends.db import SessionStore
 
 User = get_user_model()
 
