@@ -11,6 +11,17 @@ from django.utils.text import slugify
 class Department(models.Model):
     name = models.CharField(max_length=100, default="No department")
     slug = models.SlugField(max_length=100)
+    image1 = models.ImageField(upload_to='pic_folder/', default='pic_folder/None/no-img.jpg')
+    image2 = models.ImageField(upload_to='pic_folder/', default='pic_folder/None/no-img.jpg')
+
+    def image_tag1(self):
+        return mark_safe('<img src="/media/%s" width="80" height="80" />' % self.image1)
+
+    def image_tag2(self):
+        return mark_safe('<img src="/media/%s" width="80" height="80" />' % self.image2)
+
+    image_tag1.short_description = 'Image1'
+    image_tag2.short_description = 'Image2'
 
     def __unicode__(self):
         return '%s' % self.name
@@ -28,12 +39,26 @@ class Subdepartment(models.Model):
     department = models.ForeignKey(Department, on_delete=models.PROTECT, null=True)
     name = models.CharField(max_length=100, default="No subdepartment")
     slug = models.SlugField(max_length=100)
+    image1 = models.ImageField(upload_to='pic_folder/', default='pic_folder/None/no-img.jpg')
+    image2 = models.ImageField(upload_to='pic_folder/', default='pic_folder/None/no-img.jpg')
+
+    def image_tag1(self):
+        return mark_safe('<img src="/media/%s" width="80" height="80" />' % self.image1)
+
+    def image_tag2(self):
+        return mark_safe('<img src="/media/%s" width="80" height="80" />' % self.image2)
+
+    image_tag1.short_description = 'Image1'
+    image_tag2.short_description = 'Image2'
 
     def __unicode__(self):
         return '%s' % self.name
 
     def __str__(self):
         return self.name
+    
+    def get_categories(self):
+        return Category.objects.filter(subdepartment=self.id).distinct('name').order_by('name')
 
     def save(self, *args, **kwargs):
         value = self.name
@@ -42,9 +67,20 @@ class Subdepartment(models.Model):
 
 
 class Category(models.Model):
-    subdepartment = models.ForeignKey(Subdepartment, on_delete=models.PROTECT, null=True)
+    subdepartment = models.ForeignKey(Subdepartment, on_delete=models.PROTECT, null=True, related_name="sub")
     name = models.CharField(max_length=100, default="No category")
     slug = models.SlugField(max_length=100)
+    image1 = models.ImageField(upload_to='pic_folder/', default='pic_folder/None/no-img.jpg')
+    image2 = models.ImageField(upload_to='pic_folder/', default='pic_folder/None/no-img.jpg')
+
+    def image_tag1(self):
+        return mark_safe('<img src="/media/%s" width="80" height="80" />' % self.image1)
+
+    def image_tag2(self):
+        return mark_safe('<img src="/media/%s" width="80" height="80" />' % self.image2)
+
+    image_tag1.short_description = 'Image1'
+    image_tag2.short_description = 'Image2'
 
     def __unicode__(self):
         return '%s' % self.name

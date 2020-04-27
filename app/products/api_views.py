@@ -1,8 +1,6 @@
-from rest_framework.generics import ListAPIView, CreateAPIView, RetrieveUpdateDestroyAPIView, ListCreateAPIView
-from rest_framework import viewsets
-from rest_framework.views import APIView
+from rest_framework.generics import ListAPIView, CreateAPIView
 from .serializers import ProductSerializer, ProductImageSerializer
-from .models import Product, ProductImage, Subdepartment, Department, Category
+from .models import Product, ProductImage, Subdepartment, Department, Category, Brand
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter
 from rest_framework.pagination import LimitOffsetPagination
@@ -66,52 +64,16 @@ class ProductCreate(CreateAPIView):
         return redirect('checkout')
 
 
-# class ProductDetail(RetrieveUpdateDestroyAPIView):
-#     template_name = 'products/product_api.html'
-#     renderer_classes = [TemplateHTMLRenderer]
-#     serializer_class = ProductSerializer
-#
-#     def get(self, request, pk):
-#         product = get_object_or_404(Product, pk=pk)
-#         serializer = ProductSerializer(product)
-#         return Response({'serializer': serializer, 'object': product})
-
-    # def post(self, request, pk):
-    #     return render(request, 'checkout.html')
-
-
 class MultipleFieldLookupMixin(object):
 
     def get_objects(self):
         queryset = self.queryset            # Get the base queryset
         filter = {}
-        # print('DJANGOTEST:  self.lookup_fields {}'.format(self.lookup_fields))
         for key, value in self.kwargs.items():
-            print('DJANGOTEST:  key {}, lookup {}, value {}'.format(key, self.lookup_fields[key], value))
             obj = get_object_or_404(self.lookup_fields[key], slug=value)
             filter[key] = obj.id
-        # for key, value in self.lookup_fields.items():
-        #     print('DJANGOTEST: filter[0] {}, filter[1] {}, self.kwargs[key] {}'.format(key, value))
-        #     if key in self.kwargs:
-        #         if self.kwargs[key]:  # Ignore empty fields.
-        #             obj = get_object_or_404(value, slug=self.kwargs[key])
-        #             filter[key] = obj.id
-        # print('DJANGOTEST: filter {}'.format(filter))
         queryset = self.queryset.filter(**filter)
-        # self.check_object_permissions(self.request, obj)
         return queryset
-
-    # todo filter version of get objects and with check_object_permissions
-    # def get_objects(self):
-    #     queryset = self.get_queryset()             # Get the base queryset
-    #     queryset = self.filter_queryset(queryset)  # Apply any filter backends
-    #     filter = {}
-    #     for field in self.lookup_fields:
-    #         if self.kwargs[field]: # Ignore empty fields.
-    #             filter[field] = self.kwargs[field]
-    #     obj = get_object_or_404(queryset, **filter)  # Lookup the object
-    #     self.check_object_permissions(self.request, obj)
-    #     return obj
 
 
 class ProductDetail(MultipleFieldLookupMixin, ListAPIView):
@@ -126,6 +88,27 @@ class ProductDetail(MultipleFieldLookupMixin, ListAPIView):
 
 
 class ProductDepartmentDetail(ListAPIView):
+    queryset = Product.objects.all()
+    lookup_fields = 'department'
+    serializer_class = ProductSerializer
+    renderer_classes = [TemplateHTMLRenderer]
+    template_name = 'products/department.html'
+
+    def get(self, request, *args, **kwargs):
+        department = get_object_or_404(Department, slug=self.kwargs[self.lookup_fields])
+        if department is None:
+            return super().get_queryset()
+        queryset = self.queryset.filter(department=department)
+        serializer = ProductSerializer(queryset)
+        subdepartments = Subdepartment.objects.filter(department=department)
+        categories = Category.objects.filter(subdepartment__in=subdepartments)
+        distinct_brands = queryset.values_list('brand', flat=True).distinct('brand')
+        brands = Brand.objects.filter(id__in=distinct_brands).order_by('name')
+        return Response({'serializer': serializer, 'objects': queryset, 'department': department,
+                         'brands': brands, 'subdepartments': subdepartments, 'categories': categories})
+
+
+class ProductDepartmentDetail2(ListAPIView):
     queryset = Product.objects.all()
     lookup_fields = 'department'
     serializer_class = ProductSerializer

@@ -1,5 +1,5 @@
 {% extends "base_template.html" %}
-{% block title %}Gallop{% endblock %}
+{% block title %}{% if object %} {{ object.short_name }}{% else %} Product {% endif %}{% endblock %}
 {% block content %}
 {% load static %}
 

@@ -8,7 +8,7 @@ handler404 = 'gallop.views.handler404'
 
 urlpatterns = [
     path('', index, name='index'),
-    path('product/', include('products.urls')),
+    path('', include('products.urls')),
     path('blog/', include('blog.urls')),
     path('admin/', admin.site.urls),
     path('cart/', include('cart.urls')),

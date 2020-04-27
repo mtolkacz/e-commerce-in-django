@@ -8,7 +8,7 @@ from django.views.decorators.csrf import csrf_exempt
 
 
 @method_decorator(csrf_exempt, name='dispatch')
-class ProductDetailView(DetailView):
+class ProductDetailView_old(DetailView):
     model = Product
     query_pk_and_slug = True
     template_name = 'products/product.html'

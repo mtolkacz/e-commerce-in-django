@@ -35,7 +35,7 @@ class ProductAdmin(admin.ModelAdmin):
 
 class SubdepartmentAdmin(admin.ModelAdmin):
     model = Subdepartment
-    list_display = ['name', 'get_department_name', ]
+    list_display = ['name', 'get_department_name', 'image_tag1', 'image_tag2', ]
 
     def get_department_name(self, obj):
         return obj.department.name
@@ -45,7 +45,7 @@ class SubdepartmentAdmin(admin.ModelAdmin):
 
 class CategoryAdmin(admin.ModelAdmin):
     model = Category
-    list_display = ['name', 'get_subdepartment_name', ]
+    list_display = ['name', 'get_subdepartment_name', 'image_tag1', 'image_tag2', ]  # 71FS38eUaoL._SX425_.jpg
 
     def get_subdepartment_name(self, obj):
         return obj.subdepartment.name
