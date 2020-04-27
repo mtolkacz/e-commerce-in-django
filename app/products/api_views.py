@@ -149,3 +149,4 @@ class ProductCategoryDetail(ListAPIView):
         queryset = self.queryset.filter(department=dep.id, subdepartment=subdep.id, category=cat.id)
         return queryset
 
+

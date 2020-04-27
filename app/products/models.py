@@ -6,6 +6,7 @@ from accounts.models import User
 from ckeditor.fields import RichTextField
 from django.shortcuts import reverse
 from django.utils.text import slugify
+from .validators import ProductIDsValidator
 
 
 class Department(models.Model):
@@ -115,7 +116,8 @@ class Product(models.Model):
     name = models.CharField(max_length=150, default='Product name')
     brand = models.ForeignKey(Brand, on_delete=models.PROTECT, null=True)
     description = RichTextField()
-    price = MoneyField(max_digits=14, decimal_places=2, default_currency='USD')
+    price = MoneyField(max_digits=14, decimal_places=2, default_currency='USD', null=False)
+    discounted_price = MoneyField(max_digits=14, decimal_places=2, default_currency='USD', null=True)
     department = models.ForeignKey(Department, on_delete=models.PROTECT, null=True)
     subdepartment = models.ForeignKey(Subdepartment, on_delete=models.PROTECT, null=True)
     category = models.ForeignKey(Category, on_delete=models.PROTECT, null=True)
@@ -191,3 +193,45 @@ class ProductRating(models.Model):
     review = models.TextField(max_length=2000, null=True)
     product = models.ForeignKey(Product, on_delete=models.PROTECT, null=True)
 
+
+class DiscountPriorityType(models.Model):
+    name = models.CharField(max_length=150, default='Priority name', blank=True)
+    value = models.IntegerField(default=100, validators=[MaxValueValidator(100), MinValueValidator(1)])
+    description = models.CharField(max_length=300, null=True, blank=True)
+
+    def __unicode__(self):
+        return '%s' % self.name
+
+    def __str__(self):
+        return self.name
+
+
+class DiscountType(models.Model):
+    name = models.CharField(max_length=150, default='Discount type name', unique=True, blank=False)
+
+    def __unicode__(self):
+        return '%s' % self.name
+
+    def __str__(self):
+        return self.name
+
+
+class Discount(models.Model):
+    name = models.CharField(max_length=150, default='Discount name', null=False, blank=False)
+    type = models.ForeignKey(DiscountType, on_delete=models.PROTECT, null=False, blank=False)
+    set_id = models.IntegerField(null=False, blank=False)  # id of department, subdepartment, category or None if global for all products
+    value = models.IntegerField(null=False, validators=[MaxValueValidator(99), MinValueValidator(1)])
+    startdate = models.DateTimeField(null=False)
+    enddate = models.DateTimeField(null=False)
+    description = models.CharField(max_length=300, null=True, blank=True)
+    priority = models.ForeignKey(DiscountPriorityType, on_delete=models.PROTECT, null=False)
+
+    def __unicode__(self):
+        return '%s' % self.name
+
+    def __str__(self):
+        return self.name
+
+
+class DiscountCustom(models.Model):
+    value = models.TextField(null=False, validators=[ProductIDsValidator], blank=False)

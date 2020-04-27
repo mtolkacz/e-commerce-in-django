@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Product, Category, Subdepartment, Department, Brand
+from .models import Product, Category, Subdepartment, Department, Brand, DiscountType, DiscountPriorityType, Discount
 
 
 class ProductAdmin(admin.ModelAdmin):
@@ -63,6 +63,64 @@ class BrandAdmin(admin.ModelAdmin):
     get_brand_name.short_description = 'Brand Name'
 
 
+class DiscountAdmin(admin.ModelAdmin):
+    model = Discount
+    list_display = ['name', 'get_percentage_value', 'get_type_name', 'get_set_name',
+                    'get_priority_name', 'get_priority_value', 'startdate', 'enddate',
+                    'description']
+
+    def get_percentage_value(self, obj):
+        return str(obj.value) + '%'
+
+    def get_type_name(self, obj):
+        return obj.type.name
+
+    def get_set_name(self, obj):
+        set = obj.type.name
+        if set == 'department':
+            department = Department.objects.get(id=obj.set_id)
+            return department.name
+        elif set == 'subdepartment':
+            subdepartment = Subdepartment.objects.get(id=obj.set_id)
+            return subdepartment.name
+        elif set == 'category':
+            category = Category.objects.get(id=obj.set_id)
+            return category.name
+        elif set == 'brand':
+            brand = Brand.objects.get(id=obj.set_id)
+            return brand.name
+        elif set == 'product':
+            product = Product.objects.get(id=obj.set_id)
+            return product.name
+        else:
+            return obj.type.name
+
+    def get_priority_value(self, obj):
+        return obj.priority.value
+
+    def get_priority_name(self, obj):
+        return obj.priority.name
+
+    get_type_name.short_description = 'type'
+    get_priority_value.short_description = 'priority value'
+    get_priority_name.short_description = 'priority'
+    get_set_name.short_description = 'set name'
+    get_percentage_value.short_description = 'percentage discount'
+
+
+class DiscountTypeAdmin(admin.ModelAdmin):
+    model = DiscountType
+    list_display = ['name']
+
+
+class DiscountPriorityTypeAdmin(admin.ModelAdmin):
+    model = DiscountType
+    list_display = ['name', 'value', 'description']
+
+
+admin.site.register(DiscountPriorityType, DiscountPriorityTypeAdmin)
+admin.site.register(DiscountType, DiscountTypeAdmin)
+admin.site.register(Discount, DiscountAdmin)
 admin.site.register(Brand, BrandAdmin)
 admin.site.register(Product, ProductAdmin)
 admin.site.register(Category, CategoryAdmin)
