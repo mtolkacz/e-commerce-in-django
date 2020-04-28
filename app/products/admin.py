@@ -1,5 +1,7 @@
 from django.contrib import admin
-from .models import Product, Category, Subdepartment, Department, Brand, DiscountType, DiscountPriorityType, Discount
+from .models import Product, Category, Subdepartment, Department, \
+    Brand, DiscountType, DiscountPriorityType, Discount, DiscountCustom
+from django.apps import apps
 
 
 class ProductAdmin(admin.ModelAdmin):
@@ -76,24 +78,10 @@ class DiscountAdmin(admin.ModelAdmin):
         return obj.type.name
 
     def get_set_name(self, obj):
-        set = obj.type.name
-        if set == 'department':
-            department = Department.objects.get(id=obj.set_id)
-            return department.name
-        elif set == 'subdepartment':
-            subdepartment = Subdepartment.objects.get(id=obj.set_id)
-            return subdepartment.name
-        elif set == 'category':
-            category = Category.objects.get(id=obj.set_id)
-            return category.name
-        elif set == 'brand':
-            brand = Brand.objects.get(id=obj.set_id)
-            return brand.name
-        elif set == 'product':
-            product = Product.objects.get(id=obj.set_id)
-            return product.name
-        else:
-            return obj.type.name
+        model_name = obj.type.model
+        Model = apps.get_model(app_label='products', model_name=model_name)
+        set_object = Model.objects.get(id=obj.set_id)
+        return set_object.name
 
     def get_priority_value(self, obj):
         return obj.priority.value
@@ -118,6 +106,12 @@ class DiscountPriorityTypeAdmin(admin.ModelAdmin):
     list_display = ['name', 'value', 'description']
 
 
+class DiscountCustomAdmin(admin.ModelAdmin):
+    model = DiscountCustom
+    list_display = ['name', 'value', ]
+
+
+admin.site.register(DiscountCustom, DiscountCustomAdmin)
 admin.site.register(DiscountPriorityType, DiscountPriorityTypeAdmin)
 admin.site.register(DiscountType, DiscountTypeAdmin)
 admin.site.register(Discount, DiscountAdmin)

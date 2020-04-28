@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError
 from django.db import models
 from djmoney.models.fields import MoneyField
 from django.utils.html import mark_safe
@@ -7,6 +8,10 @@ from ckeditor.fields import RichTextField
 from django.shortcuts import reverse
 from django.utils.text import slugify
 from .validators import ProductIDsValidator
+from django.db.models import signals
+from .signals import discount_post_save
+from decimal import *
+from django.utils import timezone
 
 
 class Department(models.Model):
@@ -131,6 +136,12 @@ class Product(models.Model):
 
     # todo to consider if need to add "get" to the below methods names
 
+    def get_discounted_price(self, discount_value):
+        if isinstance(discount_value, int):
+            return Decimal(((100 - discount_value) * self.price.amount) / 100)
+        else:
+            return False
+
     def get_absolute_url(self):
         kwargs = {
             'pk': self.id,
@@ -208,6 +219,8 @@ class DiscountPriorityType(models.Model):
 
 class DiscountType(models.Model):
     name = models.CharField(max_length=150, default='Discount type name', unique=True, blank=False)
+    model = models.CharField(max_length=50, null=True, editable=False)
+    lookup_field = models.CharField(max_length=50, null=True, editable=False)
 
     def __unicode__(self):
         return '%s' % self.name
@@ -219,12 +232,22 @@ class DiscountType(models.Model):
 class Discount(models.Model):
     name = models.CharField(max_length=150, default='Discount name', null=False, blank=False)
     type = models.ForeignKey(DiscountType, on_delete=models.PROTECT, null=False, blank=False)
-    set_id = models.IntegerField(null=False, blank=False)  # id of department, subdepartment, category or None if global for all products
+
+    # e.g. id of department, subdepartment, category and other levels or None if global for all products
+    set_id = models.IntegerField(null=False, blank=False, validators=[MinValueValidator(1)])
+
     value = models.IntegerField(null=False, validators=[MaxValueValidator(99), MinValueValidator(1)])
     startdate = models.DateTimeField(null=False)
     enddate = models.DateTimeField(null=False)
     description = models.CharField(max_length=300, null=True, blank=True)
     priority = models.ForeignKey(DiscountPriorityType, on_delete=models.PROTECT, null=False)
+
+    def clean(self):
+        super().clean()
+        if self.enddate <= self.startdate:
+            raise ValidationError('End date must be greater than start date')
+        if self.enddate <= timezone.now():
+            raise ValidationError('End date must be greater than current datetime')
 
     def __unicode__(self):
         return '%s' % self.name
@@ -233,5 +256,27 @@ class Discount(models.Model):
         return self.name
 
 
+signals.post_save.connect(discount_post_save, sender=Discount)
+
+
+class DiscountLine(models.Model):
+    discount = models.ForeignKey(Discount, on_delete=models.CASCADE, null=False)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, null=False)
+
+
 class DiscountCustom(models.Model):
+    name = models.CharField(max_length=150, default='Custom product list', null=False, blank=False)
     value = models.TextField(null=False, validators=[ProductIDsValidator], blank=False)
+
+    def clean(self):
+        super().clean()
+        list = str(self.value).split(';')
+        if len(list) != len(set(list)):
+            raise ValidationError('Product list contains duplicates!')
+
+    def get_product_list(self):
+        return str(self.value).split(';')
+
+    def get_products_id(self):
+        ids = [int(x) for x in self.get_product_list()]
+        return ids
