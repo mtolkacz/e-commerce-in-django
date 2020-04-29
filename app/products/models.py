@@ -9,7 +9,7 @@ from django.shortcuts import reverse
 from django.utils.text import slugify
 from .validators import ProductIDsValidator
 from django.db.models import signals
-from .signals import discount_post_save
+from .signals import discount_post_save, discount_pre_save
 from decimal import *
 from django.utils import timezone
 
@@ -247,6 +247,16 @@ class Discount(models.Model):
 
     def clean(self):
         super().clean()
+
+        # todo stop execution if already exists Discount/should we allow to edit already created Discount?
+        try:
+            already_exists = Discount.objects.get(id=self.id)
+        except Discount.DoesNotExist:
+            print('DJANGOTEST: Exception - {}'.format(self.name))
+            pass
+        else:
+            if already_exists:
+                raise ValidationError('Cannot modify already created discount')
         if self.enddate <= self.startdate:
             raise ValidationError('End date must be greater than start date')
         if self.enddate <= timezone.now():
@@ -259,6 +269,7 @@ class Discount(models.Model):
         return self.name
 
 
+signals.pre_save.connect(discount_pre_save, sender=Discount)
 signals.post_save.connect(discount_post_save, sender=Discount)
 
 
