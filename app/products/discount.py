@@ -122,3 +122,6 @@ class DiscountManager:
                     return True
 
         return False
+
+    def close_discount(self, discount):
+        pass

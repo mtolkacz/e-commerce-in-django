@@ -1,6 +1,7 @@
 from django.contrib import admin
 from .models import Product, Category, Subdepartment, Department, \
-    Brand, DiscountType, DiscountPriorityType, Discount, DiscountCustom
+    Brand, DiscountType, DiscountPriorityType, Discount, DiscountCustom, \
+    DiscountStatus
 from django.apps import apps
 
 
@@ -67,12 +68,15 @@ class BrandAdmin(admin.ModelAdmin):
 
 class DiscountAdmin(admin.ModelAdmin):
     model = Discount
-    list_display = ['name', 'get_percentage_value', 'get_type_name', 'get_set_name',
+    list_display = ['name', 'get_status_name', 'get_percentage_value', 'get_type_name', 'get_set_name',
                     'get_priority_name', 'get_priority_value', 'startdate', 'enddate',
                     'description']
 
     def get_percentage_value(self, obj):
         return str(obj.value) + '%'
+
+    def get_status_name(self, obj):
+        return obj.status.name
 
     def get_type_name(self, obj):
         return obj.type.name
@@ -89,6 +93,7 @@ class DiscountAdmin(admin.ModelAdmin):
     def get_priority_name(self, obj):
         return obj.priority.name
 
+    get_status_name.short_description = 'status'
     get_type_name.short_description = 'type'
     get_priority_value.short_description = 'priority value'
     get_priority_name.short_description = 'priority'
@@ -111,6 +116,12 @@ class DiscountCustomAdmin(admin.ModelAdmin):
     list_display = ['name', 'value', ]
 
 
+class DiscountStatusAdmin(admin.ModelAdmin):
+    model = DiscountStatus
+    list_display = ['name', ]
+
+
+admin.site.register(DiscountStatus, DiscountStatusAdmin)
 admin.site.register(DiscountCustom, DiscountCustomAdmin)
 admin.site.register(DiscountPriorityType, DiscountPriorityTypeAdmin)
 admin.site.register(DiscountType, DiscountTypeAdmin)
