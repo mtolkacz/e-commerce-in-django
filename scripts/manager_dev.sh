@@ -31,6 +31,7 @@ while [ ! $number -eq 0 ]; do
 	echo "21.gallop network detail"
 	echo "22.django test"
 	echo "23.clear expired sessions"
+	echo "24.project backup"
 	printf "\nChoose: "
     read number
     case "$number" in
@@ -79,6 +80,8 @@ while [ ! $number -eq 0 ]; do
 	22) docker-compose logs --tail="100" | grep -E "DJANGOTEST:|Error"
 	   ;;
 	23) docker-compose exec web python manage.py clearsessions
+	   ;;
+	24) cp -r /home/michal/MEGAsync/GitHub/gallop '/home/michal/MEGAsync/GitHub/gallop backup/gallop_'`date +'%d-%m-%Y_%H_%M_%S'`
 	   ;;
 	0) exit 0
 	   ;;

@@ -1,4 +1,7 @@
+from datetime import datetime
+
 from django.core.exceptions import ValidationError
+from django.db.utils import DatabaseError
 from django.db import models
 from djmoney.models.fields import MoneyField
 from django.utils.html import mark_safe
@@ -178,14 +181,14 @@ class Product(models.Model):
         return self.category.name
 
     def __str__(self):
-        return self.name
+        return '{}, {}'.format(self.id, self.name)
 
-    def __repr__(self):
-        return 'Product name: ' + self.name + \
-               ', Description: ' + self.description + \
-               ', Price: ' + str(self.price) + \
-               ', Category: ' + str(self.category) + \
-               ', Image: ' + str(self.thumbnail)
+    # def __repr__(self):
+    #     return 'Product name: ' + self.name + \
+    #            ', Description: ' + self.description + \
+    #            ', Price: ' + str(self.price) + \
+    #            ', Category: ' + str(self.category) + \
+    #            ', Image: ' + str(self.thumbnail)
 
 
 class ProductImage(models.Model):
@@ -236,12 +239,13 @@ class DiscountStatus(models.Model):
 class Discount(models.Model):
     name = models.CharField(max_length=150, default='Discount name', null=False, blank=False)
     type = models.ForeignKey(DiscountType, on_delete=models.PROTECT, null=False, blank=False)
-    status = models.ForeignKey(DiscountStatus, on_delete=models.PROTECT, default=1, editable=False, null=False)
+    status = models.ForeignKey(DiscountStatus, on_delete=models.PROTECT, default=2, editable=False, null=False)
     # e.g. id of department, subdepartment, category and other levels or None if global for all products
     set_id = models.IntegerField(null=False, blank=False, validators=[MinValueValidator(1)])
     value = models.IntegerField(null=False, validators=[MaxValueValidator(99), MinValueValidator(1)])
-    startdate = models.DateTimeField(null=False)
-    enddate = models.DateTimeField(null=False)
+    startdate = models.DateTimeField(null=False, default=datetime(2020, 4, 17))
+    # todo change default dates after adding unit tests
+    enddate = models.DateTimeField(null=False, default=datetime(2020, 7, 17))
     description = models.CharField(max_length=300, null=True, blank=True)
     priority = models.ForeignKey(DiscountPriorityType, on_delete=models.PROTECT, null=False)
 
@@ -262,20 +266,74 @@ class Discount(models.Model):
         if self.enddate <= timezone.now():
             raise ValidationError('End date must be greater than current datetime')
 
+    def activate(self):
+        try:
+            self.status = DiscountStatus.objects.get(name='Active')
+            self.save(update_fields=['status'])
+        except DiscountStatus.DoesNotExist:
+            raise Exception('Cannot activate discount!')
+
+    def deactivate(self):
+        try:
+            self.status = DiscountStatus.objects.get(name='Inactive')
+            self.save(update_fields=['status'])
+        except DiscountStatus.DoesNotExist:
+            raise Exception('Cannot activate discount!')
+
+    def finish(self):
+        try:
+            self.status = DiscountStatus.objects.get(name='Finished')
+            self.save(update_fields=['status'])
+        except DiscountStatus.DoesNotExist:
+            raise Exception('Cannot finish discount!')
+
     def __unicode__(self):
         return '%s' % self.name
 
     def __str__(self):
-        return self.name
+        return '{}, {}'.format(self.id, self.name)
 
 
 signals.pre_save.connect(discount_pre_save, sender=Discount)
 signals.post_save.connect(discount_post_save, sender=Discount)
 
 
+class DiscountProductList(models.Model):
+    discount = models.ForeignKey(Discount, on_delete=models.CASCADE, null=False)
+    ids = models.TextField(null=True)
+
+    def get_product_list(self):
+        return str(self.ids).split(';')
+
+
 class DiscountLine(models.Model):
     discount = models.ForeignKey(Discount, on_delete=models.CASCADE, null=False)
     product = models.ForeignKey(Product, on_delete=models.CASCADE, null=False)
+    status = models.ForeignKey(DiscountStatus, on_delete=models.PROTECT, default=1, editable=False, null=False)
+
+    def __str__(self):
+        return '{}, {}, {}'.format(self.id, self.discount.name, self.product.name)
+
+    def activate(self):
+        try:
+            self.status = DiscountStatus.objects.get(name='Active')
+            self.save(update_fields=['status'])
+        except DiscountStatus.DoesNotExist:
+            raise Exception('Cannot activate product discount!')
+
+    def deactivate(self):
+        try:
+            self.status = DiscountStatus.objects.get(name='Inactive')
+            self.save(update_fields=['status'])
+        except DiscountStatus.DoesNotExist:
+            raise Exception('Cannot activate discount!')
+
+    def finish(self):
+        try:
+            self.status = DiscountStatus.objects.get(name='Finished')
+            self.save(update_fields=['status'])
+        except DiscountStatus.DoesNotExist:
+            raise Exception('Cannot finish discount!')
 
 
 class DiscountCustom(models.Model):
