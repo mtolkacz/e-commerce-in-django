@@ -139,6 +139,11 @@ class Product(models.Model):
 
     # todo to consider if need to add "get" to the below methods names
 
+    def reset_price(self):
+        if self.discounted_price is not None:
+            self.discounted_price = None
+            self.save(update_fields=['discounted_price'])
+
     def get_discounted_price(self, discount_value):
         if isinstance(discount_value, int):
             return Decimal(((100 - discount_value) * self.price.amount) / 100)
@@ -249,6 +254,9 @@ class Discount(models.Model):
     description = models.CharField(max_length=300, null=True, blank=True)
     priority = models.ForeignKey(DiscountPriorityType, on_delete=models.PROTECT, null=False)
 
+    def is_finished(self):
+        return self.status.name == 'Finished'
+
     def clean(self):
         super().clean()
 
@@ -268,22 +276,28 @@ class Discount(models.Model):
 
     def activate(self):
         try:
-            self.status = DiscountStatus.objects.get(name='Active')
-            self.save(update_fields=['status'])
+            new_status = DiscountStatus.objects.get(name='Active')
+            if self.status != new_status:
+                self.status = new_status
+                self.save(update_fields=['status'])
         except DiscountStatus.DoesNotExist:
             raise Exception('Cannot activate discount!')
 
     def deactivate(self):
         try:
-            self.status = DiscountStatus.objects.get(name='Inactive')
-            self.save(update_fields=['status'])
+            new_status = DiscountStatus.objects.get(name='Inactive')
+            if self.status != new_status:
+                self.status = new_status
+                self.save(update_fields=['status'])
         except DiscountStatus.DoesNotExist:
-            raise Exception('Cannot activate discount!')
+            raise Exception('Cannot deactivate discount!')
 
     def finish(self):
         try:
-            self.status = DiscountStatus.objects.get(name='Finished')
-            self.save(update_fields=['status'])
+            new_status = DiscountStatus.objects.get(name='Finished')
+            if self.status != new_status:
+                self.status = DiscountStatus.objects.get(name='Finished')
+                self.save(update_fields=['status'])
         except DiscountStatus.DoesNotExist:
             raise Exception('Cannot finish discount!')
 
@@ -303,7 +317,7 @@ class DiscountProductList(models.Model):
     ids = models.TextField(null=True)
 
     def get_product_list(self):
-        return str(self.ids).split(';')
+        return [int(x) for x in str(self.ids).split(';')]
 
 
 class DiscountLine(models.Model):
@@ -316,24 +330,30 @@ class DiscountLine(models.Model):
 
     def activate(self):
         try:
-            self.status = DiscountStatus.objects.get(name='Active')
-            self.save(update_fields=['status'])
+            new_status = DiscountStatus.objects.get(name='Active')
+            if self.status != new_status:
+                self.status = new_status
+                self.save(update_fields=['status'])
         except DiscountStatus.DoesNotExist:
             raise Exception('Cannot activate product discount!')
 
     def deactivate(self):
         try:
-            self.status = DiscountStatus.objects.get(name='Inactive')
-            self.save(update_fields=['status'])
+            new_status = DiscountStatus.objects.get(name='Inactive')
+            if self.status != new_status:
+                self.status = new_status
+                self.save(update_fields=['status'])
         except DiscountStatus.DoesNotExist:
-            raise Exception('Cannot activate discount!')
+            raise Exception('Cannot deactivate product discount!')
 
     def finish(self):
         try:
-            self.status = DiscountStatus.objects.get(name='Finished')
-            self.save(update_fields=['status'])
+            new_status = DiscountStatus.objects.get(name='Finished')
+            if self.status != new_status:
+                self.status = new_status
+                self.save(update_fields=['status'])
         except DiscountStatus.DoesNotExist:
-            raise Exception('Cannot finish discount!')
+            raise Exception('Cannot finish product discount!')
 
 
 class DiscountCustom(models.Model):
