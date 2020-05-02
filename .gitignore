@@ -28,3 +28,7 @@ env/dev/pgadmin_servers.json
 /.idea
 
 notatnik.txt
+/notes2.txt
+/notatnik2.txt
+/testing.py
+/queries.txt
