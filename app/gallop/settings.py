@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 """
 
 import os
+from celery.schedules import crontab
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -59,6 +61,21 @@ SOCIAL_AUTH_FACEBOOK_EXTRA_DATA = [                 # add this
     ('link', 'profile_url'),
 ]
 
+# Celery configuration
+CELERY_BROKER_URL = 'redis://redis:6379'
+CELERY_RESULT_BACKEND = 'redis://redis:6379'
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+
+# Celery beat schedule
+CELERY_BEAT_SCHEDULE = {
+    'hello': {
+        'task': 'products.tasks.hello',
+        'schedule': crontab()  # execute every minute
+    }
+}
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = int(os.getenv('DEBUG', 1))
 # DEBUG = 0  # todo Change debug to 0 for testing purposes
@@ -83,6 +100,7 @@ THIRD_PARTY_APPS = (
     'ckeditor',         # HTML EDITOR FOR TEXT FIELDS (e.g. product's description)
     'rest_framework',   # REST API FRAMEWORK FOR DJANGO
     'django_filters',   # REST API FILTER BACKEND
+    'celery',
 )
 LOCAL_APPS = (
     'accounts',

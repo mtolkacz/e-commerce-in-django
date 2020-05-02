@@ -18,6 +18,9 @@ services:
     networks:
       gallop:
         ipv4_address: 172.18.0.2
+  redis:
+    container_name: gallop_redis
+    image: "redis:alpine"
   db:
     container_name: gallop_db
     image: postgres:12.1
@@ -40,6 +43,24 @@ services:
     networks:
       gallop:
         ipv4_address: 172.18.0.4
+  celery:
+    container_name: gallop_celery
+    build: ./app
+    command: celery -A gallop worker -l info
+    volumes:
+      - ./app/:/usr/src/app/
+    depends_on:
+      - db
+      - redis
+  celery-beat:
+    container_name: gallop_celery_beat
+    build: ./app
+    command: celery -A gallop beat -l info
+    volumes:
+      - ./app/:/usr/src/app/
+    depends_on:
+      - db
+      - redis
   cache:
     container_name: gallop_memcached
     image: memcached
