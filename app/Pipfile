@@ -6,7 +6,7 @@ verify_ssl = true
 [dev-packages]
 
 [packages]
-django = "==2.2.5"
+django = "==2.2.10"
 gunicorn = "==19.9.0"
 django-haystack = "==2.8.1"
 elasticsearch = ">=2.0.0,<3.0.0"
@@ -17,11 +17,11 @@ django-money = "==0.15"
 djangorestframework = "==3.11.0"
 django-crispy-forms="==1.8.1"
 django-ckeditor="==5.9.0"
-python-memcached="==1.59"
 django-filter="==2.2.0"
 celery = ">=4.4.2"
 redis = ">=3.5.0"
 django-celery-results = ">=1.2.1"
+django-redis = ">=4.11.0"
 
 [requires]
 python_version = "3.7"
