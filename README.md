@@ -10,10 +10,13 @@ e-commerce system
 
 ###### backend and environment
 - docker compose 3.3
-- python 3.7.4
-- django 2.2.5
+- python 3.8
+- django 2.2.10
 - django-sslserver
-- postgres 11.5
+- postgres 12.2
+- redis-server 6.0.1
+- rabbitmq 3.8.3
+- celery 4.4.2
 - pgadmin4
 - nginx 1.17.2
 - gunicorn 19.9.0
@@ -22,7 +25,7 @@ e-commerce system
 
 ###### frontend
 - HTML5
-- jQuery
+- jQuery 2.2.4
 - bootstrap4
 
 
