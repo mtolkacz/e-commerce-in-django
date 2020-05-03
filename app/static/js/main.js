@@ -44,6 +44,10 @@ function inputValidate(item_id) {
 function increaseValue(item_id) {
     var cart_value = parseInt(document.getElementById('item'+item_id).value, 10);
     cart_value = isNaN(cart_value) ? 0 : cart_value;
+    if(cart_value > max_items_in_cart-1)
+    {
+        alert("Maximum amount reached");
+    }
     cart_value > max_items_in_cart-1 ? cart_value = max_items_in_cart : cart_value++;
     if (document.getElementById('item'+item_id).value == cart_value){
         return
@@ -140,6 +144,10 @@ function calculate_cart(cart_value, item_id)
                 if(data.cart_total_value) {
                     document.getElementById("cart_total_value").innerText = data.cart_total_value
                     document.getElementById("right-side-cart-total-value").innerText = data.cart_total_value
+                }
+                if(data.get_cart_qty) {
+                    document.getElementById("get-cart-qty").innerText = data.get_cart_qty;
+                    document.getElementById("right-side-get-cart-qty").innerText = data.get_cart_qty;
                 }
             }
             else if (data.remove_cart){
@@ -251,7 +259,7 @@ function add_to_cart(item_id)
         },
         error: function(){
                 console.log("Error!");
-                alert("You have to log in to add product to cart!");
+                alert("Something went wrong!");
         }
     });
 }
@@ -317,6 +325,37 @@ function delete_from_cart(item_id)
             }
         }
     });
+}
+
+function test_width3()
+{
+    if(document.getElementById('department_box'))
+    {
+        var owl_stage = $(".owl-stage.active").width();
+        var owl_item = $(".owl-item.active").width();
+        var x = document.querySelectorAll(".owl-stage");
+        for (i = 0; i < x.length; i++) {
+            var nodes = x[i].getElementsByClassName("owl-item")
+            x[i].style.width = (owl_item * nodes.length + (0.2 * owl_item * nodes.length))+"px";
+            x[i].style.transform = "translate3d(0px, 0px, 0px)"
+        }
+        var y = document.querySelectorAll(".owl-item");
+        for (i = 0; i < y.length; i++) {
+            y[i].style.width = owl_item+"px";
+        }
+    }
+}
+function test_width2()
+{
+    alert("in test_width");
+    if(document.getElementById('department_box'))
+    {
+        alert("I found department_box!");
+        var wid = $(".owl-item.active").width();
+        alert(wid);
+        var x = document.querySelectorAll(".owl-item");
+        document.getElementByClassName("owl-item").style.width = "300px";
+    }
 }
 
 function delete_cart()

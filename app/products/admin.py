@@ -1,5 +1,8 @@
 from django.contrib import admin
-from .models import Product, Category, Subdepartment, Department, Brand
+from .models import Product, Category, Subdepartment, Department, \
+    Brand, DiscountType, DiscountPriorityType, Discount, DiscountCustom, \
+    DiscountStatus
+from django.apps import apps
 
 
 class ProductAdmin(admin.ModelAdmin):
@@ -35,7 +38,7 @@ class ProductAdmin(admin.ModelAdmin):
 
 class SubdepartmentAdmin(admin.ModelAdmin):
     model = Subdepartment
-    list_display = ['name', 'get_department_name', ]
+    list_display = ['name', 'get_department_name', 'image_tag1', 'image_tag2', ]
 
     def get_department_name(self, obj):
         return obj.department.name
@@ -45,7 +48,7 @@ class SubdepartmentAdmin(admin.ModelAdmin):
 
 class CategoryAdmin(admin.ModelAdmin):
     model = Category
-    list_display = ['name', 'get_subdepartment_name', ]
+    list_display = ['name', 'get_subdepartment_name', 'image_tag1', 'image_tag2', ]  # 71FS38eUaoL._SX425_.jpg
 
     def get_subdepartment_name(self, obj):
         return obj.subdepartment.name
@@ -63,6 +66,66 @@ class BrandAdmin(admin.ModelAdmin):
     get_brand_name.short_description = 'Brand Name'
 
 
+class DiscountAdmin(admin.ModelAdmin):
+    model = Discount
+    list_display = ['name', 'get_status_name', 'get_percentage_value', 'get_type_name', 'get_set_name',
+                    'get_priority_name', 'get_priority_value', 'startdate', 'enddate',
+                    'description']
+
+    def get_percentage_value(self, obj):
+        return str(obj.value) + '%'
+
+    def get_status_name(self, obj):
+        return obj.status.name
+
+    def get_type_name(self, obj):
+        return obj.type.name
+
+    def get_set_name(self, obj):
+        model_name = obj.type.model
+        Model = apps.get_model(app_label='products', model_name=model_name)
+        set_object = Model.objects.get(id=obj.set_id)
+        return set_object.name
+
+    def get_priority_value(self, obj):
+        return obj.priority.value
+
+    def get_priority_name(self, obj):
+        return obj.priority.name
+
+    get_status_name.short_description = 'status'
+    get_type_name.short_description = 'type'
+    get_priority_value.short_description = 'priority value'
+    get_priority_name.short_description = 'priority'
+    get_set_name.short_description = 'set name'
+    get_percentage_value.short_description = 'percentage discount'
+
+
+class DiscountTypeAdmin(admin.ModelAdmin):
+    model = DiscountType
+    list_display = ['name']
+
+
+class DiscountPriorityTypeAdmin(admin.ModelAdmin):
+    model = DiscountType
+    list_display = ['name', 'value', 'description']
+
+
+class DiscountCustomAdmin(admin.ModelAdmin):
+    model = DiscountCustom
+    list_display = ['name', 'value', ]
+
+
+class DiscountStatusAdmin(admin.ModelAdmin):
+    model = DiscountStatus
+    list_display = ['name', ]
+
+
+admin.site.register(DiscountStatus, DiscountStatusAdmin)
+admin.site.register(DiscountCustom, DiscountCustomAdmin)
+admin.site.register(DiscountPriorityType, DiscountPriorityTypeAdmin)
+admin.site.register(DiscountType, DiscountTypeAdmin)
+admin.site.register(Discount, DiscountAdmin)
 admin.site.register(Brand, BrandAdmin)
 admin.site.register(Product, ProductAdmin)
 admin.site.register(Category, CategoryAdmin)

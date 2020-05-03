@@ -1,0 +1,137 @@
+{% extends "base_template.html" %}
+{% block title %}{% if objects %} {{ objects.short_name }}{% else %} Product {% endif %}{% endblock %}
+{% block content %}
+{% load static %}
+
+<div clas="container-fluid" style="background: #DEDEDE; text-align:left">
+    <div class="container py-3" style="background: #DEDEDE; text-align:left">
+        <h2 class="display-5">{{ department.name }}</h2>
+    </div>
+</div>
+
+<div class="container-fluid pt-2">
+    <div class="row">
+        <div class="categories-slides owl-carousel">
+{% for subdepartment in subdepartments %}
+{% for category in subdepartment.get_categories %}
+{% if forloop.first %}
+        <div class="single-product-wrapper">
+            <div class="product-img" style="text-align:center;">
+                <a href="{{ item.get_absolute_url }}">
+                    <img src="{{ category.image1.url }}"
+                         alt="{{ category }}">
+                    <span>{{ category }}</span>
+                </a>
+                <img class="hover-img"
+                     src="{{ category.image2.url }}"
+                     alt="">
+            </div>
+        </div>
+{% else %}
+        <div class="single-product-wrapper">
+            <div class="product-img" style="text-align:center;">
+                <a href="{{ item.get_absolute_url }}">
+                    <img src="{{ category.image1.url }}"
+                         alt="{{ category }}" style="height:75;width:155px;">
+                    <span>{{ category }}</span>
+                </a>
+                <img class="hover-img"
+                     src="{{ category.image2.url }}"
+                     alt="" style="height:75;width:155px;">
+            </div>
+        </div>
+{% endif %}
+{% endfor %}
+{% endfor %}
+</div>
+    </div>
+</div>
+
+<div id="department_box" class="container-fluid px-5 pb-3">
+    <div class="row">
+        <div class="col-md-4 col-sm-3 col-lg-2">
+            <h4>Category</h4>
+            <div class="list-group">
+                {% for subdepartment in subdepartments %}
+                    {% if forloop.first %}
+                        <a class="list-group-item list-group-item-dark list-group-item-action active" id="list-{{ subdepartment.slug }}-list" data-toggle="list" href="#list-{{ subdepartment.slug }}" role="tab" aria-controls="home">{{ subdepartment.name }}</a>
+                    {% else %}
+                        <a class="list-group-item list-group-item-dark list-group-item-action" id="list-{{ subdepartment.slug }}-list" data-toggle="list" href="#list-{{ subdepartment.slug }}" role="tab" aria-controls="home">{{ subdepartment.name }}</a>
+                    {% endif %}
+                {% endfor %}
+            </div>
+            <br><h4>Brands</h4>
+            <div class="list-group">
+                {% for brand in brands %}
+                    {% if forloop.first %}
+                        <a class="list-group-item list-group-item-dark list-group-item-action active" id="list-{{ brand.slug }}-list" data-toggle="list" href="#list-{{ brand.slug }}" role="tab" aria-controls="home">{{ brand.name }}</a>
+                    {% else %}
+                        <a class="list-group-item list-group-item-dark list-group-item-action" id="list-{{ brand.slug }}-list" data-toggle="list" href="#list-{{ brand.slug }}" role="tab" aria-controls="home">{{ brand.name }}</a>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+        <div class="col-md-8 col-sm-9 col-lg-10">
+            <br><br>
+            <div class="tab-content" id="nav-tabContent">
+                {% for subdepartment in subdepartments %}
+                    {% if forloop.first %}
+                        <div class="tab-pane fade show active" id="list-{{ subdepartment.slug }}" role="tabpanel"
+                             aria-labelledby="list-{{ subdepartment.slug }}-list">
+                            <div class="popular-products-slides owl-carousel">
+                                {% for category in subdepartment.get_categories %}
+                                <div class="single-product-wrapper">
+                                    <div class="product-img" style="text-align:center;">
+                                        <a href="{{ item.get_absolute_url }}">
+                                            <img src="https://specials-images.forbesimg.com/imageserve/5d9182dc6c7c8f000990b672/960x0.jpg?fit=scale"
+                                                 alt="Television">
+                                            <span>{{ category }}</span>
+                                        </a>
+                                        <img class="hover-img"
+                                             src="https://www.telecommute.org/wp-content/uploads/2018/08/The-Uses-of-Technology-in-Our-Life.jpg"
+                                             alt="">
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="tab-pane fade" id="list-{{ subdepartment.slug }}" role="tabpanel" aria-labelledby="list-{{ subdepartment.slug }}-list">
+                        <div class="popular-products-slides owl-carousel">
+                                {% for category in subdepartment.get_categories %}
+                                <div class="single-product-wrapper">
+                                    <div class="product-img" style="text-align:center;">
+                                        <a href="{{ item.get_absolute_url }}">
+                                            <img src="https://specials-images.forbesimg.com/imageserve/5d9182dc6c7c8f000990b672/960x0.jpg?fit=scale"
+                                                 alt="Television">
+                                            <span>{{ category }}</span>
+                                        </a>
+                                        <img class="hover-img"
+                                             src="https://www.telecommute.org/wp-content/uploads/2018/08/The-Uses-of-Technology-in-Our-Life.jpg"
+                                             alt="">
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+            <br><br>
+            <div class="tab-content" id="nav-tabContent">
+                {% for brand in brands %}
+                    {% if forloop.first %}
+                <div class="tab-pane fade show active" id="list-{{ brand.slug }}" role="tabpanel" aria-labelledby="list-{{ brand.slug }}-list">{{ brand.name }}</div>
+                    {% else %}
+                <div class="tab-pane fade" id="list-{{ brand.slug }}" role="tabpanel" aria-labelledby="list-{{ brand.slug }}-list">{{ brand.name }}</div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+<br><br>
+
+
+{% endblock %}
+

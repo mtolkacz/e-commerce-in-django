@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 """
 
 import os
+from celery.schedules import crontab
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -59,6 +61,24 @@ SOCIAL_AUTH_FACEBOOK_EXTRA_DATA = [                 # add this
     ('link', 'profile_url'),
 ]
 
+# Celery configuration
+CELERY_BROKER_URL = 'amqp://rabbitmq' # todo go back to this when fix problem with redis
+CELERY_RESULT_BACKEND = 'redis://redis' # todo go back to this when fix problem with redis
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_IGNORE_RESULT = False
+CELERYD_TASK_SOFT_TIME_LIMIT = 60
+CELERY_TIMEZONE = 'Europe/Warsaw'
+
+# Celery beat schedule
+CELERY_BEAT_SCHEDULE = {
+    'hello': {
+        'task': 'products.tasks.hello',
+        'schedule': crontab()  # execute every minute
+    }
+}
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = int(os.getenv('DEBUG', 1))
 # DEBUG = 0  # todo Change debug to 0 for testing purposes
@@ -83,6 +103,8 @@ THIRD_PARTY_APPS = (
     'ckeditor',         # HTML EDITOR FOR TEXT FIELDS (e.g. product's description)
     'rest_framework',   # REST API FRAMEWORK FOR DJANGO
     'django_filters',   # REST API FILTER BACKEND
+    'celery',
+    'django_celery_results',
 )
 LOCAL_APPS = (
     'accounts',
@@ -183,7 +205,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Europe/Warsaw'
 
 USE_I18N = True
 
@@ -194,11 +216,6 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
-
-# STATICFILES_FINDERS = (
-#     'django.contrib.staticfiles.finders.FileSystemFinder',
-#     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-# )
 
 # Custom static files for every apps at the project level
 STATICFILES_DIRS = (
@@ -230,8 +247,14 @@ EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 EMAIL_PORT = os.getenv('EMAIL_PORT')
 
 CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
-        'LOCATION': '127.0.0.1:11211',
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://redis",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient"
+        },
+        "KEY_PREFIX": "example"
     }
 }
+
+# sh: 1: cannot create builderror.log: Permission denied

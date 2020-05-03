@@ -1,9 +1,9 @@
 # environment variables for docker compose
-*.env
-*.env.db
-*.envdev
+.env
+.env.db
+.envdev
 .env*
-*.pgadmindev
+.pgadmindev
 /env/
 scripts/pgadmin_servers.json
 env/dev/pgadmin_servers.json
@@ -26,3 +26,14 @@ env/dev/pgadmin_servers.json
 # other
 /postgres_data
 /.idea
+
+notatnik.txt
+/notes2.txt
+/notatnik2.txt
+/ignore/testing.py
+/queries.txt
+
+# celery beat schedule file
+celerybeat-schedule
+celerybeat.pid
+/ignore/

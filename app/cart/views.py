@@ -183,6 +183,7 @@ def calculate_item_in_cart(request):
         # after successful update more data for JsonResponse
         data['item_total_value'] = str(updated_item.get_item_total())
         data['cart_total_value'] = str(existing_cart.get_cart_total())
+        data['get_cart_qty'] = str(existing_cart.get_cart_qty())
     else:
         messages.error(request, 'Incorrect product amount (max {} items)'.format(MAX_ITEMS_IN_CART))
         data['success'] = False

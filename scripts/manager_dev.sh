@@ -31,6 +31,13 @@ while [ ! $number -eq 0 ]; do
 	echo "21.gallop network detail"
 	echo "22.django test"
 	echo "23.clear expired sessions"
+	echo "24.project backup"
+        echo "25.celery log"
+        echo "26.web log"
+	echo "27.redis log"
+ 	echo "28.redis container IP"
+        echo "29.celery mail"
+        echo "30.build celery container"
 	printf "\nChoose: "
     read number
     case "$number" in
@@ -62,7 +69,7 @@ while [ ! $number -eq 0 ]; do
 	   ;;
 	14) git status
 	   ;;
-  15) gnome-terminal
+  	15) gnome-terminal
 	   ;;	
 	16) docker-compose logs --tail="100" | grep -Ev "Found another file|pgadmin|elasticsearch"
 	   ;;
@@ -80,6 +87,20 @@ while [ ! $number -eq 0 ]; do
 	   ;;
 	23) docker-compose exec web python manage.py clearsessions
 	   ;;
+	24) cp -r /home/michal/MEGAsync/GitHub/gallop '/home/michal/MEGAsync/GitHub/gallop backup/gallop_'`date +'%d-%m-%Y_%H_%M_%S'`
+	   ;;
+	25) docker-compose logs --tail="100" | grep -E "celery"
+	   ;;
+	26) docker-compose logs --tail="100" | grep -E "web"
+	   ;;
+	27) docker-compose logs --tail="100" | grep -E "redis"
+	   ;;
+	28) docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' gallop_redis_1
+	   ;;
+	29) docker-compose logs --tail="100" | grep -E "mail"
+           ;;
+	30) docker-compose up -d --build celery | docker-compose up -d --build celery-beat
+           ;;
 	0) exit 0
 	   ;;
 	*) echo

@@ -34,6 +34,30 @@
                 }
             }
         });
+        $('.categories-slides').owlCarousel({
+            items: 12,
+            margin: 5,
+            loop: true,
+            nav: false,
+            dots: false,
+            autoplay: true,
+            autoplayTimeout: 5000,
+            smartSpeed: 1000,
+            responsive: {
+                0: {
+                    items: 4
+                },
+                576: {
+                    items: 6
+                },
+                768: {
+                    items: 8
+                },
+                992: {
+                    items: 12
+                }
+            }
+        });
         $('.product_thumbnail_slides').owlCarousel({
             items: 1,
             margin: 0,

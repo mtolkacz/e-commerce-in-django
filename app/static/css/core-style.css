@@ -9,7 +9,6 @@
 @import url(../css/magnific-popup.css);
 @import url(../css/jquery-ui.min.css);
 @import url(../css/nice-select.css);
-@import url(../css/font-awesome.min.css);
 /* :: 3.0 Common/Base CSS */
 * {
   margin: 0;
@@ -738,7 +737,8 @@ img {
 .single-product-wrapper {
   position: relative;
   z-index: 1;
-  margin-bottom: 50px;
+  margin-bottom: 20px;
+  margin-top: 15px;
   overflow: hidden;
   background-color: #ffffff; }
   .single-product-wrapper .product-img {
