@@ -15,18 +15,20 @@ services:
     env_file: ./env/dev/.env
     depends_on:
       - db
-    networks:
-      gallop:
-        ipv4_address: 172.18.0.2
+      - rabbitmq
+      - redis
+  redis:
+    image: redis:latest
+    ports:
+      - 6379:6379
+    environment:
+      - TZ=Europe/Warsaw
   db:
     container_name: gallop_db
-    image: postgres:12.1
+    image: postgres
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     env_file: ./env/dev/.envdb
-    networks:
-      gallop:
-        ipv4_address: 172.18.0.3
   pgadmin:
     container_name: gallop_pgadmin
     image: dpage/pgadmin4
@@ -37,34 +39,46 @@ services:
       - pgadmin:/root/.pgadmin
     ports:
       - "5050:8001"
-    networks:
-      gallop:
-        ipv4_address: 172.18.0.4
-  cache:
-    container_name: gallop_memcached
-    image: memcached
-    ports:
-      - "11211:11211"
-    entrypoint:
-     - memcached
-     - -m 256
-    networks:
-      gallop:
-        ipv4_address: 172.18.0.5
+  celery:
+    build: ./app
+    command: celery -A gallop worker -l debug
+    volumes:
+      - ./app/:/usr/src/app/
+    links:
+      - redis
+    environment:
+      - TZ="Europe/Warsaw"
+    depends_on:
+      - db
+      - redis
+      - rabbitmq
+  celery-beat:
+    build: ./app
+    command: celery -A gallop beat -l debug
+    volumes:
+      - ./app/:/usr/src/app/
+    links:
+      - redis
+    environment:
+      - TZ="Europe/Warsaw"
+    depends_on:
+      - db
+      - redis
+      - rabbitmq
+  rabbitmq:
+    image: rabbitmq:latest
+    environment:
+      - TZ=Europe/Warsaw
   elasticsearch:
     container_name: gallop_elasticsearch
     image: launcher.gcr.io/google/elasticsearch2
+    environment:
+      - TZ="Europe/Warsaw"
     ports:
       - "9200:9200"
       - "9300:9300"
     volumes:
           - esdata:/usr/share/elasticsearch/data
-    networks:
-      gallop:
-        ipv4_address: 172.18.0.6
-networks:
-  gallop:
-    external: true
 volumes:
   postgres_data:
   esdata:

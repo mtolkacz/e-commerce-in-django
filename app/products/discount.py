@@ -173,6 +173,7 @@ class DiscountManager:
         # 3. Set discounted price and activate discount lines
         self.process_lines()
 
+
     def finish(self):
         from .models import DiscountLine, DiscountProductList
 

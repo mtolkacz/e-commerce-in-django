@@ -9,10 +9,8 @@ from django.contrib.auth import authenticate, login as auth_login, logout as aut
 from django.contrib import messages
 from django.views.decorators.http import require_http_methods
 from django.template.loader import render_to_string
-from .email import Email
 from .models import User
-import smtplib
-from django.http import Http404
+from .tasks import send_email
 
 
 # Multiple view for signing in and registration
@@ -91,9 +89,9 @@ def login(request):
                 # Look up the current site based on request.get_host() if the SITE_ID setting is not defined
                 current_site = get_current_site(request)
 
-                # Create Email object, prepare mail content and generate user token
-                # Email class includes custom predefined SMTP settings
-                registration_email = Email()
+                # # Create Email object, prepare mail content and generate user token
+                # # Email class includes custom predefined SMTP settings
+                # registration_email = Email()
                 receiver = registration_form.cleaned_data.get('email')
                 subject = 'Activate your Gallop account'
                 message = render_to_string('accounts/activate.html', {
@@ -105,18 +103,9 @@ def login(request):
                     # Generate user token
                     'token': account_activation_token.make_token(user)
                 })
-
-                # Send e-mail with activation link through SSL
-                try:
-                    registration_email.send(receiver, subject, message)
-                    # Add feedback message to user to check mailbox
-                    messages.success(request, 'Please confirm your email address to complete the registration.')
-                except smtplib.SMTPRecipientsRefused:
-                    raise Http404("SMTPRecipientsRefused")  # TODO - add loging and admin notofication
-                except smtplib.SMTPAuthenticationError:
-                    import os
-                    raise Http404("SMTPAuthenticationError" + os.getenv('EMAIL_HOST_PASSWORD'))  # TODO - add loging and admin notofication
-
+                # Celery sending mail
+                send_email.apply_async((receiver, subject, message), countdown=0)
+                messages.success(request, 'Please confirm your email address to complete the registration.')
 
     # Load login view with forms and display form messages
     return render(request, 'accounts/login.html',

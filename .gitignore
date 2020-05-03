@@ -30,5 +30,10 @@ env/dev/pgadmin_servers.json
 notatnik.txt
 /notes2.txt
 /notatnik2.txt
-/testing.py
+/ignore/testing.py
 /queries.txt
+
+# celery beat schedule file
+celerybeat-schedule
+celerybeat.pid
+/ignore/
