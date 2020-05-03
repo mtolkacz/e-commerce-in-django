@@ -1,20 +1,11 @@
-FROM python:3.7.4-alpine
+FROM python:3.8
 
 WORKDIR /usr/src/app
 
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
-
-RUN apk update \
-    && apk add --no-cache --virtual build-deps gcc python3-dev musl-dev build-base linux-headers \
-    && apk add postgresql-dev \ 
-    && apk add --no-cache jpeg-dev zlib-dev libjpeg \
-    && pip install --upgrade pip \
-    && pip install psycopg2==2.8.4 Pillow==5.3.0 django-sslserver==0.21 \
-    && apk del build-deps 
-
 RUN pip install --upgrade pip
-RUN pip install pipenv
+RUN pip install pipenv psycopg2==2.8.4 Pillow==5.3.0 django-sslserver==0.21 
 COPY ./Pipfile /usr/src/app/Pipfile
 RUN pipenv install --skip-lock --system --dev
 

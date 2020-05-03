@@ -62,11 +62,14 @@ SOCIAL_AUTH_FACEBOOK_EXTRA_DATA = [                 # add this
 ]
 
 # Celery configuration
-CELERY_BROKER_URL = 'redis://redis:6379'
-CELERY_RESULT_BACKEND = 'redis://redis:6379'
+CELERY_BROKER_URL = 'amqp://rabbitmq' # todo go back to this when fix problem with redis
+CELERY_RESULT_BACKEND = 'redis://redis' # todo go back to this when fix problem with redis
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
+CELERY_IGNORE_RESULT = False
+CELERYD_TASK_SOFT_TIME_LIMIT = 60
+CELERY_TIMEZONE = 'Europe/Warsaw'
 
 # Celery beat schedule
 CELERY_BEAT_SCHEDULE = {
@@ -101,6 +104,7 @@ THIRD_PARTY_APPS = (
     'rest_framework',   # REST API FRAMEWORK FOR DJANGO
     'django_filters',   # REST API FILTER BACKEND
     'celery',
+    'django_celery_results',
 )
 LOCAL_APPS = (
     'accounts',
@@ -201,7 +205,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Europe/Warsaw'
 
 USE_I18N = True
 
@@ -212,11 +216,6 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
-
-# STATICFILES_FINDERS = (
-#     'django.contrib.staticfiles.finders.FileSystemFinder',
-#     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-# )
 
 # Custom static files for every apps at the project level
 STATICFILES_DIRS = (
@@ -250,6 +249,6 @@ EMAIL_PORT = os.getenv('EMAIL_PORT')
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
-        'LOCATION': '127.0.0.1:11211',
+        'LOCATION': '172.18.0.5:11211',
     }
 }
