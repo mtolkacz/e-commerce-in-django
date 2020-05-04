@@ -13,6 +13,11 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 import os
 from celery.schedules import crontab
 
+import socket
+
+hostname, _, ips = socket.gethostbyname_ex(socket.gethostname())
+INTERNAL_IPS = [ip[:-1] + '1' for ip in ips] + ['127.0.0.1', '10.0.2.2']
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -105,6 +110,7 @@ THIRD_PARTY_APPS = (
     'django_filters',   # REST API FILTER BACKEND
     'celery',
     'django_celery_results',
+    'debug_toolbar',
 )
 LOCAL_APPS = (
     'accounts',
@@ -128,9 +134,9 @@ MIDDLEWARE = [
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'social_django.middleware.SocialAuthExceptionMiddleware',
-
     # add caching
     'django.middleware.cache.UpdateCacheMiddleware',
     'django.middleware.cache.FetchFromCacheMiddleware',
