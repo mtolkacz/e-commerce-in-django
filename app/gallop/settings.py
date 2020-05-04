@@ -110,6 +110,7 @@ THIRD_PARTY_APPS = (
     'django_filters',   # REST API FILTER BACKEND
     'celery',
     'django_celery_results',
+    'django_celery_beat',
     'debug_toolbar',
 )
 LOCAL_APPS = (

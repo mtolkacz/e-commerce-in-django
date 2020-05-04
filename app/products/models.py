@@ -244,7 +244,7 @@ class DiscountStatus(models.Model):
 class Discount(models.Model):
     name = models.CharField(max_length=150, default='Discount name', null=False, blank=False)
     type = models.ForeignKey(DiscountType, on_delete=models.PROTECT, null=False, blank=False)
-    status = models.ForeignKey(DiscountStatus, on_delete=models.PROTECT, default=2, editable=False, null=False)
+    status = models.ForeignKey(DiscountStatus, on_delete=models.PROTECT, to_fields='name', default='Inactive', editable=False, null=False)
     # e.g. id of department, subdepartment, category and other levels or None if global for all products
     set_id = models.IntegerField(null=False, blank=False, validators=[MinValueValidator(1)])
     value = models.IntegerField(null=False, validators=[MaxValueValidator(99), MinValueValidator(1)])
@@ -323,7 +323,7 @@ class DiscountProductList(models.Model):
 class DiscountLine(models.Model):
     discount = models.ForeignKey(Discount, on_delete=models.CASCADE, null=False)
     product = models.ForeignKey(Product, on_delete=models.CASCADE, null=False)
-    status = models.ForeignKey(DiscountStatus, on_delete=models.PROTECT, default=1, editable=False, null=False)
+    status = models.ForeignKey(DiscountStatus, on_delete=models.PROTECT, to_fields='name', default='Inactive', editable=False, null=False)
 
     def __str__(self):
         return '{}, {}, {}'.format(self.id, self.discount.name, self.product.name)
