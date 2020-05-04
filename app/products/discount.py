@@ -164,6 +164,11 @@ class DiscountManager:
 
     def process(self):
 
+        if self.discount.is_not_inactive():
+            return
+
+        self.discount.activate()
+
         # 1. Create discount's queryset of product objects
         self.create_product_queryset()
 
@@ -172,7 +177,6 @@ class DiscountManager:
 
         # 3. Set discounted price and activate discount lines
         self.process_lines()
-
 
     def finish(self):
         from .models import DiscountLine, DiscountProductList

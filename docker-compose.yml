@@ -46,21 +46,19 @@ services:
       - ./app/:/usr/src/app/
     links:
       - redis
-    environment:
-      - TZ="Europe/Warsaw"
+    env_file: ./env/dev/.env
     depends_on:
       - db
       - redis
       - rabbitmq
   celery-beat:
     build: ./app
-    command: celery -A gallop beat -l debug
+    command: celery -A gallop beat -l debug --pidfile=
     volumes:
       - ./app/:/usr/src/app/
     links:
       - redis
-    environment:
-      - TZ="Europe/Warsaw"
+    env_file: ./env/dev/.env
     depends_on:
       - db
       - redis

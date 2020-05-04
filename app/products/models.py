@@ -244,7 +244,7 @@ class DiscountStatus(models.Model):
 class Discount(models.Model):
     name = models.CharField(max_length=150, default='Discount name', null=False, blank=False)
     type = models.ForeignKey(DiscountType, on_delete=models.PROTECT, null=False, blank=False)
-    status = models.ForeignKey(DiscountStatus, on_delete=models.PROTECT, default=2, editable=False, null=False)
+    status = models.ForeignKey(DiscountStatus, on_delete=models.PROTECT, default=1, editable=False, null=False)
     # e.g. id of department, subdepartment, category and other levels or None if global for all products
     set_id = models.IntegerField(null=False, blank=False, validators=[MinValueValidator(1)])
     value = models.IntegerField(null=False, validators=[MaxValueValidator(99), MinValueValidator(1)])
@@ -253,6 +253,9 @@ class Discount(models.Model):
     enddate = models.DateTimeField(null=False, default=datetime(2020, 7, 17))
     description = models.CharField(max_length=300, null=True, blank=True)
     priority = models.ForeignKey(DiscountPriorityType, on_delete=models.PROTECT, null=False)
+
+    def is_not_inactive(self):
+        return self.status.name != 'Inactive'
 
     def is_finished(self):
         return self.status.name == 'Finished'
