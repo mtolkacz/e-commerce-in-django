@@ -11,7 +11,7 @@ class DepartmentSerializer(serializers.ModelSerializer):
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
-        fields = ('id', 'name', 'slug')
+        fields = ('id', 'name', 'slug', 'image1', 'image2')
 
 
 class BrandSerializer(serializers.ModelSerializer):
@@ -31,11 +31,15 @@ class ProductSerializer(serializers.ModelSerializer):
     subdepartment = SubdepartmentSerializer()
     category = CategorySerializer()
     brand = BrandSerializer()
+    url = serializers.CharField(source='get_absolute_url')
+    price = serializers.CharField(source='get_price_in_string')
+    discount = serializers.CharField(source='get_discount_value')
+    discounted_price = serializers.CharField(source='get_discounted_price_in_string')
 
     class Meta:
         model = Product
-        fields = ('id', 'short_name', 'name', 'description', 'price',
-                  'thumbnail', 'slug', 'department', 'subdepartment', 'category', 'brand')
+        fields = ('id', 'short_name', 'name', 'description', 'price', 'discounted_price', 'discount',
+                  'thumbnail', 'slug', 'department', 'subdepartment', 'category', 'brand', 'url')
 
 
 class ProductImageSerializer(serializers.ModelSerializer):

@@ -90,10 +90,9 @@ function decreaseValue(item_id) {
     }
     document.getElementById('item'+item_id).value = cart_value;
 
-    var right_side_value
-    cart_value > 1 ? right_side_value = "x " + cart_value : right_side_value = "";
-
+    var right_side_value = cart_value > 1 ? right_side_value = "x " + cart_value : right_side_value = "";
     document.getElementById("right-side-item-price"+item_id).innerText = right_side_value;
+
     calculate_cart(cart_value, item_id);
 }
 
@@ -112,7 +111,10 @@ function updateValue(item_id) {
         }
     }
     document.getElementById('item'+item_id).value = cart_value;
-    document.getElementById('right-side-item'+item_id).innerText = cart_value.toString();
+
+    var right_side_value = cart_value > 1 ? right_side_value = "x " + cart_value : right_side_value = "";
+    document.getElementById("right-side-item-price"+item_id).innerText = right_side_value;
+
     calculate_cart(cart_value, item_id);
 }
 
@@ -141,13 +143,16 @@ function calculate_cart(cart_value, item_id)
                 if(data.item_total_value) {
                     document.getElementById("item_total_value"+item_id).innerText = data.item_total_value
                 }
+                if(data.old_price_checkout) {
+                    document.getElementById("old-price-checkout"+item_id).innerText = data.old_price_checkout
+                }
                 if(data.cart_total_value) {
                     document.getElementById("cart_total_value").innerText = data.cart_total_value
                     document.getElementById("right-side-cart-total-value").innerText = data.cart_total_value
                 }
-                if(data.get_cart_qty) {
-                    document.getElementById("get-cart-qty").innerText = data.get_cart_qty;
-                    document.getElementById("right-side-get-cart-qty").innerText = data.get_cart_qty;
+                if(data.cart_qty) {
+                    document.getElementById("cart-qty").innerText = data.cart_qty;
+                    document.getElementById("right-side-cart-qty").innerText = data.cart_qty;
                 }
             }
             else if (data.remove_cart){
@@ -190,7 +195,7 @@ function add_to_cart(item_id)
                 console.log("Success");
                 console.log(data.success);
                 console.log(data.item_id);
-                document.getElementById("get-cart-qty").innerText = data.get_cart_qty;
+                document.getElementById("cart-qty").innerText = data.cart_qty;
                 if(data.new_cart)
                 {
                     var start_cart = `
@@ -211,7 +216,7 @@ function add_to_cart(item_id)
                         cart_list.insertAdjacentHTML("beforeend", start_cart);
                     }
                 }
-                document.getElementById("right-side-get-cart-qty").innerText = data.get_cart_qty;
+                document.getElementById("right-side-cart-qty").innerText = data.cart_qty;
 
                 var right_side_cart_total_value = document.getElementById("right-side-cart-total-value")
                 if(right_side_cart_total_value)
@@ -280,9 +285,9 @@ function delete_from_cart(item_id)
                     document.getElementById("cart_total_value").innerText = data.cart_total_value;
                     document.getElementById("right-side-cart-total-value").innerText = data.cart_total_value;
                 }
-                if(data.get_cart_qty) {
-                    document.getElementById("get-cart-qty").innerText = data.get_cart_qty;
-                    document.getElementById("right-side-get-cart-qty").innerText = data.get_cart_qty;
+                if(data.cart_qty) {
+                    document.getElementById("cart-qty").innerText = data.cart_qty;
+                    document.getElementById("right-side-cart-qty").innerText = data.cart_qty;
                 }
             }
             else if (data.remove_cart){
@@ -306,8 +311,8 @@ function delete_from_cart(item_id)
                     `;
                     shopping_cart.insertAdjacentHTML("beforeend", empty_cart);
                 }
-                document.getElementById("get-cart-qty").innerText = "";
-                document.getElementById("right-side-get-cart-qty").innerText = "";
+                document.getElementById("cart-qty").innerText = "";
+                document.getElementById("right-side-cart-qty").innerText = "";
                 var cart_list = document.getElementById("cart-list")
                 if(cart_list)
                 {
@@ -325,37 +330,6 @@ function delete_from_cart(item_id)
             }
         }
     });
-}
-
-function test_width3()
-{
-    if(document.getElementById('department_box'))
-    {
-        var owl_stage = $(".owl-stage.active").width();
-        var owl_item = $(".owl-item.active").width();
-        var x = document.querySelectorAll(".owl-stage");
-        for (i = 0; i < x.length; i++) {
-            var nodes = x[i].getElementsByClassName("owl-item")
-            x[i].style.width = (owl_item * nodes.length + (0.2 * owl_item * nodes.length))+"px";
-            x[i].style.transform = "translate3d(0px, 0px, 0px)"
-        }
-        var y = document.querySelectorAll(".owl-item");
-        for (i = 0; i < y.length; i++) {
-            y[i].style.width = owl_item+"px";
-        }
-    }
-}
-function test_width2()
-{
-    alert("in test_width");
-    if(document.getElementById('department_box'))
-    {
-        alert("I found department_box!");
-        var wid = $(".owl-item.active").width();
-        alert(wid);
-        var x = document.querySelectorAll(".owl-item");
-        document.getElementByClassName("owl-item").style.width = "300px";
-    }
 }
 
 function delete_cart()
@@ -389,8 +363,8 @@ function delete_cart()
                         `;
                         shopping_cart.insertAdjacentHTML("beforeend", empty_cart);
                     }
-                    document.getElementById("get-cart-qty").innerText = "";
-                    document.getElementById("right-side-get-cart-qty").innerText = "";
+                    document.getElementById("cart-qty").innerText = "";
+                    document.getElementById("right-side-cart-qty").innerText = "";
                     var cart_list = document.getElementById("cart-list")
                     if(cart_list)
                     {

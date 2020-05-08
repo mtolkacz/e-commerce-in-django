@@ -2,20 +2,24 @@
 {% block title %}{% if object %} {{ object.short_name }}{% else %} Product {% endif %}{% endblock %}
 {% block content %}
 {% load static %}
+{% load products_extras %}
 
-<div class="container py-3">
+<div class="container-fluid py-3">
             <div class="row">
                 <section class="single_product_details_area d-flex align-items-center">
                     <div class="col-12 col-sm-12 col-md-6 clearfix">
                         <div id="carouselExampleFade" class="carousel slide carousel-fade" data-ride="carousel">
                             <div class="carousel-inner">
-                                <div class="carousel-item active">
-                                    <img src="{{ object.thumbnail.url }}" alt="">
-                                </div>
-                                {% for pic in object.images.all %}
-                                <div class="carousel-item">
-                                    <img src="{{ pic.image.url }}" alt="">
-                                </div>
+                                {% for pic in images %}
+                                    {% if forloop.first %}
+                                    <div class="carousel-item active">
+                                        <img src="{{ pic.image.url }}" alt="">
+                                    </div>
+                                    {% else %}
+                                    <div class="carousel-item">
+                                        <img src="{{ pic.image.url }}" alt="">
+                                    </div>
+                                    {% endif %}
                                 {% endfor %}
                             </div>
                             <a class="carousel-control-prev" href="#carouselExampleFade" role="button" data-slide="prev">
@@ -29,11 +33,19 @@
                         </div>
                     </div>
                     <div class="col-12 col-sm-12 col-md-6 single_product_desc clearfix">
-                        <span>{{ object.get_category_display }}</span>
-                        <a href="cart.html">
-                            <h2>{{ object.name }}</h2>
-                        </a>
-                        <p class="product-price"><span class="old-price">$65.00</span> {{ object.price }}</p>
+                        <p class="lead"><a href="{% url 'department' object.department.slug %}">{{ object.department.name }}</a>
+                            <i class='fas fa-angle-right' style='font-size:14px; color:black'></i>
+                            <a href="{% url 'subdepartment' object.department.slug object.subdepartment.slug %}">{{ object.subdepartment.name }}</a>
+                            <i class='fas fa-angle-right' style='font-size:14px; color:black'></i>
+                            <a href="{% url 'category' object.department.slug object.subdepartment.slug object.category.slug %}">{{ object.category.name }}</a>
+                        </p>
+                        <div>
+                            {% if object.discounted_price %}
+                            <div class="product-badge offer-badge"><span style="color:#fff;display: inline-block;">-{{ object.get_discount_value }}%</span></div>
+                            {% endif %}
+                            <h4 class="pt-2">{{ object.name }}</h4></div>
+                        <p class="product-price">{% if object.discounted_price %}<span class="old-price">{{ object.price }}</span>{% endif %}
+                            {% if object.discounted_price %}<b>{{ object.discounted_price }}</b>{% else %}<p style="color:#000;font-size:22px">{{ object.price }}</p>{% endif %}</p>
                         <p id="product-desc" class="product-desc">{{ object.description|safe }}</p>
 
                         <form class="cart-form clearfix" method="post">

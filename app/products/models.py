@@ -1,7 +1,6 @@
 from datetime import datetime
 
 from django.core.exceptions import ValidationError
-from django.db.utils import DatabaseError
 from django.db import models
 from djmoney.models.fields import MoneyField
 from django.utils.html import mark_safe
@@ -15,6 +14,7 @@ from django.db.models import signals
 from .signals import discount_post_save, discount_pre_save
 from decimal import *
 from django.utils import timezone
+from gallop import settings
 
 
 class Department(models.Model):
@@ -37,6 +37,9 @@ class Department(models.Model):
 
     def __str__(self):
         return self.name
+
+    # def get_url(self):
+    #     return '{}/products/{}/'.format(settings.HOMEPAGE, self.slug)
 
     def save(self, *args, **kwargs):
         value = self.name
@@ -69,6 +72,9 @@ class Subdepartment(models.Model):
     def get_categories(self):
         return Category.objects.filter(subdepartment=self.id).distinct('name').order_by('name')
 
+    # def get_url(self):
+    #     return '{}/{}/{}/'.format(settings.HOMEPAGE, self.department.slug, self.slug)
+
     def save(self, *args, **kwargs):
         value = self.name
         self.slug = slugify(value, allow_unicode=True)
@@ -93,6 +99,9 @@ class Category(models.Model):
 
     def __unicode__(self):
         return '%s' % self.name
+
+    # def get_url(self):
+    #     return '{}{}/'.format(self.subdepartment.get_url(), self.slug)
 
     def __str__(self):
         return self.name
@@ -125,7 +134,7 @@ class Product(models.Model):
     brand = models.ForeignKey(Brand, on_delete=models.PROTECT, null=True)
     description = RichTextField()
     price = MoneyField(max_digits=14, decimal_places=2, default_currency='USD', null=False)
-    discounted_price = MoneyField(max_digits=14, decimal_places=2, default_currency='USD', null=True)
+    discounted_price = MoneyField(max_digits=14, decimal_places=2, default_currency='USD', editable=False, null=True, blank=True)
     department = models.ForeignKey(Department, on_delete=models.PROTECT, null=True)
     subdepartment = models.ForeignKey(Subdepartment, on_delete=models.PROTECT, null=True)
     category = models.ForeignKey(Category, on_delete=models.PROTECT, null=True)
@@ -137,7 +146,20 @@ class Product(models.Model):
 
     image_tag.short_description = 'Image'
 
-    # todo to consider if need to add "get" to the below methods names
+    def get_price_in_string(self):
+        return str(self.price)
+
+    def get_discounted_price_in_string(self):
+        return str(self.discounted_price) if self.discounted_price else ''
+
+    def get_discount_value(self):
+        if self.discounted_price:
+            try:
+                discount_line = DiscountLine.objects.get(product=self, status__name='Active')
+            except DiscountLine.DoesNotExist:
+                return ''
+            else:
+                return discount_line.discount.value
 
     def reset_price(self):
         if self.discounted_price is not None:
@@ -151,11 +173,13 @@ class Product(models.Model):
             return False
 
     def get_absolute_url(self):
-        kwargs = {
-            'pk': self.id,
-            'slug': self.slug
-        }
-        return reverse("product", kwargs=kwargs)
+        return reverse('product',
+                       kwargs={
+                           'department': self.department.slug,
+                           'subdepartment': self.subdepartment.slug,
+                           'category': self.category.slug,
+                           'pk': self.pk,
+                           'slug': self.slug, })
 
     def get_add_to_cart_url(self):
         return reverse("add_item_to_cart", kwargs={
@@ -167,11 +191,8 @@ class Product(models.Model):
         self.slug = slugify(value, allow_unicode=True)
         super().save(*args, **kwargs)
 
-    def get_images(self):
-        return self.images[0]
-
-    def get_first_image(self):
-        return self.productimage_set.all()[0]
+    def get_first_image_url(self):
+        return ProductImage.objects.filter(product=self).order_by('id')[0].image.url
 
     def brand_name(self):
         return self.brand.name

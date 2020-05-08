@@ -1,12 +1,10 @@
 from cart.models import Order
-from products.models import Product
 from django.contrib.auth import get_user_model
-from django.contrib.sessions.models import Session
 
 User = get_user_model()
 
 
-def cart_processor(request):
+def cart_context_processor(request):
     cart_dict = {}
     existing_cart = {}
 

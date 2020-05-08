@@ -66,6 +66,7 @@
         </div>
     </div>
 
+{{ images }}
     <section class="new_arrivals_area section-padding-80 clearfix">
         <div class="container">
             <div class="row">
@@ -77,9 +78,9 @@
             </div>
         </div>
 
-        <div class="container">
+        <div class="container_fluid px-5">
             <div class="row">
-                <div class="col-12">
+                <div class="col-12" style="text-align:center;">
                     <div class="popular-products-slides owl-carousel">
                         {% for item in products %}
                         <!-- Single Product -->
@@ -90,12 +91,12 @@
                                     <img src="{{ item.thumbnail.url }}" alt="">
                                 </a>
                                 <!-- Hover Thumb -->
-                                <img class="hover-img" src="{{ item.thumbnail.url }}" alt="">
+                                <img class="hover-img" src="{{ item.get_first_image_url }}" alt="">
                                 <!-- Favourite -->
                                 <div class="product-favourite">
                                     <a href="#" class="favme fa fa-heart"></a>
                                 </div>
-                            </div>
+                            </div> 
                             <!-- Product Description -->
                             <div class="product-description">
                                 <span>{{ item.subdepartment.name }}</span>

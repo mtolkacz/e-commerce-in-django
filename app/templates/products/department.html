@@ -17,27 +17,25 @@
 {% if forloop.first %}
         <div class="single-product-wrapper">
             <div class="product-img" style="text-align:center;">
-                <a href="{{ item.get_absolute_url }}">
+                <a href="{% url 'category' department.slug subdepartment.slug category.slug %}">
                     <img src="{{ category.image1.url }}"
                          alt="{{ category }}">
                     <span>{{ category }}</span>
-                </a>
                 <img class="hover-img"
                      src="{{ category.image2.url }}"
-                     alt="">
+                     alt=""></a>
             </div>
         </div>
 {% else %}
         <div class="single-product-wrapper">
             <div class="product-img" style="text-align:center;">
-                <a href="{{ item.get_absolute_url }}">
+                <a href="{% url 'category' department.slug subdepartment.slug category.slug %}">
                     <img src="{{ category.image1.url }}"
                          alt="{{ category }}" style="height:75;width:155px;">
                     <span>{{ category }}</span>
-                </a>
                 <img class="hover-img"
                      src="{{ category.image2.url }}"
-                     alt="" style="height:75;width:155px;">
+                     alt="" style="height:75;width:155px;"></a>
             </div>
         </div>
 {% endif %}

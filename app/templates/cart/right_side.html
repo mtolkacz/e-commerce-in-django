@@ -5,7 +5,7 @@
 
         <!-- Cart Button -->
         <div class="cart-button">
-            <a href="#" id="rightSideCart"><img src="{% static 'img/core-img/bag.svg' %}" alt=""> <span id="right-side-get-cart-qty">{{ cart.get_cart_qty }}</span></a>
+            <a href="#" id="rightSideCart"><img src="{% static 'img/core-img/bag.svg' %}" alt=""> <span id="right-side-cart-qty">{{ cart.get_cart_qty }}</span></a>
         </div>
 
         <div class="cart-content d-flex">
@@ -31,8 +31,8 @@
                         <div class="cart-item-desc">
                           <span class="product-remove"><i class="fa fa-close" aria-hidden="true"></i></span>
                             <span>{{ item.product.subdepartment.name }}</span>
-                            <br><h6>{{ item.product.name }}</h6>
-                            <span class="price">{{ item.product.price }}
+                            <br><a href="{{ item.product.get_absolute_url }}" ><h6>{{ item.product.name }}</h6></a>
+                            <span class="price">{% if item.product.discounted_price %}{{ item.product.discounted_price }}{% else %}{{ item.product.price }}{% endif %}
                                 <item-price id="right-side-item-price{{ item.id }}">{% if item.amount > 1 %}x {{ item.amount }}{% endif %}</item-price>
                             </span>
                         </div>

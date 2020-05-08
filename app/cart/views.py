@@ -7,7 +7,7 @@ import datetime
 from .extras import generate_order_id
 from django.contrib import messages
 from .forms import OrderForm
-from django.http import JsonResponse
+from django.http import JsonResponse, Http404
 
 # User = settings.AUTH_USER_MODEL
 from django.contrib.auth import get_user_model
@@ -20,17 +20,14 @@ User = get_user_model()
 def get_pending_cart(request):
     order = False
     if request.user.username:
-        user = get_object_or_404(User, username=request.user.username)
-        order = Order.objects.filter(owner=user, is_ordered=False)
+        if request.user.is_authenticated:
+            user = get_object_or_404(User, username=request.user.username)
+            order = Order.objects.filter(owner=user, is_ordered=False)
     elif request.session.session_key:
         session = Session.objects.filter(session_key=request.session.session_key).first()
         order = Order.objects.filter(session_key=session)
 
-    if order:
-        if order.exists():
-            return order[0]
-    else:
-        return 0
+    return order[0] if order else 0
 
 
 def add_item_to_cart(request):
@@ -51,23 +48,21 @@ def add_item_to_cart(request):
                 order_item.save()
                 data['new_item'] = False
                 data['success'] = True
-                data['get_cart_qty'] = existing_cart.get_cart_qty()
+                data['cart_qty'] = existing_cart.get_cart_qty()
                 data['amount'] = str(order_item.amount)
             else:
-                # order_item, status = OrderItem.objects.get_or_create(product=product)
                 order_item = OrderItem.objects.create(product=product)
 
                 if order_item:
                     existing_cart.items.add(order_item)
                     existing_cart.save()
                     data['success'] = True
-                    data['get_cart_qty'] = existing_cart.get_cart_qty()
+                    data['cart_qty'] = existing_cart.get_cart_qty()
         else:
             if request.user.username:
                 user = get_object_or_404(User, username=request.user.username)
                 cart, status = Order.objects.get_or_create(owner=user, is_ordered=False)
             else:
-                # session = Session.objects.filter(session_key=request.session.session_key).first()
                 if not request.session.session_key:
                     request.session['guest'] = True
                     request.session.save()
@@ -80,18 +75,18 @@ def add_item_to_cart(request):
                 cart.save()
                 existing_cart = cart
                 data['success'] = True
-                data['get_cart_qty'] = '1'
+                data['cart_qty'] = '1'
                 data['new_cart'] = True
                 data['checkout_url'] = 'https://' + str(request.get_host()) + reverse('checkout')
 
         data['cart_total_value'] = str(existing_cart.get_cart_total())
         data['item_id'] = order_item.id
         if data['new_item']:
-            data['product_url'] = 'https://' + str(request.get_host()) + str(product.get_absolute_url())
+            data['product_url'] = str(product.get_absolute_url())
             data['product_thumbnail_url'] = 'https://' + str(request.get_host()) + str(product.thumbnail.url)
             data['product_subdepartment_name'] = product.subdepartment.name
             data['product_name'] = product.name
-            data['product_price'] = str(product.price)
+            data['product_price'] = str(product.price if product.discounted_price is None else product.discounted_price)
         # messages.info(request, "Product {} added to cart".format(product.name))
     return JsonResponse(data)
 
@@ -114,8 +109,10 @@ def delete_item_from_cart(request):
     # create empty dictionary for JsonResponse data
     data = {}
 
+    existing_cart = get_pending_cart(request)
+
     # return if parameters not passed
-    if item_id is None:
+    if item_id is None or existing_cart is None:
         return JsonResponse(data)
 
     try:
@@ -126,24 +123,21 @@ def delete_item_from_cart(request):
     except ValueError:
         return JsonResponse(data)
 
-    is_deleted = OrderItem.objects.filter(pk=item_id).delete()
-
-    if is_deleted:
-        existing_cart = get_pending_cart(request)
-
+    try:
+        OrderItem.objects.get(pk=item_id).delete()
+    except OrderItem.DoesNotExist:
+        data['success'] = False
+    else:
         if existing_cart.items.first():
             messages.info(request, "Item has been deleted")
             data['success'] = True
             data['cart_total_value'] = str(existing_cart.get_cart_total())
-            data['get_cart_qty'] = str(existing_cart.get_cart_qty())
+            data['cart_qty'] = str(existing_cart.get_cart_qty())
 
         # remove cart if last product is deleted
         else:
             remove_cart = existing_cart.delete()
             data['remove_cart'] = remove_cart
-    else:
-        data['success'] = False
-        data['ups'] = True
     return JsonResponse(data)
 
 
@@ -181,9 +175,12 @@ def calculate_item_in_cart(request):
         data['success'] = True
 
         # after successful update more data for JsonResponse
+        data['amount'] = str(updated_item.amount)
         data['item_total_value'] = str(updated_item.get_item_total())
+        if updated_item.is_discounted():
+            data['old_price_checkout'] = str(updated_item.get_item_total_no_discount())
         data['cart_total_value'] = str(existing_cart.get_cart_total())
-        data['get_cart_qty'] = str(existing_cart.get_cart_qty())
+        data['cart_qty'] = str(existing_cart.get_cart_qty())
     else:
         messages.error(request, 'Incorrect product amount (max {} items)'.format(MAX_ITEMS_IN_CART))
         data['success'] = False
