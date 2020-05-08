@@ -1,0 +1,206 @@
+{% extends "base_template.html" %}
+{% block title %}Gallop{% endblock %}
+{% block content %}
+{% load static %}
+{% load products_extras %}
+
+{% if results.objects %}
+<section class="shop_grid_area section-padding-80">
+        <div class="container">
+            <div class="row">
+
+                <div class="col-12 col-md-4 col-lg-3">
+                    <div class="shop_sidebar_area">
+                        <h6 class="widget-title mb-30">Filter by</h6>
+                        <div class="widget brands mb-50">
+                            <p class="widget-title2 mb-30">Brands</p>
+                            <div class="widget-desc">
+                                <ul>
+                                    {% for brand in results.additional.brands %}
+                                    <li><a href="#">{{ brand.name }}</a></li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="widget price mb-50">
+                            <p class="widget-title2 mb-30">Price</p>
+
+                            <div class="widget-desc">
+                                <div class="slider-range">
+                                    <div data-min="{{ results.additional.price.min }}" data-max="{{ results.additional.price.max }}" data-unit="$" class="slider-range-price ui-slider ui-slider-horizontal ui-widget ui-widget-content ui-corner-all" data-value-min="{{ results.additional.price.min }}" data-value-max="{{ results.additional.price.max }}" data-label-result="Range:">
+                                        <div class="ui-slider-range ui-widget-header ui-corner-all"></div>
+                                        <span class="ui-slider-handle ui-state-default ui-corner-all" tabindex="0"></span>
+                                        <span class="ui-slider-handle ui-state-default ui-corner-all" tabindex="0"></span>
+                                    </div>
+                                    <div class="range-price">Range: ${{ results.additional.price.min }} - ${{ results.additional.price.max }}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="widget color mb-50">
+                            <p class="widget-title2 mb-30">Color</p>
+                            <div class="widget-desc">
+                                <ul class="d-flex">
+                                    <li><a href="#" class="color1"></a></li>
+                                    <li><a href="#" class="color2"></a></li>
+                                    <li><a href="#" class="color3"></a></li>
+                                    <li><a href="#" class="color4"></a></li>
+                                    <li><a href="#" class="color5"></a></li>
+                                    <li><a href="#" class="color6"></a></li>
+                                    <li><a href="#" class="color7"></a></li>
+                                    <li><a href="#" class="color8"></a></li>
+                                    <li><a href="#" class="color9"></a></li>
+                                    <li><a href="#" class="color10"></a></li>
+                                </ul>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="col-12 col-md-8 col-lg-9">
+                    <div class="shop_grid_product_area">
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="product-topbar d-flex align-items-center justify-content-between">
+                                    <div>
+                                        <p class="lead"><a href="{% url 'department' results.additional.department.slug %}">
+                                            {{ results.additional.department.name }}</a>
+                                            <i class='fas fa-angle-right' style='font-size:14px; color:black'></i>
+                                            <a href="{% url 'subdepartment' results.additional.department.slug results.additional.subdepartment.slug %}">
+                                                {{ results.additional.subdepartment.name }}</a>
+                                        </p>
+                                        <h4 class="pb-3">{{ results.additional.category.name }}</h4>
+                                        <div class="total-products">
+                                            <p><span>{{ results.additional.total_active_records }}</span>
+                                                {% if results.additional.total_active_records > 1 %}products{% else %}product{% endif %} found</p>
+                                        </div>
+                                    </div>
+                                    <div class="product-sorting d-flex">
+                                        <p>Sort by:</p>
+                                        <form action="#" method="get">
+                                            <select name="select" id="sortByselect">
+                                                <option value="value">Highest Rated</option>
+                                                <option value="value">Newest</option>
+                                                <option value="value">Price: $$ - $</option>
+                                                <option value="value">Price: $ - $$</option>
+                                            </select>
+                                            <input type="submit" class="d-none" value="">
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            {% for product in results.objects %}
+                            <div class="col-12 col-sm-6 col-lg-4">
+                                <div class="single-product-wrapper">
+                                    <div class="product-img">
+                                        <img src="{{ product.thumbnail }}" alt="">
+                                        <img class="hover-img" src="img/product-img/product-2.jpg" alt="">
+
+                                        {% if product.discounted_price %}
+                                        <div class="product-badge offer-badge">
+                                            <span>-{{ product.discount }}%</span>
+                                        </div>
+                                        {% endif %}
+                                        <div class="product-favourite">
+                                            <a href="#" class="favme fa fa-heart"></a>
+                                        </div>
+                                    </div>
+
+                                    <div class="product-description">
+                                        <span>{{ product.subdepartment.name }}</span>
+                                        <a href="{{ product.url }}">
+                                            <h6>{{ product.name }}</h6>
+                                        </a>
+                                        <p class="product-price">
+                                            {% if product.discounted_price %}<span class="old-price">{{ product.price }}</span>{% endif %}
+                                            {% if product.discounted_price %}<text style="font-size:20px;font-weight: 700;color: #dc0345;">{{ product.discounted_price }}</text>{% else %}{{ product.price }}{% endif %}</p>
+
+                                        <div class="hover-content">
+                                            <div class="add-to-cart-btn">
+                                                <button onclick="add_to_cart({{ product.id }}); return false;" class="btn essence-btn">Add to cart</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                     <nav aria-label="navigation">
+                        <ul class="pagination mt-50 mb-70">
+                            {% if previous %}
+                            <li class="page-item"><a class="page-link" href="{{ previous }}"><i class="fa fa-angle-left"></i></a></li>
+                            {% else %}
+                            <li class="page-active" style="visibility:hidden"><i class="fa fa-angle-left"></i></li>
+                            {% endif %}
+                                {% for i in count|page_numbers|temp_range %}
+                                {% if results.additional.page == i|add:1 %}
+                                <li class="page-active"><b>{{ i|add:1 }}</b></li>
+                                {% else %}
+                                {% if forloop.first %}
+                                <li class="page-item"><a class="page-link" href="{% delete_get_parameter 'page' %}">{{ i|add:1 }}</a></li>
+                                {% else %}
+                                <li class="page-item"><a class="page-link" href="{% replace_get_parameter 'page' i|add:1 %}">{{ i|add:1 }}</a></li>
+                                {% endif %}
+                                {% endif %}
+                                {% endfor %}
+                            {% if next %}
+                            <li class="page-item"><a class="page-link" href="{{ next }}"><i class="fa fa-angle-right"></i></a></li>
+                            {% else %}
+                            <li class="page-active" style="visibility:hidden"><i class="fa fa-angle-right"></i></li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+</section>
+{% else %}
+
+<section class="new_arrivals_area section-padding-80 px-5 clearfix">
+    <div class="container_fluid">
+        <div class="row">
+            <div class="col-12" style="text-align:center;">
+                <div class="total-products">
+                    <b>No products found</b>
+                </div><br>
+                <h2>Check other popular products</h2>
+                <br>
+                <div class="category-popular-products-slides owl-carousel">
+                    {% for item in results.additional.popular_products %}
+                    <!-- Single Product -->
+                    <div class="single-product-wrapper">
+                        <!-- Product Image -->
+                        <div class="product-img">
+                            <a href="{{ item.url }}">
+                                <img src="{{ item.thumbnail }}" alt="">
+                            </a>
+                            <!-- Hover Thumb -->
+                            <img class="hover-img" src="{{ item.thumbnail.url }}" alt="">
+                            <!-- Favourite -->
+                            <div class="product-favourite">
+                                <a href="#" class="favme fa fa-heart"></a>
+                            </div>
+                        </div>
+                        <!-- Product Description -->
+                        <div class="product-description">
+                            <span>{{ item.subdepartment.name }}</span>
+                            <a href="{{ item.url }}">
+                                <h6 style="height:55px;display:block;">{{ item.name }}</h6>
+                            </a>
+                            <p class="product-price">{{ item.price }}</p>
+                            <button onclick="add_to_cart({{ item.id }}); return false;" class="essence-btn btn-sm">Add
+                                to cart
+                            </button>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endif %}
+{% endblock %}

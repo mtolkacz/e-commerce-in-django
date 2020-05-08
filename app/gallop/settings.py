@@ -86,7 +86,7 @@ CELERY_BEAT_SCHEDULE = {
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = int(os.getenv('DEBUG', 1))
-# DEBUG = 0  # todo Change debug to 0 for testing purposes
+# DEBUG = 0
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
@@ -138,9 +138,6 @@ MIDDLEWARE = [
     'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'social_django.middleware.SocialAuthExceptionMiddleware',
-    # add caching
-    'django.middleware.cache.UpdateCacheMiddleware',
-    'django.middleware.cache.FetchFromCacheMiddleware',
 ]
 
 ROOT_URLCONF = 'gallop.urls'
@@ -158,7 +155,7 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'social_django.context_processors.backends',
                 'social_django.context_processors.login_redirect',
-                'cart.context_processors.cart_processor',
+                'cart.context_processors.cart_context_processor',
             ],
         },
     },
@@ -256,13 +253,20 @@ EMAIL_PORT = os.getenv('EMAIL_PORT')
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://redis",
+        "LOCATION": "redis://redis:6379/",
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient"
         },
-        "KEY_PREFIX": "example"
     }
 }
+
+
+REST_FRAMEWORK = {
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 2
+}
+
 #
 # LOGGING = {
 #     'version': 1,

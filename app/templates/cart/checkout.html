@@ -19,26 +19,36 @@
                 {% for item in order.get_cart_items %}
                 <div id="row{{ item.id }}">
                     <div class="row my-2">
-                    <div class="col-12 col-sm-12 col-md-2 text-center">
-                        <a href="{{ item.product.get_absolute_url }}"><img alt="prewiew" class="img-responsive" height="80" src="{{ item.product.thumbnail.url }}" width="120"></a>
+                    <div class="col-12 col-sm-12 col-md-2 text-center product-img" style="text-align:middle">
+                            <a href="{{ item.product.get_absolute_url }}"><img alt="prewiew" class="img-responsive" height="80" src="{{ item.product.thumbnail.url }}" width="120"></a>
+                            {% if item.product.discounted_price %}
+                            <div class="product-badge offer-badge">
+                                <span>-{{ item.product.get_discount_value }}%</span>
+                            </div>
+                        {% endif %}
                     </div>
                     <div class="col-12 text-sm-center col-sm-12 text-md-left col-md-5 pt-3">
                         <a href="{{ item.product.get_absolute_url }}"><span class="product-name">{{ item.product.name }}</span></a>
                     </div>
                     <div class="col-12 col-sm-12 text-sm-center col-md-5 row pt-3">
-                        <div class="col-4 col-sm-4 col-md-4 text-md-right" style="padding-top: 5px">
+                        <div class="col-5 col-sm-5 col-md-5 text-md-right" style="padding-top: 5px">
                             {% if item.amount > 1 %}
-                            <span id="item_total_value{{ item.id }}">{{ item.get_item_total }}</span> </strong>
-                            <br><small><span id="apiece_value{{ item.id }}">{{ item.product.price }} apiece</span></small>
+                            <span id="item_total_value{{ item.id }}">{{ item.get_item_total }}</span>
+                            {% if item.product.discounted_price %}<span id="old-price-checkout{{ item.id }}" class="old-price-checkout">{{ item.get_item_total_no_discount }}</span>{% endif %}
+                            <br><small><span id="apiece_value{{ item.id }}">
+                            {% if item.product.discounted_price %}{{ item.product.discounted_price }} {% else %}{{ item.product.price }}{% endif %} apiece</span>
+                        </small>
                             {% else %}
-                            <span id="item_total_value{{ item.id }}">{{ item.product.price }}</span></strong>
+                            <span id="item_total_value{{ item.id }}">
+                                {% if item.product.discounted_price %}{{ item.product.discounted_price }}</span>
+                            <span id="old-price-checkout{{ item.id }}" class="old-price-checkout">{{ item.product.price }}</span>
+                                {% else %}{{ item.product.price }}</span>{% endif %}
                             <br><small><span id="apiece_value{{ item.id }}"></span></small>
                             {% endif %}
                         </div>
-                        <div class="col-6 col-sm-6 col-md-6">
+                        <div class="col-5 col-sm-5 col-md-5">
                             <a href="#" onclick="decreaseValue({{ item.id }}); return false;"><i class="fas fa-minus mr-2"></i></a>
-                            <input onchange="updateValue({{ item.id }}); return false;" type="number" required
-                            size="1" min="1" max="30" value="{{ item.amount }}" id="item{{ item.id }}" style="width:40px;text-align: center; ">
+                            <input onchange="updateValue({{ item.id }}); return false;" type="text" value="{{ item.amount }}" id="item{{ item.id }}" style="width:40px;text-align: center; ">
                             <a href="#" onclick="increaseValue({{ item.id }}); return false;"><i
                                         class="fas fa-plus ml-2"></i></a><br>
                         </div>
@@ -59,16 +69,16 @@
         <div id="card-footer" class="ca0rd-footer">
             <div class="coupon col-md-12 col-sm-12 no-padding-left pull-left">
                 <div class="row">
-                    <div class="col-md-3 col-sm-6 col-6 pt-2">
+                    <div class="col-md-3 col-sm-6 col-6 pt-2 pb-5">
                         <input class="form-control" placeholder="cupone code" type="text">
                     </div>
-                    <div class="col-md-3 col-sm-6 col-6 pt-2">
+                    <div class="col-md-3 col-sm-6 col-6 pt-2 pb-5">
                         <input class="btn btn-default" type="submit" value="Use cupone">
                     </div>
-                    <div class="col-md-3 col-sm-6 col-6 pt-2">
+                    <div class="col-md-3 col-sm-6 col-6 pt-2 pb-5">
                         <div class="float-right" style="margin: 5px">Total price: <b><span id="cart_total_value">{{ order.get_cart_total }}</span></b></div>
                     </div>
-                    <div class="col-md-3 col-sm-6 col-6 pt-2">
+                    <div class="col-md-3 col-sm-6 col-6 pt-2 pb-5">
                          <button class="btn btn-success" type="button">Checkout</button>
                         <a id="delete_item" title="Click to delete shipping cart" href="#" onclick="delete_cart(); return false;">
                             <button class="btn btn-danger btn-xs float-right mr-3" type="button">

@@ -1,67 +1,13 @@
-from rest_framework.generics import ListAPIView, CreateAPIView
-from .serializers import ProductSerializer, ProductImageSerializer
+from rest_framework.generics import ListAPIView
+from .serializers import ProductSerializer, BrandSerializer, \
+    DepartmentSerializer, SubdepartmentSerializer, CategorySerializer
 from .models import Product, ProductImage, Subdepartment, Department, Category, Brand
-from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework.filters import SearchFilter
-from rest_framework.pagination import LimitOffsetPagination
-from rest_framework.exceptions import ValidationError
+from rest_framework.filters import OrderingFilter, SearchFilter
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.renderers import TemplateHTMLRenderer
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
-from django.shortcuts import redirect
-
-
-class ProductPagination(LimitOffsetPagination):
-    default_limit = 10
-    max_limit = 100
-
-
-class ProductList(ListAPIView):
-    queryset = Product.objects.all()
-    serializer_class = ProductSerializer
-    filter_backends = (DjangoFilterBackend, SearchFilter)
-    filter_fields = ('id', )
-    search_fields = ('name', 'description',)
-    pagination_class = ProductPagination
-
-    # todo Example of filtering API - testing
-    def get_queryset(self):
-        price = self.request.query_params.get('price', None)
-        if price is None:
-            return super().get_queryset()
-        queryset = Product.objects.all()
-        if price.lower() == 'true':
-            return queryset.filter(
-                price__gte='300',
-            )
-        else:
-            return queryset.filter(
-                price__lt='300',
-            )
-        return queryset
-
-
-class ProductImageList(ListAPIView):
-    queryset = ProductImage.objects.all()
-    serializer_class = ProductImageSerializer
-    filter_backends = (DjangoFilterBackend, )
-    filter_fields = ('product', )
-
-
-class ProductCreate(CreateAPIView):
-    serializer_class = ProductSerializer
-
-    def create(self, request, *args, **kwargs):
-        try:
-            price = request.data.get('price')
-            if price is not None and float(price) <= 0.0:
-                raise ValidationError({'price': 'Must be above 0.00'})
-        except ValueError:
-            raise ValidationError({'price': 'A valid number is required'})
-        return super().create(request, *args, **kwargs)
-
-    def post(self, request, *args, **kwargs):
-        return redirect('checkout')
+import math
 
 
 class MultipleFieldLookupMixin(object):
@@ -108,23 +54,12 @@ class ProductDepartmentDetail(ListAPIView):
                          'brands': brands, 'subdepartments': subdepartments, 'categories': categories})
 
 
-class ProductDepartmentDetail2(ListAPIView):
-    queryset = Product.objects.all()
-    lookup_fields = 'department'
-    serializer_class = ProductSerializer
-
-    def get_queryset(self):
-        dep = get_object_or_404(Department, slug=self.kwargs[self.lookup_fields])
-        if dep is None:
-            return super().get_queryset()
-        queryset = self.queryset.filter(department=dep.id)
-        return queryset
-
-
 class ProductSubdepartmentDetail(ListAPIView):
     queryset = Product.objects.all()
     lookup_fields = ['department', 'subdepartment']
     serializer_class = ProductSerializer
+    ordering_fields = ['id']
+    filter_backends = [OrderingFilter]
 
     def get_queryset(self):
         dep = get_object_or_404(Department, slug=self.kwargs[self.lookup_fields[0]])
@@ -139,8 +74,14 @@ class ProductCategoryDetail(ListAPIView):
     queryset = Product.objects.all()
     lookup_fields = ['department', 'subdepartment', 'category']
     serializer_class = ProductSerializer
+    renderer_classes = [TemplateHTMLRenderer]
+    template_name = 'products/shop_category.html'
+    filter_backends = (SearchFilter, OrderingFilter)
+    filterset_fields = ['price', ]
+    ordering_fields = ['price', ]
+    pagination_class = PageNumberPagination
 
-    def get_queryset(self):
+    def get_queryset(self, **kwargs):
         dep = get_object_or_404(Department, slug=self.kwargs[self.lookup_fields[0]])
         subdep = get_object_or_404(Subdepartment, slug=self.kwargs[self.lookup_fields[1]])
         cat = get_object_or_404(Category, slug=self.kwargs[self.lookup_fields[2]])
@@ -149,4 +90,73 @@ class ProductCategoryDetail(ListAPIView):
         queryset = self.queryset.filter(department=dep.id, subdepartment=subdep.id, category=cat.id)
         return queryset
 
+    def get_additional_data(self, request, queryset):
+        distinct_brands = queryset.values('brand').distinct()
+        brands = Brand.objects.filter(id__in=distinct_brands).order_by('name')
+        additional = {}
+        if queryset:
+            product = queryset[0]
+            additional = {'department': DepartmentSerializer(product.department).data,
+                          'subdepartment': SubdepartmentSerializer(product.subdepartment).data,
+                          'category': CategorySerializer(product.category).data,
+                          'total_active_records': queryset.count(),
+                          'brands': BrandSerializer(brands, many=True).data,
+                          'page': int(request.GET.get('page', '1'))}
+            min = queryset.order_by('price')[0].price
+            max = queryset.order_by('-price')[0].price
+            price = {
+                'max': math.ceil(max.amount),
+                'min': math.floor(min.amount),
+            }
+            additional['price'] = price
+        else:
+            popular_products = self.get_serializer(self.queryset[:10], many=True)
+            additional['popular_products'] = popular_products.data
+        return additional
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset(**kwargs))
+
+        additional = self.get_additional_data(request, queryset)
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            data = {
+                'objects': serializer.data,
+                'additional': additional,
+            }
+            return self.get_paginated_response(data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        data = {
+            'objects': serializer.data,
+            'additional': additional.data,
+        }
+        return Response(data)
+
+    def get(self, request, *args, **kwargs):
+        return self.list(request, *args, **kwargs)
+
+
+class ProductDetail(ListAPIView):
+    lookup_fields = ['department', 'subdepartment', 'category', 'pk']
+    serializer_class = ProductSerializer
+    renderer_classes = [TemplateHTMLRenderer]
+    template_name = 'products/product.html'
+
+    def get(self, request, *args, **kwargs):
+        dep = get_object_or_404(Department, slug=self.kwargs[self.lookup_fields[0]])
+        subdep = get_object_or_404(Subdepartment, slug=self.kwargs[self.lookup_fields[1]])
+        cat = get_object_or_404(Category, slug=self.kwargs[self.lookup_fields[2]])
+        prod = get_object_or_404(Product, id=self.kwargs[self.lookup_fields[3]])
+        if dep is None or subdep is None or cat is None or prod is None:
+            return 0
+        object = get_object_or_404(Product, department=dep, subdepartment=subdep, category=cat, id=prod.id)
+        images = ProductImage.objects.filter(product=object)
+        context = {
+            'object': object,
+            'images': images,
+        }
+        return Response(context)
 

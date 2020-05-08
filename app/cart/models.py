@@ -3,6 +3,7 @@ from django.conf import settings
 from products.models import Product, Category
 from django.contrib.auth import get_user_model
 from django.contrib.sessions.models import Session
+from djmoney.models.fields import MoneyField
 
 User = get_user_model()
 MAX_ITEMS_IN_CART = 30
@@ -14,12 +15,19 @@ class OrderItem(models.Model):
     date_added = models.DateTimeField(auto_now=True)
     date_ordered = models.DateTimeField(null=True)
     amount = models.IntegerField(default=1)
+    price = MoneyField(max_digits=14, decimal_places=2, default_currency='USD', null=True)
 
     def __str__(self):
         return self.product.name
 
-    def get_item_total(self):
+    def is_discounted(self):
+        return True if self.product.discounted_price else False
+
+    def get_item_total_no_discount(self):
         return self.product.price * self.amount
+
+    def get_item_total(self):
+        return (self.product.discounted_price if self.product.discounted_price else self.product.price) * self.amount
 
 
 class Order(models.Model):
@@ -36,7 +44,8 @@ class Order(models.Model):
         return self.items.all().order_by('id')
 
     def get_cart_total(self):
-        return sum([item.product.price*item.amount for item in self.items.all()])
+        return sum([(item.product.discounted_price if item.product.discounted_price else item.product.price)
+                    * item.amount for item in self.items.all()])
 
     def get_cart_qty(self):
         return sum(item.amount for item in self.items.all())

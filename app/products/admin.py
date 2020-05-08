@@ -7,13 +7,26 @@ from django.apps import apps
 
 class ProductAdmin(admin.ModelAdmin):
     model = Product
-    list_display = ['name',
+    list_display = ['id',
+                    'name',
                     'get_brand_name',
                     'price',
+                    'get_discounted_price',
+                    'get_discount_value',
                     'get_department_name',
                     'get_subdepartment_name',
                     'get_category_name',
                     'image_tag', ]
+
+    def get_discount_value(self, obj):
+        return '-{}%'.format(obj.get_discount_value()) if obj.discounted_price else ''
+    get_discount_value.admin_order_field = 'discounted_price'
+    get_discount_value.short_description = 'Discount value'
+
+    def get_discounted_price(self, obj):
+        return obj.discounted_price if obj.discounted_price else ''
+    get_discounted_price.admin_order_field = 'discounted_price'
+    get_discounted_price.short_description = 'Discounted price'
 
     def get_brand_name(self, obj):
         return obj.brand.name
@@ -38,7 +51,7 @@ class ProductAdmin(admin.ModelAdmin):
 
 class SubdepartmentAdmin(admin.ModelAdmin):
     model = Subdepartment
-    list_display = ['name', 'get_department_name', 'image_tag1', 'image_tag2', ]
+    list_display = ['id', 'name', 'get_department_name', 'image_tag1', 'image_tag2', ]
 
     def get_department_name(self, obj):
         return obj.department.name
@@ -48,7 +61,7 @@ class SubdepartmentAdmin(admin.ModelAdmin):
 
 class CategoryAdmin(admin.ModelAdmin):
     model = Category
-    list_display = ['name', 'get_subdepartment_name', 'image_tag1', 'image_tag2', ]  # 71FS38eUaoL._SX425_.jpg
+    list_display = ['id', 'name', 'get_subdepartment_name', 'image_tag1', 'image_tag2', ]  # 71FS38eUaoL._SX425_.jpg
 
     def get_subdepartment_name(self, obj):
         return obj.subdepartment.name
@@ -58,7 +71,7 @@ class CategoryAdmin(admin.ModelAdmin):
 
 class BrandAdmin(admin.ModelAdmin):
     model = Brand
-    list_display = ['name', 'get_brand_name', ]
+    list_display = ['id', 'name', 'get_brand_name', ]
 
     def get_brand_name(self, obj):
         return obj.brand.name
@@ -68,7 +81,7 @@ class BrandAdmin(admin.ModelAdmin):
 
 class DiscountAdmin(admin.ModelAdmin):
     model = Discount
-    list_display = ['name', 'get_status_name', 'get_percentage_value', 'get_type_name', 'get_set_name',
+    list_display = ['id', 'name', 'get_status_name', 'get_percentage_value', 'get_type_name', 'get_set_name',
                     'get_priority_name', 'get_priority_value', 'startdate', 'enddate',
                     'description']
 

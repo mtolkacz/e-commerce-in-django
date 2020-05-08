@@ -733,7 +733,6 @@ img {
         .cta-area .cta-content .cta--text {
           padding-right: 0; } }
 
-/* :: 8.0 Popular Products Area CSS */
 .single-product-wrapper {
   position: relative;
   z-index: 1;
@@ -773,6 +772,16 @@ img {
       top: 20px;
       left: 20px;
       z-index: 10; }
+      .product-badge.offer-badge {
+        background-color: #dc0345;
+        text-align: center;
+        color: #ffffff;
+        font-family: "Ubuntu", sans-serif;
+        display: inline-block;
+        font-weight: 700;
+        font-size: 12px;
+        width:50px;
+        }
       .single-product-wrapper .product-img .product-badge.offer-badge {
         background-color: #dc0345; }
       .single-product-wrapper .product-img .product-badge.new-badge {
@@ -811,15 +820,14 @@ img {
       margin-bottom: 5px; }
     .single-product-wrapper .product-description p {
       margin-bottom: 0;
-      font-size: 14px;
+      font-size: 18px;
       font-family: "Ubuntu", sans-serif;
-      font-weight: 700;
       color: #000000; }
       .single-product-wrapper .product-description p span {
-        font-size: 14px;
+        font-size: 16px;
         font-family: "Ubuntu", sans-serif;
-        font-weight: 700;
         color: #aaaaaa;
+        font-weight: normal;
         margin-right: 10px;
         text-decoration: line-through; }
     .single-product-wrapper .product-description .hover-content {
@@ -875,6 +883,17 @@ img {
 .pagination {
   position: relative;
   z-index: 1; }
+    .page-active {
+    width: 40px;
+    height: 40px;
+    border: 1px solid #ebebeb;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 38px;
+    padding: 0;
+    text-align: center;
+    background-color: #BABABA;
+    color: #787878; }
   .pagination .page-item .page-link {
     width: 40px;
     height: 40px;
@@ -1005,8 +1024,7 @@ img {
       margin-bottom: 0;
       font-family: "Ubuntu", sans-serif;
       font-size: 24px;
-      color: #dc0345;
-      font-weight: 700; }
+      color: #dc0345; }
       @media only screen and (min-width: 768px) and (max-width: 991px) {
         .single_product_details_area .single_product_desc .product-price {
           font-size: 20px; } }
@@ -1015,9 +1033,14 @@ img {
         font-family: "Ubuntu", sans-serif;
         font-size: 24px;
         color: #787878;
-        font-weight: 700;
         text-decoration: line-through;
         margin-right: 15px; }
+      .old-price-checkout {
+        display: inline-block;
+        font-family: "Ubuntu", sans-serif;
+        color: #787878;
+        font-size: 15px;
+        text-decoration: line-through;}
     .single_product_details_area .single_product_desc .product-desc {
       font-size: 16px; }
       @media only screen and (min-width: 768px) and (max-width: 991px) {

@@ -44,4 +44,4 @@ django-debug-toolbar = "==2.2"
 django-celery-beat = "==2.0.0"
 
 [requires]
-python_version = "3.7"
+python_version = "3.8"
