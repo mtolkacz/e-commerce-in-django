@@ -402,16 +402,18 @@ function getOrdering(selectObject) {
 }
 
 
-function setBrandCheckboxes() {
+function setFilterCheckboxes() {
 
     var brands_div = document.getElementById("brands");
+    var discount = document.getElementById("showDiscounts");
 
-    if(brands_div){
         // get current url
         var url = new URL(window.location.href);
 
         // search parameters from current url
         var search_params = url.searchParams;
+
+    if(brands_div){
 
         if (search_params.get('brand')) {
             search_params.forEach(function(value, key) {
@@ -427,8 +429,15 @@ function setBrandCheckboxes() {
             document.getElementById("allBrands").disabled = true;
         }
     }
+
+    if(discount){
+        if(search_params.get('discountonly')){
+            discount.checked = true;
+        }
+    }
 }
-setBrandCheckboxes()
+
+setFilterCheckboxes()
 
 function getBrand(brandSlug) {
     // get current url
@@ -483,4 +492,25 @@ function getBrand(brandSlug) {
             window.location.href = new_url;
         }
     }
+}
+
+function getDiscountsOnly() {
+    // get current url
+    var url = new URL(window.location.href)
+
+    // search parameters from current url
+    var search_params = url.searchParams;
+
+    var already_showing = search_params.get('discountonly');
+
+    if (already_showing) {
+        var new_url = new URL(window.location.href)
+        // set search property to blank
+        search_params.delete('discountonly');
+    } else {
+        search_params.set('discountonly', 'true');
+    }
+    url_search = search_params.toString();
+    var new_url = url.toString();
+    window.location.href = new_url;
 }

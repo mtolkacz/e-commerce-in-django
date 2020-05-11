@@ -53,6 +53,7 @@ class ProductSubdepartmentDetail(ListAPIView):
 class ProductFilter(FilterSet):
     price = RangeFilter()
     brand = CharFilter(method='get_brand_parameters')
+    discountonly = CharFilter(method='get_discounted_products_only')
 
     class Meta:
         model = Product
@@ -61,6 +62,9 @@ class ProductFilter(FilterSet):
     def get_brand_parameters(self, queryset, name, value):
         brands = self.request.GET.getlist('brand')
         return queryset.filter(brand__slug__in=brands)
+
+    def get_discounted_products_only(self, queryset, name, value):
+        return queryset.exclude(discounted_price__isnull=True)
 
 
 class ProductCategoryDetail(ListAPIView):

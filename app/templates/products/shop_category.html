@@ -19,7 +19,7 @@
                         </div>
                         {% endif%}
 
-                        <div class="widget brands mb-50">
+                        <div class="widget brands mb-30">
                             <p class="widget-title2 mb-30">Brands</p>
                             <div id="brands" class="widget-desc">
                                     <input type="checkbox" id="allBrands" name="brand0" onchange="getBrand(this)">
@@ -30,7 +30,14 @@
                                     {% endfor %}
                             </div>
                         </div>
-                        <div class="widget price mb-50">
+                        <div class="widget mb-30">
+                            <p class="widget-title2 mb-30">Discount</p>
+                            <div id="brands" class="widget-desc">
+                                    <input type="checkbox" id="showDiscounts" onchange="getDiscountsOnly()">
+                                    <label for="allBrands">Sale</label><br>
+                                    </div>
+                        </div>
+                        <div class="widget price mb-30">
                             <p class="widget-title2 mb-30">Price</p>
                             <div class="widget-desc">
                                 <div class="slider-range text-center">
@@ -59,24 +66,6 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="widget color mb-50">
-                            <p class="widget-title2 mb-30">Color</p>
-                            <div class="widget-desc">
-                                <ul class="d-flex">
-                                    <li><a href="#" class="color1"></a></li>
-                                    <li><a href="#" class="color2"></a></li>
-                                    <li><a href="#" class="color3"></a></li>
-                                    <li><a href="#" class="color4"></a></li>
-                                    <li><a href="#" class="color5"></a></li>
-                                    <li><a href="#" class="color6"></a></li>
-                                    <li><a href="#" class="color7"></a></li>
-                                    <li><a href="#" class="color8"></a></li>
-                                    <li><a href="#" class="color9"></a></li>
-                                    <li><a href="#" class="color10"></a></li>
-                                </ul>
-                            </div>
-                        </div>
-
                     </div>
                 </div>
                 <div class="col-12 col-md-8 col-lg-9">
