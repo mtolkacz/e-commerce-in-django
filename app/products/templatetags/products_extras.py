@@ -34,3 +34,11 @@ def delete_get_parameter(context, field):
         pass
 
     return '?{}'.format(dict_.urlencode())
+
+
+@register.simple_tag()
+def active_request_get(request):
+    dict = request.GET.copy()
+    if 'ordering' in dict:
+        del dict['ordering']
+    return len(dict) if len(dict) else False

@@ -1,0 +1,28 @@
+{% extends "base_template.html" %}
+{% block title %}Gallop{% endblock %}
+{% block content %}
+{% load static %}
+{% load products_extras %}
+{% load rest_framework %}
+<br><br><br>
+
+<script>
+    function getURL() {
+        var test = window.location.href +"?ordering=-price"
+        alert(test);
+    }
+    var url = new URL(window.location.href+"/?ordering=-price")
+    getURL()
+    </script>
+<br><br>
+
+{% for product in results %}
+{{ product.id }}. {{ product.name }}, {{ product.price }}<br>
+{% endfor %}
+
+<br><br><br>
+
+
+{% include "products/brands.html" %}
+
+{% endblock %}

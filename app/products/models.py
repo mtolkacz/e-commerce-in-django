@@ -140,6 +140,7 @@ class Product(models.Model):
     category = models.ForeignKey(Category, on_delete=models.PROTECT, null=True)
     thumbnail = models.ImageField(upload_to='pic_folder/', default='pic_folder/None/no-img.jpg')
     slug = models.SlugField(max_length=150)  # todo check max product name length
+    creationdate = models.DateTimeField(auto_now_add=True)
 
     def image_tag(self):
         return mark_safe('<img src="/media/%s" width="80" height="80" />' % self.thumbnail)

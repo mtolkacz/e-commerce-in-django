@@ -1,5 +1,112 @@
+function validate_price(option){
+    var validation = true
+    var price_slider = document.getElementById("price-slider");
+    var element_min = document.getElementById("min_price");
+    var element_max = document.getElementById("max_price");
+    var starts_with_currency = document.getElementById(option + "_price").value.startsWith("$");
+    var parsed_value;
+
+    if (starts_with_currency == false){
+        parsed_value = parseInt(document.getElementById(option + "_price").value);
+    } else {
+        parsed_value = parseInt(document.getElementById(option + "_price").value.substring(1));
+    }
+    var data_min = price_slider.getAttribute("data-min");
+    var data_max = price_slider.getAttribute("data-max");
+
+    if (Number.isInteger(parsed_value) == false){
+        if(option=='min'){
+            element_min.value = price_slider.getAttribute("data-unit") + data_min;
+        } else if(option=='max'){
+            element_max.value = price_slider.getAttribute("data-unit") + data_max;
+        }
+        validation = false
+    } else if (((parsed_value < data_min) || (parsed_value > element_max.value.substring(1))) && option=='min'){
+        element_min.value = price_slider.getAttribute("data-unit") + data_min
+        validation = false
+    } else if ((parsed_value > data_max || parsed_value < element_min.value.substring(1)) && option=='max'){
+        element_max.value = price_slider.getAttribute("data-unit") + data_max
+        validation = false
+    } else if (starts_with_currency == false){
+        if(option=='min'){
+            element_min.value = price_slider.getAttribute("data-unit") + element_min.value
+        } else if(option=='max'){
+            element_max.value = price_slider.getAttribute("data-unit") + element_max.value
+        }
+    }
+
+    return validation
+}
+
+function set_price_parameters(){
+    var url = new URL(window.location.href);
+    var search_params = url.searchParams;
+
+    search_params.set('price_min', document.getElementById("min_price").value.substring(1));
+    search_params.set('price_max', document.getElementById("max_price").value.substring(1));
+
+    // change the search property of the main url
+    url.search = search_params.toString();
+
+    // the new url string
+    var new_url = url.toString();
+    window.location.href = new_url;
+}
+
+function add_filter_price_button()
+{
+    var button_exists = document.getElementById("filter-price");
+    if (button_exists == null) {
+        var slider_form = document.getElementById("slider-form-group")
+        var filter_price = `
+                        <div class="col-xs-3 pt-3 py-2">
+                            <button id="filter-price" onclick="set_price_parameters();return false;" type="button" class="btn btn-dark">Filter price</button>
+                        </div>
+                         `;
+        slider_form.insertAdjacentHTML("beforeend", filter_price);
+    }
+}
+
+function manage_filter_price(option){
+    var can_add_button = validate_price(option);
+    if(can_add_button){
+        add_filter_price_button();
+    }
+}
+
 (function ($) {
     'use strict';
+
+$('#delete-filter').click(function() {
+    var url = new URL(window.location.href)
+    var search_params = url.searchParams;
+
+    var new_url = new URL(window.location.href)
+    // set search property to blank
+    new_url.search = '';
+    var new_params = new_url.searchParams
+
+    if (search_params.get('ordering')) {
+        search_params.forEach(function(value, key) {
+            if (key == 'ordering') {
+                if (new_params.get('ordering')) {
+                    new_params.append(key, value);
+                } else {
+                    new_params.append(key, value);
+                }
+            }
+        });
+        url.search = new_params.toString();
+        var new_url = url.toString()
+        window.location.href = url;
+        //alert(url);
+    } else {
+        new_url.search = '';
+        var new_url = new_url.toString();
+        //alert(new_url);
+        window.location.href = new_url;
+    }
+});
 
     var $window = $(window);
 
@@ -155,8 +262,11 @@
             values: [value_min, value_max],
             slide: function (event, ui) {
                 var result = label_result + " " + unit + ui.values[0] + ' - ' + unit + ui.values[1];
-                console.log(t);
-                t.closest('.slider-range').find('.range-price').html(result);
+                var input_min = document.getElementById("min_price")
+                var input_max = document.getElementById("max_price")
+                input_min.value = unit + ui.values[0]
+                input_max.value = unit + ui.values[1]
+                add_filter_price_button();
             }
         });
     });
