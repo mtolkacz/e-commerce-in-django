@@ -24,10 +24,16 @@ def get_pending_cart(request):
             user = get_object_or_404(User, username=request.user.username)
             order = Order.objects.filter(owner=user, is_ordered=False)
     elif request.session.session_key:
-        session = Session.objects.filter(session_key=request.session.session_key).first()
-        order = Order.objects.filter(session_key=session)
-
-    return order[0] if order else 0
+        try:
+            session = Session.objects.get(session_key=request.session.session_key)
+        except Session.DoesNotExist:
+            return 0
+        else:
+            try:
+                order = Order.objects.get(session_key=session)
+            except Order.DoesNotExist:
+                return 0
+    return order if order else 0
 
 
 def add_item_to_cart(request):
@@ -80,7 +86,7 @@ def add_item_to_cart(request):
                 data['checkout_url'] = 'https://' + str(request.get_host()) + reverse('checkout')
 
         data['cart_total_value'] = str(existing_cart.get_cart_total())
-        data['item_id'] = order_item.id
+        data['item_id'] = item_id
         if data['new_item']:
             data['product_url'] = str(product.get_absolute_url())
             data['product_thumbnail_url'] = 'https://' + str(request.get_host()) + str(product.thumbnail.url)
@@ -124,7 +130,7 @@ def delete_item_from_cart(request):
         return JsonResponse(data)
 
     try:
-        OrderItem.objects.get(pk=item_id).delete()
+        OrderItem.objects.get(order=existing_cart, product__id=item_id).delete()
     except OrderItem.DoesNotExist:
         data['success'] = False
     else:
@@ -152,21 +158,21 @@ def calculate_item_in_cart(request):
     if item_id is None and new_cart_value is None:
         return JsonResponse(data)
 
+    # get current logged-in user order
+    existing_cart = get_pending_cart(request)
+
     try:
         # check if new cart value and item_id are integers
         value = int(new_cart_value)
         item_id = int(item_id)
 
         # get current logged-in user order and order items objects in cart
-        updated_item = OrderItem.objects.get(pk=item_id)
+        updated_item = OrderItem.objects.get(order=existing_cart, product_id=item_id)
 
     # render checkout site if request's arguments aren't integers
     # or if order item objects don't exist
     except (ValueError, OrderItem.DoesNotExist):
         return JsonResponse(data)
-
-    # get current logged-in user order
-    existing_cart = get_pending_cart(request)
 
     # check if value is in the right range
     if 0 < value <= MAX_ITEMS_IN_CART:
