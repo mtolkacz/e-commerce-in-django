@@ -88,16 +88,14 @@ class ProductCategoryDetail(ListAPIView):
         queryset = self.queryset.filter(department=dep.id, subdepartment=subdep.id, category=cat.id)
         return queryset
 
-    def get_additional_data(self, request, queryset):
+    def get_additional_data(self, request, queryset, **kwargs):
         distinct_brands = queryset.values('brand').distinct()
         brands = Brand.objects.filter(id__in=distinct_brands).order_by('name')
-        additional = {}
+        dep = get_object_or_404(Department, slug=self.kwargs[self.lookup_fields[0]])
+        subdep = get_object_or_404(Subdepartment, slug=self.kwargs[self.lookup_fields[1]])
+        cat = get_object_or_404(Category, slug=self.kwargs[self.lookup_fields[2]])
         if queryset:
-            product = queryset[0]
-            additional = {'department': DepartmentSerializer(product.department).data,
-                          'subdepartment': SubdepartmentSerializer(product.subdepartment).data,
-                          'category': CategorySerializer(product.category).data,
-                          'brands': BrandSerializer(brands, many=True).data,
+            additional = {'brands': BrandSerializer(brands, many=True).data,
                           'page': int(request.GET.get('page', '1'))}
             min = queryset.order_by('price')[0].price
             max = queryset.order_by('-price')[0].price
@@ -108,7 +106,12 @@ class ProductCategoryDetail(ListAPIView):
             additional['price'] = price
         else:
             popular_products = self.get_serializer(self.queryset[:10], many=True)
-            additional['popular_products'] = popular_products.data
+            additional = {
+                'popular_products': popular_products.data,
+            }
+        additional['department'] = DepartmentSerializer(dep).data
+        additional['subdepartment'] = SubdepartmentSerializer(subdep).data
+        additional['category'] = CategorySerializer(cat).data
         return additional
 
     @staticmethod
@@ -126,7 +129,7 @@ class ProductCategoryDetail(ListAPIView):
 
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset(**kwargs)
-        additional = self.get_additional_data(request, queryset)
+        additional = self.get_additional_data(request, queryset, **kwargs)
         queryset = self.filter_queryset(queryset)
         additional = self.get_filtered_price(request, queryset, additional)
 
@@ -136,14 +139,15 @@ class ProductCategoryDetail(ListAPIView):
             data = {
                 'objects': serializer.data,
                 'additional': additional,
-                'query_count': queryset.count(),
+                'query_count': queryset.count() if queryset else 0,
             }
             return self.get_paginated_response(data)
 
         serializer = self.get_serializer(queryset, many=True)
         data = {
             'objects': serializer.data,
-            'additional': additional.data,
+            'additional': additional,
+            'query_count': queryset.count() if queryset else 0,
         }
         return Response(data)
 

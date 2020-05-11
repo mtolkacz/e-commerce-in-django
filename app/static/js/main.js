@@ -208,13 +208,10 @@ function add_to_cart(item_id) {
                     var start_cart = `
                     <h5 class="py-3">Summary</h5>
                     <ul class="summary-table pb-10">
-                        <li><span>TOTAL:</span> <span id="right-side-cart-total-value"></span></li>
+                        <li><span>Total: </span> <span id="right-side-cart-total-value">{{ cart.get_cart_total }}</span></li>
                     </ul>
-                    <br>
-                    <div class="checkout-btn my-20">
-                        <a href="` + data.checkout_url + `" class="btn essence-btn">check out</a>
-                    </div>
-                    <br>
+                    <a href="` + data.checkout_url + `" ><button class="btn-lg my-3 px-5 btn btn-dark"><i class="fas fa-shopping-cart"></i>
+ Cart</button></a>
                     `;
                     var cart_list = document.getElementById("cart-list");
                     if (cart_list) {
@@ -241,13 +238,14 @@ function add_to_cart(item_id) {
                     <div id="right-side-item` + data.item_id + `" class="single-cart-item">
                         <a href="` + data.product_url + `">
                             <img src="` + data.product_thumbnail_url + `" class="cart-thumb" alt=""></a>
-                            <div class="cart-item-desc">
+                            <div class="cart-item-desc pb-2">
                               <span class="product-remove"><i class="fa fa-close" aria-hidden="true"></i></span>
                                 <span>` + data.product_subdepartment_name + `</span>
                                 <br><h6>` + data.product_name + `</h6>
                                 <span class="price">` + data.product_price + `
                                     <item-price id="right-side-item-price` + data.item_id + `"></item-price>
                                 </span>
+                                <br><button id="delete_item_button" onclick="removeItem(` + data.item_id + `); return false;" class="btn btn-danger btn-sm"><i class="fas fa-trash-alt"></i> Delete from cart</button>
                             </div>
                     </div>
                     `;

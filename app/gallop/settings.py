@@ -59,12 +59,27 @@ SOCIAL_AUTH_FACEBOOK_SCOPE = ['email', 'user_link']  # add this
 SOCIAL_AUTH_FACEBOOK_PROFILE_EXTRA_PARAMS = {       # add this
   'fields': 'id, name, email, picture.type(large), link'
 }
+SOCIAL_AUTH_POSTGRES_JSONFIELD = True
 SOCIAL_AUTH_FACEBOOK_EXTRA_DATA = [                 # add this
     ('name', 'name'),
     ('email', 'email'),
     ('picture', 'picture'),
     ('link', 'profile_url'),
 ]
+
+SOCIAL_AUTH_PIPELINE = (
+    'social_core.pipeline.social_auth.social_details',
+    'social_core.pipeline.social_auth.social_uid',
+    'social_core.pipeline.social_auth.social_user',
+    'social_core.pipeline.user.get_username',
+    'social_core.pipeline.social_auth.associate_by_email',
+    'social_core.pipeline.user.create_user',
+    'social_core.pipeline.social_auth.associate_user',
+    'social_core.pipeline.social_auth.load_extra_data',
+    'social_core.pipeline.user.user_details',
+)
+
+SOCIAL_AUTH_FACEBOOK_FIELD_SELECTORS = ['email', ]
 
 # Celery configuration
 CELERY_BROKER_URL = 'amqp://rabbitmq' # todo go back to this when fix problem with redis
@@ -249,6 +264,7 @@ EMAIL_HOST = os.getenv('EMAIL_HOST')
 EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 EMAIL_PORT = os.getenv('EMAIL_PORT')
+EMAIL_USE_TLS = True
 
 CACHES = {
     "default": {

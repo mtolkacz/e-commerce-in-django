@@ -22,13 +22,14 @@
                     <a href="{{ item.product.get_absolute_url }}" >
                         <img src="{{ item.product.thumbnail.url }}" class="cart-thumb" alt=""></a>
                         <!-- Cart Item Desc -->
-                        <div class="cart-item-desc">
+                        <div class="cart-item-desc pb-2">
                           <span class="product-remove"><i class="fa fa-close" aria-hidden="true"></i></span>
                             <span>{{ item.product.subdepartment.name }}</span>
                             <br><a href="{{ item.product.get_absolute_url }}" ><h6>{{ item.product.name }}</h6></a>
                             <span class="price">{% if item.product.discounted_price %}{{ item.product.discounted_price }}{% else %}{{ item.product.price }}{% endif %}
                                 <item-price id="right-side-item-price{{ item.product.id }}">{% if item.amount > 1 %}x {{ item.amount }}{% endif %}</item-price>
                             </span>
+                            <br><button id="right_side_delete_item_button" onclick="removeItem({{item.product.id}}); return false;" class="btn btn-danger btn-sm"><i class="fas fa-trash-alt"></i> Delete from cart</button>
                         </div>
                 </div>
                 {% endfor %}

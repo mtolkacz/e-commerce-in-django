@@ -3,15 +3,15 @@
 {% block content %}
 {% load static %}
 {% load products_extras %}
-{% if results %}
-<section class="shop_grid_area section-padding-80">
+
+<section class="shop_grid_area pt-5">
         <div class="container">
             <div class="row">
 
                 <div class="col-12 col-md-4 col-lg-3">
                     <div class="shop_sidebar_area">
+                        {% if results.objects %}
                         <h6 class="widget-title mb-30">Filter by</h6>
-
                         {% active_request_get request as get_parameters %}
                         {% if get_parameters %}
                         <div class="pb-3">
@@ -66,6 +66,7 @@
                                 </div>
                             </div>
                         </div>
+                        {% endif %}
                     </div>
                 </div>
                 <div class="col-12 col-md-8 col-lg-9">
@@ -86,6 +87,7 @@
                                                 {% if results.query_count > 1 %}products{% else %}product{% endif %} found</p>
                                         </div>
                                     </div>
+                                    {% if results.objects %}
                                     <div class="product-sorting d-flex">
                                         <p>Sort by:</p>
                                             <select name="select" id="sortByselect" onchange="getOrdering(this)">
@@ -95,9 +97,11 @@
                                                 <option value="LowPrice">Price: $ - $$</option>
                                             </select>
                                     </div>
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>
+                        {% if results.objects %}
                         <div class="row">
                             {% for product in results.objects %}
                             <div class="col-12 col-sm-6 col-lg-4">
@@ -135,8 +139,9 @@
                             </div>
                             {% endfor %}
                         </div>
+                        {% endif %}
                     </div>
-                    {% if count|page_numbers > 1 %}
+                    {% if count|page_numbers > 1 and results.objects %}
                      <nav aria-label="navigation">
                         <ul class="pagination mt-50 mb-70">
                             {% if previous %}
@@ -167,15 +172,12 @@
             </div>
         </div>
 </section>
-{% else %}
 
-<section class="new_arrivals_area section-padding-80 px-5 clearfix">
+{% if not results.objects %}
+<section class="new_arrivals_area px-5 clearfix">
     <div class="container_fluid">
         <div class="row">
             <div class="col-12" style="text-align:center;">
-                <div class="total-products">
-                    <b>No products found</b>
-                </div><br>
                 <h2>Check other popular products</h2>
                 <br>
                 <div class="category-popular-products-slides owl-carousel">
@@ -212,6 +214,5 @@
         </div>
     </div>
 </section>
-
 {% endif %}
 {% endblock %}

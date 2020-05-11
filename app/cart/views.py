@@ -22,7 +22,10 @@ def get_pending_cart(request):
     if request.user.username:
         if request.user.is_authenticated:
             user = get_object_or_404(User, username=request.user.username)
-            order = Order.objects.filter(owner=user, is_ordered=False)
+            try:
+                order = Order.objects.get(owner=user, is_ordered=False)
+            except Order.DoesNotExist:
+                pass
     elif request.session.session_key:
         try:
             session = Session.objects.get(session_key=request.session.session_key)
