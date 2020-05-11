@@ -66,7 +66,7 @@
         </div>
     </div>
 
-{{ images }}
+
     <section class="new_arrivals_area section-padding-80 clearfix">
         <div class="container">
             <div class="row">
@@ -97,14 +97,13 @@
                                     <a href="#" class="favme fa fa-heart"></a>
                                 </div>
                             </div> 
-                            <!-- Product Description -->
                             <div class="product-description">
                                 <span>{{ item.subdepartment.name }}</span>
                                 <a href="{{ item.get_absolute_url }}">
                                     <h6 style="height:55px;display:block;">{{ item.name }}</h6>
                                 </a>
                                 <p class="product-price">{{ item.price }}</p>
-                                <button onclick="add_to_cart({{ item.id }}); return false;" class="essence-btn btn-sm">Add to cart</button>
+                                <button onclick="add_to_cart({{ item.id }}); return false;" class="btn-primary btn-sm"><i class="fas fa-shopping-cart"></i> Add to cart</button>
                             </div>
                         </div>
                         {% endfor %}

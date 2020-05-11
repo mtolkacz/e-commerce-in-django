@@ -3,8 +3,7 @@
 {% block content %}
 {% load static %}
 {% load products_extras %}
-
-{% if results.objects %}
+{% if results %}
 <section class="shop_grid_area section-padding-80">
         <div class="container">
             <div class="row">
@@ -12,48 +11,61 @@
                 <div class="col-12 col-md-4 col-lg-3">
                     <div class="shop_sidebar_area">
                         <h6 class="widget-title mb-30">Filter by</h6>
-                        <div class="widget brands mb-50">
+
+                        {% active_request_get request as get_parameters %}
+                        {% if get_parameters %}
+                        <div class="pb-3">
+                            <button id="delete-filter" type="button" class="btn btn-primary">Delete filters</button>
+                        </div>
+                        {% endif%}
+
+                        <div class="widget brands mb-30">
                             <p class="widget-title2 mb-30">Brands</p>
-                            <div class="widget-desc">
-                                <ul>
+                            <div id="brands" class="widget-desc">
+                                    <input type="checkbox" id="allBrands" name="brand0" onchange="getBrand(this)">
+                                    <label for="allBrands">All</label><br>
                                     {% for brand in results.additional.brands %}
-                                    <li><a href="#">{{ brand.name }}</a></li>
+                                    <input type="checkbox" id="{{brand.slug}}" name="brand{{ forloop.counter }}" onchange="getBrand(this)">
+                                    <label for="{{brand.slug}}">{{brand.name}}</label><br>
                                     {% endfor %}
-                                </ul>
                             </div>
                         </div>
-                        <div class="widget price mb-50">
-                            <p class="widget-title2 mb-30">Price</p>
-
-                            <div class="widget-desc">
-                                <div class="slider-range">
-                                    <div data-min="{{ results.additional.price.min }}" data-max="{{ results.additional.price.max }}" data-unit="$" class="slider-range-price ui-slider ui-slider-horizontal ui-widget ui-widget-content ui-corner-all" data-value-min="{{ results.additional.price.min }}" data-value-max="{{ results.additional.price.max }}" data-label-result="Range:">
-                                        <div class="ui-slider-range ui-widget-header ui-corner-all"></div>
-                                        <span class="ui-slider-handle ui-state-default ui-corner-all" tabindex="0"></span>
-                                        <span class="ui-slider-handle ui-state-default ui-corner-all" tabindex="0"></span>
+                        <div class="widget mb-30">
+                            <p class="widget-title2 mb-30">Discount</p>
+                            <div id="brands" class="widget-desc">
+                                    <input type="checkbox" id="showDiscounts" onchange="getDiscountsOnly()">
+                                    <label for="allBrands">Sale</label><br>
                                     </div>
-                                    <div class="range-price">Range: ${{ results.additional.price.min }} - ${{ results.additional.price.max }}</div>
+                        </div>
+                        <div class="widget price mb-30">
+                            <p class="widget-title2 mb-30">Price</p>
+                            <div class="widget-desc">
+                                <div class="slider-range text-center">
+                                    <div id="price-slider" data-min="{{ results.additional.price.min }}" data-max="{{ results.additional.price.max }}" data-unit="$" class="slider-range-price ui-slider ui-slider-horizontal ui-widget ui-widget-content ui-corner-all"
+                                         data-value-min="{% if results.additional.filtered_price.min %}{{ results.additional.filtered_price.min }}{% else %}{{ results.additional.price.min }} {% endif %}"
+                                         data-value-max="{% if results.additional.filtered_price.max %}{{ results.additional.filtered_price.max }}{% else %}{{ results.additional.price.max }} {% endif %}"
+                                         data-label-result="Range:">
+                                        <div class="ui-slider-range ui-widget-header ui-corner-all"></div>
+                                        <span id="slider-min" class="ui-slider-handle ui-state-default ui-corner-all" tabindex="0"></span>
+                                        <span id="slider-max" class="ui-slider-handle ui-state-default ui-corner-all" tabindex="0"></span>
+                                    </div>
+                                    <div id="slider-form-group" class="form-group row justify-content-center">
+                                        <div class="pt-2 text-center pr-2">
+                                            <label for="min_price">Min price</label>
+                                            <input disabled=true  onchange="manage_filter_price('min'); return false;" id="min_price" class="form-control text-center"
+                                                   value="${% if results.additional.filtered_price.min %}{{ results.additional.filtered_price.min }}{% else %}{{ results.additional.price.min }} {% endif %}" type="text"
+                                                   maxlength="10" size="3">
+                                        </div>
+                                        <div class="pt-2 text-center pl-2">
+                                            <label for="max_price">Max price</label>
+                                            <input disabled=true onchange="manage_filter_price('max'); return false;" id="max_price" class="form-control text-center"
+                                                   value="${% if results.additional.filtered_price.max %}{{ results.additional.filtered_price.max }}{% else %}{{ results.additional.price.max }} {% endif %}" type="text"
+                                                   maxlength="10" size="3">
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="widget color mb-50">
-                            <p class="widget-title2 mb-30">Color</p>
-                            <div class="widget-desc">
-                                <ul class="d-flex">
-                                    <li><a href="#" class="color1"></a></li>
-                                    <li><a href="#" class="color2"></a></li>
-                                    <li><a href="#" class="color3"></a></li>
-                                    <li><a href="#" class="color4"></a></li>
-                                    <li><a href="#" class="color5"></a></li>
-                                    <li><a href="#" class="color6"></a></li>
-                                    <li><a href="#" class="color7"></a></li>
-                                    <li><a href="#" class="color8"></a></li>
-                                    <li><a href="#" class="color9"></a></li>
-                                    <li><a href="#" class="color10"></a></li>
-                                </ul>
-                            </div>
-                        </div>
-
                     </div>
                 </div>
                 <div class="col-12 col-md-8 col-lg-9">
@@ -70,21 +82,18 @@
                                         </p>
                                         <h4 class="pb-3">{{ results.additional.category.name }}</h4>
                                         <div class="total-products">
-                                            <p><span>{{ results.additional.total_active_records }}</span>
-                                                {% if results.additional.total_active_records > 1 %}products{% else %}product{% endif %} found</p>
+                                            <p><span>{{ results.query_count }}</span>
+                                                {% if results.query_count > 1 %}products{% else %}product{% endif %} found</p>
                                         </div>
                                     </div>
                                     <div class="product-sorting d-flex">
                                         <p>Sort by:</p>
-                                        <form action="#" method="get">
-                                            <select name="select" id="sortByselect">
-                                                <option value="value">Highest Rated</option>
-                                                <option value="value">Newest</option>
-                                                <option value="value">Price: $$ - $</option>
-                                                <option value="value">Price: $ - $$</option>
+                                            <select name="select" id="sortByselect" onchange="getOrdering(this)">
+                                                <option value="HiRated">Highest Rated</option>
+                                                <option value="Newest">Newest</option>
+                                                <option value="HiPrice">Price: $$ - $</option>
+                                                <option value="LowPrice">Price: $ - $$</option>
                                             </select>
-                                            <input type="submit" class="d-none" value="">
-                                        </form>
                                     </div>
                                 </div>
                             </div>
@@ -118,7 +127,7 @@
 
                                         <div class="hover-content">
                                             <div class="add-to-cart-btn">
-                                                <button onclick="add_to_cart({{ product.id }}); return false;" class="btn essence-btn">Add to cart</button>
+                                                <button onclick="add_to_cart({{ product.id }}); return false;" class="btn btn-primary">Add to cart</button>
                                             </div>
                                         </div>
                                     </div>
@@ -127,6 +136,7 @@
                             {% endfor %}
                         </div>
                     </div>
+                    {% if count|page_numbers > 1 %}
                      <nav aria-label="navigation">
                         <ul class="pagination mt-50 mb-70">
                             {% if previous %}
@@ -152,6 +162,7 @@
                             {% endif %}
                         </ul>
                     </nav>
+                    {% endif %}
                 </div>
             </div>
         </div>
