@@ -47,30 +47,27 @@
                         <p class="product-price">{% if object.discounted_price %}<span class="old-price">{{ object.price }}</span>{% endif %}
                             {% if object.discounted_price %}<b>{{ object.discounted_price }}</b>{% else %}<p style="color:#000;font-size:22px">{{ object.price }}</p>{% endif %}</p>
                         <p id="product-desc" class="product-desc">{{ object.description|safe }}</p>
-
-                        <form class="cart-form clearfix" method="post">
-                            <div class="select-box d-flex mt-50 mb-30">
-                                <select name="select" id="productSize" class="mr-5">
-                                    <option value="value">Size: XL</option>
-                                    <option value="value">Size: X</option>
-                                    <option value="value">Size: M</option>
-                                    <option value="value">Size: S</option>
-                                </select>
-                                <select name="select" id="productColor">
-                                    <option value="value">Color: Black</option>
-                                    <option value="value">Color: White</option>
-                                    <option value="value">Color: Red</option>
-                                    <option value="value">Color: Purple</option>
-                                </select>
+                        <i class="fas fa-surprise"></i>
+                        <div class="py-3">
+                            {% if object.stock > 10 %}<span style="color: green"><i class="fas fa-check-circle fa-2x pr-2"></i> Product available</span>
+                            {% elif object.stock < 10 and object.stock > 4 %}<span style="color: orange"><i class="fas fa-exclamation-circle fa-2x pr-2"></i> Not many products left</span>
+                            {% elif object.stock < 5 and object.stock > 0 %}<span style="color: red"><i class="fas fa-exclamation-circle fa-2x pr-2"></i> {{ object.stock }}{% if object.stock == 1 %} product{% else %}  products{% endif %} left</span>
+                            {% elif object.stock < 1 %}<span style="color: red"><i class="fas fa-times-circle fa-2x pr-2"></i> Product not available</span>
+                            {% endif %}
+                        </div>
+                        <div class="cart-fav-box d-flex align-items-center">
+                            <button id="add_item_button" onclick="add_to_cart({{ object.id }}); return false;"
+                                    class="btn btn-primary mr-2"><i class="fas fa-shopping-cart"></i> Add to cart
+                            </button>
+                            {% if exists_in_cart %}
+                            <button id="delete_item_button" onclick="removeItem({{ object.id }}); return false;"
+                                    class="btn btn-danger ml-2"><i class="fas fa-trash-alt"></i> Delete from cart
+                            </button>
+                            {% endif %}
+                            <div class="product-favourite ml-4">
+                                <a href="#" class="favme fa fa-heart"></a>
                             </div>
-                            <div class="cart-fav-box d-flex align-items-center">
-                                <button id="add_item_button" onclick="add_to_cart({{ object.id }}); return false;" class="btn btn-primary mr-2"><i class="fas fa-shopping-cart"></i> Add to cart</button>
-                                {% if exists_in_cart %}<button id="delete_item_button" onclick="removeItem({{ object.id }}); return false;" class="btn btn-danger ml-2"><i class="fas fa-trash-alt"></i> Delete from cart</button>{% endif %}
-                                <div class="product-favourite ml-4">
-                                    <a href="#" class="favme fa fa-heart"></a>
-                                </div>
-                            </div>
-                        </form>
+                        </div>
                     </div>
                 </section>
             </div>
