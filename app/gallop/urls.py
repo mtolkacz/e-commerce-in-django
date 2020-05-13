@@ -14,7 +14,7 @@ urlpatterns = [
     path('products/', include('products.urls'), name='products'),
     path('blog/', include('blog.urls')),
     path('admin/', admin.site.urls),
-    path('cart/', include('cart.urls')),
+    path('purchase/', include('cart.urls')),
     path('account/', include('accounts.urls')),
     path('social-auth/', include('social_django.urls', namespace='social')),
 ]

@@ -6,9 +6,8 @@ from .models import *
 import datetime
 from .extras import generate_order_id
 from django.contrib import messages
-from .forms import OrderForm
 from django.http import JsonResponse, Http404
-
+from .forms import CheckoutForm
 # User = settings.AUTH_USER_MODEL
 from django.contrib.auth import get_user_model
 
@@ -86,7 +85,7 @@ def add_item_to_cart(request):
                 data['success'] = True
                 data['cart_qty'] = '1'
                 data['new_cart'] = True
-                data['checkout_url'] = 'https://' + str(request.get_host()) + reverse('checkout')
+                data['cart_url'] = 'https://' + str(request.get_host()) + reverse('cart')
 
         data['cart_total_value'] = str(existing_cart.get_cart_total())
         data['item_id'] = item_id
@@ -206,16 +205,18 @@ def order_summary(request, **kwargs):
     return render(request, 'cart/order_summary.html', context)
 
 
-def checkout(request):
+def cart(request):
     order = get_pending_cart(request)
-    items = 0 if isinstance(order, int) else order.get_cart_items()
-    cart_item_form = 0 if isinstance(items, int) else OrderForm(initial={'amount': items[0].amount})
 
     context = {
         'order': order,
-        # 'items': items,
     }
-    return render(request, 'cart/checkout.html', context)
+    return render(request, 'cart/cart.html', context)
+
+
+def checkout(request):
+    form = CheckoutForm()
+    return render(request, 'cart/checkout.html', {'form': form})
 
 
 @login_required()

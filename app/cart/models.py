@@ -47,6 +47,9 @@ class Order(models.Model):
         return sum([(item.product.discounted_price if item.product.discounted_price else item.product.price)
                     * item.amount for item in self.items.all()])
 
+    def get_cart_currency(self):
+        return self.get_cart_total().currency if self.get_cart_total().currency else 'USD'
+
     def get_cart_qty(self):
         return sum(item.amount for item in self.items.all())
 

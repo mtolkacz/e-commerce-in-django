@@ -15,7 +15,7 @@
                 <ul class="summary-table pb-10">
                     <li><span>Total: </span> <span id="right-side-cart-total-value">{{ cart.get_cart_total }}</span></li>
                 </ul>
-                <a href="{% url 'checkout' %}" ><button class="btn-lg my-3 px-5 btn btn-dark"><i class="fas fa-shopping-cart"></i>
+                <a href="{% url 'cart' %}" ><button class="btn-lg my-3 px-5 btn btn-dark"><i class="fas fa-shopping-cart"></i>
  Cart</button></a>
                 {% for item in cart.get_cart_items %}
                 <div id="right-side-item{{item.product.id}}" class="single-cart-item">
