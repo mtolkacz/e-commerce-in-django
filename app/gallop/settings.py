@@ -127,6 +127,7 @@ THIRD_PARTY_APPS = (
     'django_celery_results',
     'django_celery_beat',
     'debug_toolbar',
+    'paypal.standard.ipn',
 )
 LOCAL_APPS = (
     'accounts',
@@ -311,3 +312,8 @@ REST_FRAMEWORK = {
 #         },
 #     },
 # }
+
+PAYPAL_RECEIVER_EMAIL = os.getenv('PAYPAL_RECEIVER_EMAIL', ''),
+PAYPAL_TEST = True
+PAYPAL_API_KEY = os.getenv('PAYPAL_API_KEY', ''),
+

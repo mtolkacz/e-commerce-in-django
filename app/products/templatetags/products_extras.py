@@ -1,5 +1,4 @@
 from django import template
-# from urllib.parse import urlencode
 import math
 from django.conf import settings
 

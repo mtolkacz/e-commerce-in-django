@@ -2,98 +2,110 @@
 {% block title %}Cart{% endblock %}
 {% block content %}
 {% load static %}
+{% load crispy_forms_tags %}
+{% load cart_extras %}
 
-<div class="container pt-3 pb-3">
-    <div id="shopping-cart" class="card shopping-cart">
-        <div id="card-header" class="card-header bg-light text-dark">
-            <i aria-hidden="true" class="fa fa-shopping-cart"></i> Shipping cart
-            <a href="{% url 'index' %}"><button class="btn btn-primary btn-sm mr-4 float-right" type="button"><span
-                    class="glyphicon glyphicon-share-alt"></span> Continue shopping
-            </button></a>
-            <div class="clearfix"></div>
-        </div>
-        {% if order.id %}
-        <div id="card-body" class="card-body">
-            <!-- PRODUCT -->
-                {% for item in order.get_cart_items %}
-                <div id="row{{ item.product.id }}">
-                    <div class="row my-2">
-                    <div class="col-12 col-sm-12 col-md-2 text-center product-img" style="text-align:middle">
-                            <a href="{{ item.product.get_absolute_url }}"><img alt="prewiew" class="img-responsive" height="80" src="{{ item.product.thumbnail.url }}" width="120"></a>
-                            {% if item.product.discounted_price %}
-                            <div class="product-badge offer-badge">
-                                <span>-{{ item.product.get_discount_value }}%</span>
-                            </div>
-                        {% endif %}
-                    </div>
-                    <div class="col-12 text-sm-center col-sm-12 text-md-left col-md-5 pt-3">
-                        <a href="{{ item.product.get_absolute_url }}"><span class="product-name">{{ item.product.name }}</span></a>
-                    </div>
-                    <div class="col-12 col-sm-12 text-sm-center col-md-5 row pt-3">
-                        <div class="col-5 col-sm-5 col-md-5 text-md-right" style="padding-top: 5px">
-                            {% if item.amount > 1 %}
-                            <span id="item_total_value{{ item.product.id }}">{{ item.get_item_total }}</span>
-                            {% if item.product.discounted_price %}<span id="old-price-checkout{{ item.product.id }}" class="old-price-checkout">{{ item.get_item_total_no_discount }}</span>{% endif %}
-                            <br><small><span id="apiece_value{{ item.product.id }}">
-                            {% if item.product.discounted_price %}{{ item.product.discounted_price }} {% else %}{{ item.product.price }}{% endif %} apiece</span>
-                        </small>
-                            {% else %}
-                            <span id="item_total_value{{ item.product.id }}">
-                                {% if item.product.discounted_price %}{{ item.product.discounted_price }}</span>
-                            <span id="old-price-checkout{{ item.product.id }}" class="old-price-checkout">{{ item.product.price }}</span>
-                                {% else %}{{ item.product.price }}</span>{% endif %}
-                            <br><small><span id="apiece_value{{ item.product.id }}"></span></small>
-                            {% endif %}
-                        </div>
-                        <div class="col-5 col-sm-5 col-md-5">
-                            <a href="#" onclick="decreaseValue({{ item.product.id }}); return false;"><i class="fas fa-minus mr-2"></i></a>
-                            <input onchange="updateValue({{ item.product.id }}); return false;" type="text" value="{{ item.amount }}" id="item{{ item.product.id }}" style="width:40px;text-align: center; ">
-                            <a href="#" onclick="increaseValue({{ item.product.id }}); return false;"><i
-                                        class="fas fa-plus ml-2"></i></a><br>
-                        </div>
-                         <div class="col-2 col-sm-2 col-md-2">
-                            <a id="delete_item" title="Click to delete item from cart" href="#" onclick="removeItem({{ item.product.id }}); return false;">
-                                <button class="btn btn-outline-danger btn-xs" type="button">
-                                <i aria-hidden="true" class="fa fa-trash"></i>
-                                </button>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-                    <hr class="my-4">
-                </div>
-
-            {% endfor %}
-        </div>
-        <div id="card-footer" class="ca0rd-footer">
-            <div class="coupon col-md-12 col-sm-12 no-padding-left pull-left">
-                <div class="row">
-                    <div class="col-md-3 col-sm-6 col-6 pt-2 pb-5">
-                        <input class="form-control" placeholder="cupone code" type="text">
-                    </div>
-                    <div class="col-md-3 col-sm-6 col-6 pt-2 pb-5">
-                        <input class="btn btn-default" type="submit" value="Use cupone">
-                    </div>
-                    <div class="col-md-3 col-sm-6 col-6 pt-2 pb-5">
-                        <div class="float-right" style="margin: 5px">Total price: <b><span id="cart_total_value">{{ order.get_cart_total }}</span></b></div>
-                    </div>
-                    <div class="col-md-3 col-sm-6 col-6 pt-2 pb-5">
-                         <button class="btn btn-success" type="button">Checkout</button>
-                        <a id="delete_item" title="Click to delete shipping cart" href="#" onclick="delete_cart(); return false;">
-                            <button class="btn btn-danger btn-xs float-right mr-3" type="button">
-                            <i aria-hidden="true" class="fa fa-trash"></i>
-                            </button>
-                        </a>
-                    </div>
-                </div>
+<div class="jumbotron-fluid">
+  <div class="container py-5 mb-5">
+    <div class="row">
+      <div class="col-md-7 order-md-2 mb-4">
+        <h4 class="d-flex justify-content-between align-items-center mb-3">
+          <span>Checkout</span>
+          <a href="{% url 'cart' %}"><button class="btn btn-dark mt-3"><i class="fas fa-shopping-cart"></i> Go back to Cart</button></a>
+        </h4>
+        <ul class="list-group mb-3">
+          {% for item in cart.get_cart_items %}
+          <li class="list-group-item d-flex justify-content-between {% if forloop.counter0|divisibleby:2 %}bg-light{% else %}lh-condensed{% endif %}">
+            <div>
+              <a href="{{ item.product.get_absolute_url }}" ><h7 class="my-0">{% if item.amount > 1  %}<span class="pr-2"> {{ item.amount }} x </span>{% endif %}{{ item.product.name }}</h7></a>
             </div>
-        </div>
+            <span class="text-muted" style="text-align: right">
+              {% if item.amount > 1 %}
+                              {% if item.product.discounted_price %}<span id="old-price-checkout{{ item.product.id }}"
+                                                                          class="old-price-checkout">{{ item.get_item_total_no_discount }}</span>
+                              {% endif %}<span id="item_total_value{{ item.product.id }}">{{ item.get_item_total }}</span>
+                              <br><small><span id="apiece_value{{ item.product.id }}">
+                              {% if item.product.discounted_price %}{{ item.product.discounted_price }} {% else %}{{ item.product.price }}{% endif %} apiece</span>
+                          </small>
+                              {% else %}
+                              <span id="item_total_value{{ item.product.id }}">
+                                  {% if item.product.discounted_price %} <span id="old-price-checkout{{ item.product.id }}" class="old-price-checkout">{{ item.product.price }}</span>
+                                {{ item.product.discounted_price }}</span>
+
+                              {% else %}{{ item.product.price }}</span>{% endif %}
+            <br><small><span id="apiece_value{{ item.product.id }}"></span></small>
+            {% endif %}
+            </span>
+          </li>
+          {% endfor %}
+          <li class="list-group-item d-flex justify-content-between bg-light">
+            <div class="text-success">
+              <h6 class="my-0">Promo code</h6>
+              <small>EXAMPLECODE</small>
+            </div>
+            <span class="text-success">-$5</span>
+          </li>
+          <li class="list-group-item d-flex justify-content-between">
+            <span>Total ({{ cart.get_cart_currency }})</span>
+            <strong>{{ cart.get_cart_total }}</strong>
+          </li>
+        </ul>
+
+        <form class="card p-2">
+          <div class="input-group">
+            <input type="text" class="form-control" placeholder="Promo code">
+            <div class="input-group-append">
+              <button type="submit" class="btn btn-primary">Redeem</button>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="col-md-5 order-md-1">
+
+      <form method="post" class="needs-validation" novalidate>
+        {% csrf_token %}
+        {% if user_data %}
+        <h4 class="mb-3">Billing address</h4>
+        {{ user.first_name }} {{ user.last_name }}<br>
+        {{ user.address_1 }}<br>
+        {% if user.address_2 %}{{ user.address_2 }}<br>{% endif %}
+        {{ user.country }}, {{ user.voivodeship }}<br>
+        {{ user.zip_code }} {{ user.city }}<br>
+
+          <hr class="mb-4">
+          <!-- Shippment address chechbox-->
+          <div class="custom-control custom-checkbox pb-4">
+              <input type="checkbox" class="custom-control-input" autocomplete="off" name="same-address" value="same-address" {% if same_address %}{{ same_address }}{% endif %} id="same-address">
+              <label class="custom-control-label" for="same-address">Shipping address is the same as my billing address</label>
+          </div>
+
+          {% include "cart/checkout/shipment_address.html" %}
+
         {% else %}
-        <div id="card-body" class="card-body">
-            <br><h5><span class="py-5 px-5">Your cart is empty</span></h5><br>
-        </div>
-		{% endif %}
+
+          {% include "cart/checkout/billing_address.html" %}
+          {% if not user.username %}
+          <div class="custom-control custom-checkbox">
+              <input type="checkbox" name="account-checkbox" value="account_checkbox" {% if account_checkbox %}{{ account_checkbox }}{% endif %} class="custom-control-input" id="account-checkbox">
+              <label class="custom-control-label" for="account-checkbox">Save information for future and create account</label>
+          </div>
+
+          {% include "cart/checkout/create_account.html" %}
+          {% endif %}
+          <div class="custom-control custom-checkbox">
+              <input type="checkbox" name="same-address" value="same-address" {% if same_address %}{{ same_address }}{% endif %} class="custom-control-input" id="same-address">
+              <label class="custom-control-label" for="same-address">Shipping address is the same as my billing address</label>
+          </div>
+
+          {% include "cart/checkout/shipment_address.html" %}
+
+        {% endif %}
+         <button type="submit" class="btn btn-success btn-lg mt-3"><i class="fas fa-shopping-bag"></i> Go to Payment</button>
+        </form>
+         <button id="delete-purchase" class="btn btn-danger btn-sm mt-3"><i class="fas fa-trash"></i> Delete purchase</button>
+      </div>
     </div>
+  </div>
 </div>
 
 {% endblock %}
