@@ -1,3 +1,4 @@
+
 /*price range*/
 $('#sl2').slider();
 

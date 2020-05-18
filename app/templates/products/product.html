@@ -67,7 +67,7 @@
                             {% endif %}
                                 {% else %}
                             {% endif %}
-                                <button class="btn btn-info ml-2"><i class="fas fa fa-heart"></i> Add to favorite</button>
+                            {% if user.username %}<button class="btn btn-info ml-2"><i class="fas fa fa-heart"></i> Add to favorite</button>{% endif %}
                         </div>
                     </div>
                 </section>

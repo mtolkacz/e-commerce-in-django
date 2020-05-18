@@ -203,9 +203,7 @@
                                 <h6 style="height:55px;display:block;">{{ item.name }}</h6>
                             </a>
                             <p class="product-price">{{ item.price }}</p>
-                            <button onclick="add_to_cart({{ item.id }}); return false;" class="essence-btn btn-sm">Add
-                                to cart
-                            </button>
+                            <button onclick="add_to_cart({{ item.id }}); return false;" class="btn-primary btn-sm"><i class="fas fa-shopping-cart"></i> Add to cart</button>
                         </div>
                     </div>
                     {% endfor %}

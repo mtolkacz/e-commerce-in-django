@@ -302,6 +302,14 @@
     </footer>
     <!-- ##### Footer Area End ##### -->
 
+    <script>
+    {% if messages %}
+        {% for message in messages %}
+        alert("{{ message }}");
+        {% endfor %}
+    {% endif %}
+    </script>
+
     <!-- jQuery (Necessary for All JavaScript Plugins) -->
     <script src="{% static 'js/jquery/jquery-2.2.4.min.js' %}"></script>
     <!-- Popper js -->

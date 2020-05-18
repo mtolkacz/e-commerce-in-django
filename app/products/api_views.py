@@ -94,6 +94,7 @@ class ProductCategoryDetail(ListAPIView):
         dep = get_object_or_404(Department, slug=self.kwargs[self.lookup_fields[0]])
         subdep = get_object_or_404(Subdepartment, slug=self.kwargs[self.lookup_fields[1]])
         cat = get_object_or_404(Category, slug=self.kwargs[self.lookup_fields[2]])
+        additional = {}
         if queryset:
             additional = {'brands': BrandSerializer(brands, many=True).data,
                           'page': int(request.GET.get('page', '1'))}

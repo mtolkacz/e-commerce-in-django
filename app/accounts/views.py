@@ -13,6 +13,62 @@ from .models import User
 from .tasks import send_email
 
 
+def create_user_from_form(form):
+    # Save form but not commit yet
+    user = form.save(commit=False)
+
+    # Set deactivated till mail confirmation
+    user.is_active = False
+
+    # Create new user
+    user.save()
+
+    return user
+
+
+def send_activation_link(request, user, **kwargs):
+
+    # Look up the current site based on request.get_host() if the SITE_ID setting is not defined
+    current_site = get_current_site(request)
+
+    # # Create Email object, prepare mail content and generate user token
+    # # Email class includes custom predefined SMTP settings
+
+    print('DJANGOTEST: Username = {}, mail = {}'.format(user.username, user.email))
+    # receiver = form.cleaned_data.get('email')
+    receiver = user.email
+    subject = 'Activate your Gallop account'
+    if 'order' in kwargs:
+        context = {
+            'user': user,
+            'domain': current_site.domain,
+            # Return a bytestring version of user.pk and encode a bytestring to a base64 string
+            # for use in URLs, stripping any trailing equal signs.
+            'uid': urlsafe_base64_encode(force_bytes(user.pk)),
+            # Generate user token
+            'token': account_activation_token.make_token(user),
+            # Generate user token
+            'oid': urlsafe_base64_encode(force_bytes(kwargs['order'].id)),
+        }
+        print('DJANGOTEST: kwargs = {}'.format(kwargs['order'].id))
+        message = render_to_string('accounts/purchase_activate.html', context)
+    else:
+        context = {
+            'user': user,
+            'domain': current_site.domain,
+            # Return a bytestring version of user.pk and encode a bytestring to a base64 string
+            # for use in URLs, stripping any trailing equal signs.
+            'uid': urlsafe_base64_encode(force_bytes(user.pk)),
+            # Generate user token
+            'token': account_activation_token.make_token(user)
+        }
+        message = render_to_string('accounts/activate.html', context)
+
+    # Celery sending mail
+    send_email.apply_async((receiver, subject, message), countdown=0)
+    messages.success(request, 'Please confirm your email address to complete the registration.')
+
+
 # Multiple view for signing in and registration
 @require_http_methods(["GET", "POST"])
 def login(request):
@@ -37,8 +93,15 @@ def login(request):
             if login_form.is_valid():
 
                 # Normalize form fields to consistent format
-                username = login_form.cleaned_data.get('username')
+                login = login_form.cleaned_data.get('username')
                 raw_password = login_form.cleaned_data.get('password')
+
+                username = login
+                if username.find('@') >= 0:
+                    try:
+                        username = User.objects.get(email=login).username
+                    except User.DoesNotExist:
+                        messages.error(request, 'Incorrect login')
 
                 # If the given credentials are valid, return a User object.
                 user = authenticate(username=username, password=raw_password)
@@ -62,10 +125,12 @@ def login(request):
                         if next_url:
                             return HttpResponseRedirect(next_url)
 
+                        hello = user.first_name if user.first_name else user.username
+                        messages.success(request, 'Welcome {}'.format(hello))
                         # Go to index view
                         return redirect('index')
                     else:
-                        messages.error(request, 'Your account was inactive.')
+                        messages.error(request, 'Your account is inactive.')
                 else:
                     messages.error(request, 'Invalid login details given.')
 
@@ -77,35 +142,10 @@ def login(request):
 
             # Return True if the form has no errors, or False otherwise
             if registration_form.is_valid():
-                # Save form but not commit yet
-                user = registration_form.save(commit=False)
 
-                # Set deactivated till mail confirmation
-                user.is_active = False
+                user = create_user_from_form(registration_form)
 
-                # Create new user
-                user.save()
-
-                # Look up the current site based on request.get_host() if the SITE_ID setting is not defined
-                current_site = get_current_site(request)
-
-                # # Create Email object, prepare mail content and generate user token
-                # # Email class includes custom predefined SMTP settings
-                # registration_email = Email()
-                receiver = registration_form.cleaned_data.get('email')
-                subject = 'Activate your Gallop account'
-                message = render_to_string('accounts/activate.html', {
-                    'user': user,
-                    'domain': current_site.domain,
-                    # Return a bytestring version of user.pk and encode a bytestring to a base64 string
-                    # for use in URLs, stripping any trailing equal signs.
-                    'uid': urlsafe_base64_encode(force_bytes(user.pk)),
-                    # Generate user token
-                    'token': account_activation_token.make_token(user)
-                })
-                # Celery sending mail
-                send_email.apply_async((receiver, subject, message), countdown=0)
-                messages.success(request, 'Please confirm your email address to complete the registration.')
+                send_activation_link(request, user)
 
     # Load login view with forms and display form messages
     return render(request, 'accounts/login.html',
@@ -143,6 +183,8 @@ def activate(request, uidb64, token):
 
         # Set registered session variable to display successful_registration view
         request.session['registered'] = True
+        hello = user.first_name if user.first_name else user.username
+        messages.success(request, 'Welcome {}'.format(hello))
 
         # Load successful registration view
         return redirect('successful_registration')

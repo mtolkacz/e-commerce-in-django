@@ -29,7 +29,7 @@
                             <span class="price">{% if item.product.discounted_price %}{{ item.product.discounted_price }}{% else %}{{ item.product.price }}{% endif %}
                                 <item-price id="right-side-item-price{{ item.product.id }}">{% if item.amount > 1 %}x {{ item.amount }}{% endif %}</item-price>
                             </span>
-                            <br><button id="right_side_delete_item_button" onclick="removeItem({{item.product.id}}); return false;" class="btn btn-danger btn-sm"><i class="fas fa-trash-alt"></i> Delete from cart</button>
+                            {% if not checkout %}<br><button id="right_side_delete_item_button" onclick="removeItem({{item.product.id}}); return false;" class="btn btn-danger btn-sm"><i class="fas fa-trash-alt"></i> Delete from cart</button>{% endif %}
                         </div>
                 </div>
                 {% endfor %}

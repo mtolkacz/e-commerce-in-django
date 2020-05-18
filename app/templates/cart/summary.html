@@ -5,16 +5,33 @@
 {% load crispy_forms_tags %}
 {% load cart_extras %}
 
+{% if access_code %}
+<div class="jumbotron-fluid">
+  <div class="container py-5 my-5 text-center">
+    <div class="row justify-content-center pt-2">
+      <form>
+        <div class="form-group">
+          <input id="ref_code" name="ref_code" type="hidden" value="{{ ref_code }}">
+          <input id="purchase_key" name="purchase_key" type="hidden" value="{{ oidb64 }}">
+          <label for="access_code">Access code:</label>
+          <input class="form-control" id="access_code" placeholder="Access code....">
+        </div>
+        <button type="button" class="btn btn-dark" id="access-button">Display purchase</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% else %}
 <div class="jumbotron-fluid">
   <div class="container py-5 mb-5">
     <div class="row">
       <div class="col-md-7 order-md-2 mb-4">
         <h4 class="d-flex justify-content-between align-items-center mb-3">
-          <span>Checkout</span>
-          <a href="{% url 'cart' %}"><button class="btn btn-dark mt-3"><i class="fas fa-shopping-cart"></i> Go back to Cart</button></a>
+          <span>Your purchase</span>
+          <span class="badge badge-dark badge-pill">{{ order.get_cart_qty }}</span>
         </h4>
         <ul class="list-group mb-3">
-          {% for item in cart.get_cart_items %}
+          {% for item in order.get_cart_items %}
           <li class="list-group-item d-flex justify-content-between {% if forloop.counter0|divisibleby:2 %}bg-light{% else %}lh-condensed{% endif %}">
             <div>
               <a href="{{ item.product.get_absolute_url }}" ><h7 class="my-0">{% if item.amount > 1  %}<span class="pr-2"> {{ item.amount }} x </span>{% endif %}{{ item.product.name }}</h7></a>
@@ -46,25 +63,13 @@
             <span class="text-success">-$5</span>
           </li>
           <li class="list-group-item d-flex justify-content-between">
-            <span>Total ({{ cart.get_cart_currency }})</span>
-            <strong>{{ cart.get_cart_total }}</strong>
+            <span>Total ({{ order.get_cart_currency }})</span>
+            <strong>{{ order.get_cart_total }}</strong>
           </li>
         </ul>
-
-        <form class="card p-2">
-          <div class="input-group">
-            <input type="text" class="form-control" placeholder="Promo code">
-            <div class="input-group-append">
-              <button type="submit" class="btn btn-primary">Redeem</button>
-            </div>
-          </div>
-        </form>
       </div>
       <div class="col-md-5 order-md-1">
-
-      <form method="post" class="needs-validation" novalidate>
-        {% csrf_token %}
-        {% if user_data %}
+        {% if user %}
         <h4 class="mb-3">Billing address</h4>
         {{ user.first_name }} {{ user.last_name }}<br>
         {{ user.address_1 }}<br>
@@ -72,40 +77,47 @@
         {{ user.country }}, {{ user.voivodeship }}<br>
         {{ user.zip_code }} {{ user.city }}<br>
 
-          <hr class="mb-4">
-          <!-- Shippment address chechbox-->
-          <div class="custom-control custom-checkbox pb-4">
-              <input type="checkbox" class="custom-control-input" autocomplete="off" name="same-address" value="same-address" {% if same_address %}{{ same_address }}{% endif %} id="same-address">
-              <label class="custom-control-label" for="same-address">Shipping address is the same as my billing address</label>
-          </div>
+        <h4 class="my-3">Shipping address</h4>
+        {{ shipment.first_name }} {{ shipment.last_name }}<br>
+        {{ shipment.address_1 }}<br>
+        {% if shipment.address_2 %}{{ shipment.address_2 }}<br>{% endif %}
+        {{ shipment.country }}, {{ shipment.voivodeship }}<br>
+        {{ shipment.zip_code }} {{ shipment.city }}<br>
 
-          {% include "cart/checkout/shipment_address.html" %}
+          <!-- Payment -->
+          {% include "cart/checkout/paypal_button.html" %}
+        </form>
 
         {% else %}
 
+        <form method="post" class="needs-validation" novalidate>
           {% include "cart/checkout/billing_address.html" %}
-          {% if not user.username %}
+          {% csrf_token %}
+          <!-- Shippment address chechbox-->
+
           <div class="custom-control custom-checkbox">
-              <input type="checkbox" name="account-checkbox" value="account_checkbox" {% if account_checkbox %}{{ account_checkbox }}{% endif %} class="custom-control-input" id="account-checkbox">
-              <label class="custom-control-label" for="account-checkbox">Save information for future and create account</label>
+              <input type="checkbox" class="custom-control-input" id="new-account">
+              <label class="custom-control-label" for="new-account">Save information for future and create account</label>
           </div>
 
           {% include "cart/checkout/create_account.html" %}
-          {% endif %}
+
           <div class="custom-control custom-checkbox">
-              <input type="checkbox" name="same-address" value="same-address" {% if same_address %}{{ same_address }}{% endif %} class="custom-control-input" id="same-address">
+              <input type="checkbox" class="custom-control-input" id="same-address">
               <label class="custom-control-label" for="same-address">Shipping address is the same as my billing address</label>
           </div>
 
           {% include "cart/checkout/shipment_address.html" %}
 
-        {% endif %}
-         <button type="submit" class="btn btn-success btn-lg mt-3"><i class="fas fa-shopping-bag"></i> Go to Payment</button>
         </form>
-         <button id="delete-purchase" class="btn btn-danger btn-sm mt-3"><i class="fas fa-trash"></i> Delete purchase</button>
+
+        <!-- Payment -->
+        {% include "cart/checkout/paypal_button.html" %}
+
+        {% endif %}
       </div>
     </div>
   </div>
 </div>
-
+{% endif %}
 {% endblock %}

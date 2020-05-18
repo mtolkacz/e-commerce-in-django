@@ -58,7 +58,6 @@ class UserManager(BaseUserManager):
 
 class User(AbstractBaseUser, PermissionsMixin):
     username_validator = UnicodeUsernameValidator()
-
     username = models.CharField(
         _('username'),
         max_length=150,
@@ -69,13 +68,15 @@ class User(AbstractBaseUser, PermissionsMixin):
             'unique': _("A user with that username already exists."),
         },
     )
-    first_name = models.CharField(_('first name'), max_length=50, blank=False)
-    last_name = models.CharField(_('last name'), max_length=150, blank=False)
-    email = models.EmailField(_('email address'), unique=True)
-    city = models.CharField(max_length=50, blank=True)
+    first_name = models.CharField(_('first name'), max_length=50, blank=False, null=False)
+    last_name = models.CharField(_('last name'), max_length=150, blank=False, null=False)
+    email = models.EmailField(_('email address'), unique=True, null=False)
+    city = models.CharField(max_length=50, blank=False, null=False)
     voivodeship = models.ForeignKey(Voivodeship, on_delete=models.SET_NULL, blank=False, null=True)
     country = models.ForeignKey(Country, on_delete=models.SET_NULL, blank=False, null=True)
     zip_code = models.CharField(max_length=6, validators=[ZipCodeValidator], blank=False, null=False)
+    address_1 = models.CharField(max_length=100, blank=False, null=False)
+    address_2 = models.CharField(max_length=100, blank=True, null=True)
     # phone = models.IntegerField(default=0)
     is_staff = models.BooleanField(
         _('staff status'),
@@ -124,5 +125,16 @@ class User(AbstractBaseUser, PermissionsMixin):
     def email_user(self, subject, message, from_email=None, **kwargs):
         """Send an email to this user."""
         send_mail(subject, message, from_email, [self.email], **kwargs)
+
+    def has_all_billing_data(self):
+        return False if (self.address_1 is None or
+                        self.address_1 == '' or
+                        self.city is None or
+                        self.city == '' or
+                        self.voivodeship is None or
+                        self.country is None or
+                        self.zip_code is None or
+                        self.zip_code == '') else True
+
 
 

@@ -17,6 +17,12 @@ class VoivodeshipAdmin(admin.ModelAdmin):
     get_country_name.short_description = 'Country'
 
 
+class UserAdmin(admin.ModelAdmin):
+    model = User
+    list_display = ['username', 'first_name', 'last_name', 'email', 'country',
+                    'voivodeship', 'address_1', 'address_2', 'zip_code', 'city', ]
+
+
 admin.site.register(User, UserAdmin)
 admin.site.register(Country, CountryAdmin)
 admin.site.register(Voivodeship, VoivodeshipAdmin)

@@ -4,7 +4,7 @@
 {% load static %}
 {% load crispy_forms_tags %}
 
-<div class="container py-3">
+<div class="container py-5">
     <div class="card bg-light">
         <article class="card-body mx-auto" style="max-width: 400px;">
             {% if messages %}
@@ -29,14 +29,14 @@
             <h4 class="card-title my-3 text-center">Sing in</h4>
             <p style="line-height: 50%;">
                 <a href="{% url 'social:begin' 'twitter' %}">
-                    <button class="btn btn-block btn-twitter"><i class="fab fa-twitter"></i>   Login via Twitter
+                    <button class="btn btn-block btn-twitter"><i class="fab fa-twitter"></i>   Twitter login
                     </button>
                 </a>
                 <br><a href="{% url 'social:begin' 'facebook' %}">
-                <button class="btn btn-block btn-facebook"><i class="fab fa-twitter"></i>   Login via facebook</button>
+                <button class="btn btn-block btn-facebook"><i class="fab fa-twitter"></i>   Facebook login</button>
             </a>
                 <br><a href="#" onclick="showSignIn();return false;">
-                <button class="btn btn-block btn-dark"><i class="fab"></i>   Login via username</button>
+                <button class="btn btn-block btn-dark"><i class="fab"></i>   Login</button>
             </a>
             </p>
             <script>

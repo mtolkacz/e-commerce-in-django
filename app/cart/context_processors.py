@@ -6,17 +6,16 @@ User = get_user_model()
 
 def cart_context_processor(request):
     cart_dict = {}
-    existing_cart = {}
 
-    if request.user.username:
-        user = User.objects.filter(username=request.user.username).first()
-
-        if user:
-            existing_cart = Order.objects.filter(owner=user, is_ordered=False).first()
+    if request.user.id:
+        try:
+            cart_dict['cart'] = Order.objects.get(owner__id=request.user.id, is_ordered=False)
+        except Order.DoesNotExist:
+            pass
     elif request.session.session_key:
-        existing_cart = Order.objects.filter(session_key=request.session.session_key, is_ordered=False).first()
-
-    if existing_cart:
-        cart_dict = {'cart': existing_cart}
+        try:
+            cart_dict['cart'] = Order.objects.get(session_key=request.session.session_key, is_ordered=False)
+        except Order.DoesNotExist:
+            pass
 
     return cart_dict

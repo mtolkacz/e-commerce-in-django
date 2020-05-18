@@ -77,6 +77,56 @@ function manage_filter_price(option){
 (function ($) {
     'use strict';
 
+$('#access-button').on('keypress click', function(e) {
+    var value = $('#accessCodeInput').val();
+    var CSRF_TOKEN = getCookie('csrftoken');
+    if (e.which === 13 || e.type === 'click') {
+        $.ajax({
+            url: '/purchase/get_access/',
+            headers: {
+                'X-CSRFTOKEN': CSRF_TOKEN
+            },
+            data: {
+                'ref_code': $('#ref_code').val(),
+                'purchase_key': $('#purchase_key').val(),
+                'access_code': $('#access_code').val()
+            },
+            success: purchaseSuccess,
+            dataType: 'json',
+        });
+    }
+});
+
+function purchaseSuccess(data, textStatus, jqXHR)
+{
+    if(data.success){
+        location.reload();
+        return false;
+    } else {
+        alert('Access denied. Wrong access code.');
+    }
+}
+
+$('#delete-purchase').on('click', function() {
+    var q = confirm("Do you want to delete a purchase?");
+    if (q == true) {
+    var CSRF_TOKEN = getCookie('csrftoken');
+        $.ajax({
+            url: '/purchase/delete/',
+            headers: {
+                'X-CSRFTOKEN': CSRF_TOKEN
+            },
+            success: deletePurchase,
+            dataType: 'json',
+        });
+    }
+});
+
+function deletePurchase(data)
+{
+    location.reload();
+}
+
 $('#delete-filter').click(function() {
     var url = new URL(window.location.href)
     var search_params = url.searchParams;
@@ -114,6 +164,31 @@ $('#delete-filter').click(function() {
     if ($.fn.classyNav) {
         $('#essenceNav').classyNav();
     }
+
+    $('#same-address').change(function() {
+        var shippment_address = document.getElementById('shippment_address');
+        if(shippment_address){
+            if(shippment_address.style.display=='block'){
+                shippment_address.style.display='none';
+                this.checked = true;
+            } else {
+                shippment_address.style.display='block';
+                this.checked = false;
+            }
+
+        }
+    });
+    $('#account-checkbox').change(function() {
+        var create_account = document.getElementById('create-account');
+        if(create_account){
+            if(create_account.style.display=='block'){
+                create_account.style.display='none';
+            } else {
+                create_account.style.display='block';
+            }
+
+        }
+    });
 
     // :: Sliders Active Code
     if ($.fn.owlCarousel) {
