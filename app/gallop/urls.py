@@ -13,10 +13,11 @@ urlpatterns = [
     path('', index, name='index'),
     path('products/', include('products.urls'), name='products'),
     path('blog/', include('blog.urls')),
-    path('admin/', admin.site.urls),
-    path('cart/', include('cart.urls')),
+    path('gallop-admin/', admin.site.urls),
+    path('purchase/', include('cart.urls')),
     path('account/', include('accounts.urls')),
     path('social-auth/', include('social_django.urls', namespace='social')),
+    path('paypal/', include('paypal.standard.ipn.urls')),
 ]
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

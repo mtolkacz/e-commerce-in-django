@@ -56,17 +56,18 @@
                             {% endif %}
                         </div>
                         <div class="cart-fav-box d-flex align-items-center">
-                            <button id="add_item_button" onclick="add_to_cart({{ object.id }}); return false;"
+                            {% if object.stock %}<button id="add_item_button" onclick="add_to_cart({{ object.id }}); return false;"
                                     class="btn btn-primary mr-2"><i class="fas fa-shopping-cart"></i> Add to cart
                             </button>
                             {% if exists_in_cart %}
                             <button id="delete_item_button" onclick="removeItem({{ object.id }}); return false;"
                                     class="btn btn-danger ml-2"><i class="fas fa-trash-alt"></i> Delete from cart
                             </button>
+
                             {% endif %}
-                            <div class="product-favourite ml-4">
-                                <a href="#" class="favme fa fa-heart"></a>
-                            </div>
+                                {% else %}
+                            {% endif %}
+                            {% if user.username %}<button class="btn btn-info ml-2"><i class="fas fa fa-heart"></i> Add to favorite</button>{% endif %}
                         </div>
                     </div>
                 </section>

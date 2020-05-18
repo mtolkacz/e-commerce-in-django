@@ -94,6 +94,7 @@ class ProductCategoryDetail(ListAPIView):
         dep = get_object_or_404(Department, slug=self.kwargs[self.lookup_fields[0]])
         subdep = get_object_or_404(Subdepartment, slug=self.kwargs[self.lookup_fields[1]])
         cat = get_object_or_404(Category, slug=self.kwargs[self.lookup_fields[2]])
+        additional = {}
         if queryset:
             additional = {'brands': BrandSerializer(brands, many=True).data,
                           'page': int(request.GET.get('page', '1'))}
@@ -104,18 +105,12 @@ class ProductCategoryDetail(ListAPIView):
                 'min': math.floor(min.amount),
             }
             additional['price'] = price
-        else:
-            popular_products = self.get_serializer(self.queryset[:10], many=True)
-            additional = {
-                'popular_products': popular_products.data,
-            }
         additional['department'] = DepartmentSerializer(dep).data
         additional['subdepartment'] = SubdepartmentSerializer(subdep).data
         additional['category'] = CategorySerializer(cat).data
         return additional
 
-    @staticmethod
-    def get_filtered_price(request, queryset, additional):
+    def append_data_after_filtering(self, request, additional, filtered_queryset):
         price_min = request.GET.get('price_min', False)
         price_max = request.GET.get('price_max', False)
 
@@ -125,28 +120,39 @@ class ProductCategoryDetail(ListAPIView):
                 'min': Decimal(price_min),
             }
             additional['filtered_price'] = filtered_price
+
+        if not filtered_queryset:
+            popular_products = self.get_serializer(self.queryset[:10], many=True)
+            additional['popular_products'] = popular_products.data
+
         return additional
 
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset(**kwargs)
         additional = self.get_additional_data(request, queryset, **kwargs)
-        queryset = self.filter_queryset(queryset)
-        additional = self.get_filtered_price(request, queryset, additional)
+        filtered_queryset = self.filter_queryset(queryset)
 
-        page = self.paginate_queryset(queryset)
+        # get filtered min and max price after filtering
+        # and if filtered queryset is empty then get popular products
+        additional = self.append_data_after_filtering(request, additional, filtered_queryset)
+
+        page = self.paginate_queryset(filtered_queryset)
         if page is not None:
             serializer = self.get_serializer(page, many=True)
             data = {
                 'objects': serializer.data,
                 'additional': additional,
+                # below counters are used to constraint frontend view on page template
+                'filter_query_count': filtered_queryset.count() if filtered_queryset else 0,
                 'query_count': queryset.count() if queryset else 0,
             }
             return self.get_paginated_response(data)
 
-        serializer = self.get_serializer(queryset, many=True)
+        serializer = self.get_serializer(filtered_queryset, many=True)
         data = {
             'objects': serializer.data,
             'additional': additional,
+            'filter_query_count': filtered_queryset.count() if filtered_queryset else 0,
             'query_count': queryset.count() if queryset else 0,
         }
         return Response(data)

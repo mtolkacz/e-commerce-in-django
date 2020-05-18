@@ -1,0 +1,106 @@
+{% extends "base_template.html" %}
+{% block title %}Cart{% endblock %}
+{% block content %}
+{% load static %}
+
+<div class="container pt-3 pb-3">
+    <div id="shopping-cart" class="card shopping-cart">
+        <div id="card-header" class="card-header bg-light text-dark">
+            <i aria-hidden="true" class="fa fa-shopping-cart"></i> Shipping cart
+            <a href="{% url 'index' %}">
+                <button class="btn btn-primary btn-sm mr-4 float-right" type="button"><span
+                        class="glyphicon glyphicon-share-alt"></span> Continue shopping
+                </button>
+            </a>
+            <div class="clearfix"></div>
+        </div>
+        {% if order.id %}
+        <div id="card-body" class="card-body">
+            <!-- PRODUCT -->
+            {% for item in order.get_cart_items %}
+            <div id="row{{ item.product.id }}" class="py-4 {% if forloop.counter0|divisibleby:2 %}bg-light{% else %}lh-condensed{% endif %}">
+                <div class="row">
+                    <div class="col-12 col-sm-12 col-md-2 text-center product-img " style="text-align:middle">
+                        <a href="{{ item.product.get_absolute_url }}"><img alt="prewiew" class="img-responsive"
+                                                                           height="80"
+                                                                           src="{{ item.product.thumbnail.url }}"
+                                                                           width="120"></a>
+                        {% if item.product.discounted_price %}
+                        <div class="product-badge offer-badge">
+                            <span>-{{ item.product.get_discount_value }}%</span>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="col-12 text-sm-center col-sm-12 text-md-left col-md-5 pt-3">
+                        <a href="{{ item.product.get_absolute_url }}"><span
+                                class="product-name">{{ item.product.name }}</span></a>
+                    </div>
+                    <div class="col-12 col-sm-12 text-sm-center col-md-5 row pt-3">
+                        <div class="col-5 col-sm-5 col-md-5 text-md-right" style="padding-top: 5px">
+                            {% if item.amount > 1 %}
+                            <span id="item_total_value{{ item.product.id }}">{{ item.get_item_total }}</span>
+                            {% if item.product.discounted_price %}<span id="old-price-checkout{{ item.product.id }}"
+                                                                        class="old-price-checkout">{{ item.get_item_total_no_discount }}</span>
+                            {% endif %}
+                            <br><small><span id="apiece_value{{ item.product.id }}">
+                            {% if item.product.discounted_price %}{{ item.product.discounted_price }} {% else %}{{ item.product.price }}{% endif %} apiece</span>
+                        </small>
+                            {% else %}
+                            <span id="item_total_value{{ item.product.id }}">
+                                {% if item.product.discounted_price %}{{ item.product.discounted_price }}</span>
+                            <span id="old-price-checkout{{ item.product.id }}" class="old-price-checkout">{{ item.product.price }}</span>
+                            {% else %}{{ item.product.price }}</span>{% endif %}
+                            <br><small><span id="apiece_value{{ item.product.id }}"></span></small>
+                            {% endif %}
+                        </div>
+                        <div class="col-5 col-sm-5 col-md-5">
+                            <a href="#" onclick="decreaseValue({{ item.product.id }}); return false;"><i
+                                    class="fas fa-minus mr-2"></i></a>
+                            <input onchange="updateValue({{ item.product.id }}); return false;" type="text"
+                                   value="{{ item.amount }}" id="item{{ item.product.id }}"
+                                   style="width:40px;text-align: center; ">
+                            <a href="#" onclick="increaseValue({{ item.product.id }}); return false;"><i
+                                    class="fas fa-plus ml-2"></i></a><br>
+                        </div>
+                        <div class="col-2 col-sm-2 col-md-2">
+                            <a id="delete_item" title="Click to delete item from cart" href="#"
+                               onclick="removeItem({{ item.product.id }}); return false;">
+                                <button class="btn btn-outline-danger btn-xs" type="button">
+                                    <i aria-hidden="true" class="fa fa-trash"></i>
+                                </button>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <div id="card-footer" class="ca0rd-footer">
+            <div class="coupon col-md-12 col-sm-12 no-padding-left pull-left">
+                <div class="row">
+                    <div class="col-lg-6 d-none d-sm-block pt-2 pb-5"></div>
+                    <div class="col-lg-3 col-md-8 col-sm-6 col-6 pt-2 pb-5">
+                        <div class="float-right" style="margin: 5px">Total price: <b><span id="cart_total_value">{{ order.get_cart_total }}</span></b>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-4 col-sm-6 col-6 pt-2 pb-5">
+                        <a href="{% url 'checkout' %}"><button class="btn btn-success" type="button">Checkout</button></a>
+                        <a id="delete_item" title="Click to delete shipping cart" href="#"
+                           onclick="delete_cart(); return false;">
+                            <button class="btn btn-danger btn-xs float-right mr-4" type="button">
+                                <i aria-hidden="true" class="fa fa-trash"></i>
+                            </button>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div id="card-body" class="card-body">
+            <br><h5><span class="py-5 px-5">Your cart is empty</span></h5><br>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}

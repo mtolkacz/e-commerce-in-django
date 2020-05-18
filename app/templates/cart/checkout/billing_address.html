@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+</body>
+</html>{% load crispy_forms_tags %}
+
+{% if billing_form.errors %}
+	<!-- Error messaging -->
+	<div id="errors">
+		<div class="inner">
+			<p>There were some errors in the information you entered. Please correct the following:</p>
+			{{ billing_form.non_field_errors }}
+			<ul>
+				{% for field in billing_form %}
+					{% if field.errors %}<li>{{ field.label }}: {{ field.errors|striptags }}</li>{% endif %}
+				{% endfor %}
+			</ul>
+		</div>
+	</div>
+	<!-- /Error messaging -->
+{% endif %}
+
+<div id="billing_address" style="display:block">
+          <h4 class="mb-3">Billing address</h4>
+          <!-- First and Last name -->
+          <div class="row">
+
+            <div class="col-md-6">
+              {{ billing_form.first_name|as_crispy_field }}
+            </div>
+            <div class="col-md-6">
+              {{ billing_form.last_name|as_crispy_field }}
+            </div>
+          </div>
+          <!-- Address 1 -->
+          <div class="mb-3">
+            {{ billing_form.address_1|as_crispy_field }}
+          </div>
+          <!-- Address 2 -->
+          <div class="mb-3">
+            {{ billing_form.address_2|as_crispy_field }}
+          </div>
+          <!-- Country, Voivodeship -->
+          <div class="row">
+            <div class="col-6 mb-3">
+              {{ billing_form.country|as_crispy_field }}
+            </div>
+            <div class="col-6 mb-3">
+              {{ billing_form.voivodeship|as_crispy_field }}
+            </div>
+          </div>
+          <!-- Zip-code, City -->
+          <div class="row">
+            <div class="col-6 mb-3">
+              {{ billing_form.zip_code|as_crispy_field }}
+            </div>
+            <div class="col-6">
+              {{ billing_form.city|as_crispy_field }}
+            </div>
+          </div>
+          {% if not user.email %}
+          <!-- Email -->
+          <div class="pb-3">
+            {{ billing_form.email|as_crispy_field }}
+          </div>
+          {% endif %}
+</div>

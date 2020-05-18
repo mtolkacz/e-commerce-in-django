@@ -1,0 +1,8 @@
+{% autoescape off %}
+Hi {{ first_name }},
+Link to purchase {{ order.ref_code }}:
+https://{{ domain }}{% url 'summary' ref_code=order.ref_code oidb64=oidb64 %}
+
+{% if order.access_code %}Your access code:
+{{ order.access_code }}{% endif %}
+{% endautoescape %}

@@ -1,3 +1,4 @@
+
 /*price range*/
 $('#sl2').slider();
 
@@ -133,7 +134,7 @@ function removeItem(item_id) {
 
 function calculate_cart(cart_value, item_id) {
     $.ajax({
-        url: '/cart/calculate/',
+        url: '/purchase/cart/calculate/',
         data: {
             'cart_value': cart_value,
             'item_id': item_id
@@ -190,7 +191,7 @@ function add_to_cart(item_id) {
 
     }
     $.ajax({
-        url: '/cart/add_item/',
+        url: '/purchase/cart/add_item/',
         headers: {
             'X-CSRFTOKEN': CSRF_TOKEN
         },
@@ -210,7 +211,7 @@ function add_to_cart(item_id) {
                     <ul class="summary-table pb-10">
                         <li><span>Total: </span> <span id="right-side-cart-total-value">{{ cart.get_cart_total }}</span></li>
                     </ul>
-                    <a href="` + data.checkout_url + `" ><button class="btn-lg my-3 px-5 btn btn-dark"><i class="fas fa-shopping-cart"></i>
+                    <a href="` + data.cart_url + `" ><button class="btn-lg my-3 px-5 btn btn-dark"><i class="fas fa-shopping-cart"></i>
  Cart</button></a>
                     `;
                     var cart_list = document.getElementById("cart-list");
@@ -269,7 +270,7 @@ function add_to_cart(item_id) {
 function delete_from_cart(item_id) {
     var CSRF_TOKEN = getCookie('csrftoken');
     $.ajax({
-        url: '/cart/delete_item/',
+        url: '/purchase/cart/delete_item/',
         headers: {
             'X-CSRFTOKEN': CSRF_TOKEN
         },
@@ -332,7 +333,7 @@ function delete_cart() {
     var q = confirm("Do you want to delete shipping cart?");
     if (q == true) {
         $.ajax({
-            url: '/cart/delete_cart/',
+            url: '/purchase/cart/delete_cart/',
             dataType: 'json',
             success: function(data) {
                 if (data.success) {

@@ -1,7 +1,6 @@
 from datetime import datetime
-
 from django.core.exceptions import ValidationError
-from django.db import models
+from django.db import models, transaction, IntegrityError
 from djmoney.models.fields import MoneyField
 from django.utils.html import mark_safe
 from django.core.validators import MaxValueValidator, MinValueValidator
@@ -14,7 +13,6 @@ from django.db.models import signals
 from .signals import discount_post_save, discount_pre_save
 from decimal import *
 from django.utils import timezone
-from gallop import settings
 
 
 class Department(models.Model):
@@ -37,9 +35,6 @@ class Department(models.Model):
 
     def __str__(self):
         return self.name
-
-    # def get_url(self):
-    #     return '{}/products/{}/'.format(settings.HOMEPAGE, self.slug)
 
     def save(self, *args, **kwargs):
         value = self.name
@@ -72,8 +67,6 @@ class Subdepartment(models.Model):
     def get_categories(self):
         return Category.objects.filter(subdepartment=self.id).distinct('name').order_by('name')
 
-    # def get_url(self):
-    #     return '{}/{}/{}/'.format(settings.HOMEPAGE, self.department.slug, self.slug)
 
     def save(self, *args, **kwargs):
         value = self.name
@@ -99,9 +92,6 @@ class Category(models.Model):
 
     def __unicode__(self):
         return '%s' % self.name
-
-    # def get_url(self):
-    #     return '{}{}/'.format(self.subdepartment.get_url(), self.slug)
 
     def __str__(self):
         return self.name
@@ -133,14 +123,15 @@ class Product(models.Model):
     name = models.CharField(max_length=150, default='Product name')
     brand = models.ForeignKey(Brand, on_delete=models.PROTECT, null=True)
     description = RichTextField()
-    price = MoneyField(max_digits=14, decimal_places=2, default_currency='USD', null=False)
+    price = MoneyField(max_digits=6, decimal_places=2, default_currency='USD', null=False)
     discounted_price = MoneyField(max_digits=14, decimal_places=2, default_currency='USD', editable=False, null=True, blank=True)
     department = models.ForeignKey(Department, on_delete=models.PROTECT, null=True)
     subdepartment = models.ForeignKey(Subdepartment, on_delete=models.PROTECT, null=True)
     category = models.ForeignKey(Category, on_delete=models.PROTECT, null=True)
     thumbnail = models.ImageField(upload_to='pic_folder/', default='pic_folder/None/no-img.jpg')
     slug = models.SlugField(max_length=150)  # todo check max product name length
-    stock = models.IntegerField(default=0, validators=[MinValueValidator(0)])
+    stock = models.SmallIntegerField(default=0, null=False)
+    booked = models.PositiveSmallIntegerField(default=0, null=False)
     creationdate = models.DateTimeField(auto_now_add=True)
 
     def image_tag(self):
@@ -150,6 +141,33 @@ class Product(models.Model):
 
     def get_price_in_string(self):
         return str(self.price)
+
+    def book(self, amount=0):
+        if amount > 0:
+            self.booked += amount
+            self.stock -= amount
+        else:
+            self.booked += 1
+            self.stock -= 1
+        self.save(update_fields=['booked', 'stock'])
+
+    def undo_book(self):
+        if self.booked > 0:
+            self.booked -= 1
+            self.stock += 1
+            self.save(update_fields=['booked', 'stock'])
+            return True
+        else:
+            return False
+
+    def add_stock(self):
+        self.stock += 1
+        self.save(update_fields=['stock'])
+
+    def remove_stock(self):
+        if self.stock > 0:
+            self.stock -= 1
+            self.save(update_fields=['stock'])
 
     def get_discounted_price_in_string(self):
         return str(self.discounted_price) if self.discounted_price else ''
@@ -195,18 +213,6 @@ class Product(models.Model):
 
     def get_first_image_url(self):
         return ProductImage.objects.filter(product=self).order_by('id')[0].image.url
-
-    def brand_name(self):
-        return self.brand.name
-
-    def department_name(self):
-        return self.department.name
-
-    def subdepartment_name(self):
-        return self.subdepartment.name
-
-    def category_name(self):
-        return self.category.name
 
     def __str__(self):
         return '{}, {}'.format(self.id, self.name)

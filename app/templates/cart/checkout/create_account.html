@@ -1,0 +1,18 @@
+{% load crispy_forms_tags %}
+
+<div id="create-account" class="pt-3" style="display:{% if account_checkbox %}block{% else %}none{% endif %}">
+    <h4 class="mb-3">Create Account</h4>
+    <!-- Username 1 -->
+    <div class="mb-3">
+        {{ billing_form.username|as_crispy_field }}
+    </div>
+    <!-- Passwords -->
+    <div class="row">
+        <div class="col-md-6">
+            {{ billing_form.password1|as_crispy_field }}
+        </div>
+        <div class="col-md-6">
+            {{ billing_form.password2|as_crispy_field }}
+        </div>
+    </div>
+</div>
