@@ -56,14 +56,13 @@
                             {% endif %}
                         </div>
                         <div class="cart-fav-box d-flex align-items-center">
-                            {% if object.stock %}<button id="add_item_button" onclick="add_to_cart({{ object.id }}); return false;"
+                            {% if object.stock > 0 %}<button id="add_item_button" onclick="add_to_cart({{ object.id }}); return false;"
                                     class="btn btn-primary mr-2"><i class="fas fa-shopping-cart"></i> Add to cart
                             </button>
                             {% if exists_in_cart %}
                             <button id="delete_item_button" onclick="removeItem({{ object.id }}); return false;"
                                     class="btn btn-danger ml-2"><i class="fas fa-trash-alt"></i> Delete from cart
                             </button>
-
                             {% endif %}
                                 {% else %}
                             {% endif %}

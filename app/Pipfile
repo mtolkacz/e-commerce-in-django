@@ -22,7 +22,8 @@ django-celery-results = "==1.2.1"
 django-redis = "==4.11.0"
 django-debug-toolbar = "==2.2"
 django-celery-beat = "==2.0.0"
-django-paypal = "==1.0.0"
+paypal-checkout-serversdk = ">=1.0.1"
+python-dateutil= ">=2.8.1"
 
 [packages]
 django = "==2.2.10"
@@ -43,7 +44,8 @@ django-celery-results = "==1.2.1"
 django-redis = "==4.11.0"
 django-debug-toolbar = "==2.2"
 django-celery-beat = "==2.0.0"
-django-paypal = "==1.0.0"
+paypal-checkout-serversdk = ">=1.0.1"
+python-dateutil= ">=2.8.1"
 
 [requires]
 python_version = "3.8"

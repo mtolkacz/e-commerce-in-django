@@ -38,16 +38,32 @@ class OrderItem(models.Model):
 
 
 class Order(models.Model):
+    IN_CART = 1
+    BOOKED = 2
+    CONFIRMED = 3
+    PAID = 4
+    COMPLETED = 5
+    STATUS = (
+        (IN_CART, 'Products in cart - not booked yet'),
+        (BOOKED, 'Stock booked'),
+        (CONFIRMED, 'Confirmed by client'),
+        (PAID, 'Paid - waiting for delivery'),
+        (COMPLETED, 'Completed - Delivered to client'),
+    )
     owner = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
-    ref_code = models.CharField(max_length=20)
+    ref_code = models.CharField(max_length=20, editable=False)
     is_ordered = models.BooleanField(default=False)
     items = models.ManyToManyField(OrderItem)
     # payment_details = models.ForeignKey(Payment, null=True)
     date_ordered = models.DateTimeField(auto_now=True)
     session_key = models.ForeignKey(Session, on_delete=models.CASCADE, null=True, editable=False)
-    access_code = models.SmallIntegerField(null=True, blank=False)
-    confirmed = models.BooleanField(default=False)
-    booked = models.BooleanField(default=False, null=False)
+    access_code = models.SmallIntegerField(null=True, blank=False, editable=False)
+    confirmed = models.BooleanField(default=False, editable=False)
+    booked = models.BooleanField(default=False, null=False, editable=False)
+    status = models.PositiveSmallIntegerField(
+        choices=STATUS,
+        default=IN_CART,
+    )
 
     # save email for client without account which don't want to create one
     email = models.EmailField(null=True)
@@ -68,43 +84,32 @@ class Order(models.Model):
         return sum([(item.product.discounted_price if item.product.discounted_price else item.product.price)
                     * item.amount for item in self.items.all()])
 
+    def get_cart_total_str(self):
+        return str(self.get_cart_total().amount)
+
     def get_cart_currency(self):
         return self.get_cart_total().currency if self.get_cart_total().currency else 'USD'
 
     def get_cart_qty(self):
         return sum(item.amount for item in self.items.all())
 
-    def book2(self):
-        items = self.items.all()
-        products_ids = [items.values_list('product')]
-        products = Product.objects.filter(id__in=products_ids, stock__gte=1)
-        if products:
-            for product in products:
-                booked = product.book()
-                if booked:
-                    try:  # probably not needed try block cause uses cached items
-                        order_item = items.get(product=product)
-                    except OrderItem.DoesNotExist:
-                        product.undo_book()
-                    else:
-                        order_item.booked = True
-                        order_item.save(update_fields=['booked'])
-
-        success = items.filter(booked=True)
-        print("DJANGOTEST: {}".format(success))
-        return True if success else False
-
     def book(self):
         items = self.items.all()
         for item in items:
             item.product.book(amount=item.amount)
+        self.update_status(self.BOOKED)
 
     def __str__(self):
         return '{}'.format(self.ref_code)
 
     def confirm(self):
         self.confirmed = True
-        self.save(update_fields=['confirmed'])
+        self.status = self.CONFIRMED
+        self.save(update_fields=['confirmed', 'status', ])
+
+    def update_status(self, status):
+        self.status = status
+        self.save(update_fields=['status', ])
 
     def create_access_code(self):
         self.access_code = random.randint(1000, 9999)
@@ -128,12 +133,12 @@ class Shipment(models.Model):
     IN_PREPARATION = 2
     SENT = 3
     DELIVERED = 4
-    STATUS = {
+    STATUS = (
         (NEW, 'New and before payment'),
         (IN_PREPARATION, 'Paid and during preparation'),
         (SENT, 'Sent to client'),
         (DELIVERED, 'Delivered to client'),
-    }
+    )
     order = models.OneToOneField(Order, on_delete=models.CASCADE, null=True, editable=False)
     type = models.ForeignKey(ShipmentType, on_delete=models.CASCADE, null=True)
     cost = MoneyField(null=True, max_digits=14, decimal_places=2, default_currency='USD')
@@ -194,3 +199,16 @@ signals.pre_save.connect(shipment_pre_save, sender=Shipment)
 class OrderAccess(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, null=True)
     session_key = models.ForeignKey(Session, on_delete=models.CASCADE, null=True, editable=False)
+
+
+class Payment(models.Model):
+    id = models.CharField(max_length=17, blank=False, null=False, editable=False, primary_key=True)
+    order = models.ForeignKey(Order, on_delete=models.SET_NULL, null=True, editable=False)
+    createdate = models.DateTimeField(null=True, blank=True, editable=False)
+    updatedate = models.DateTimeField(null=True, blank=True, editable=False)
+    status = models.CharField(max_length=10, blank=False, null=False, editable=False)
+    value = MoneyField(null=True, max_digits=14, decimal_places=2, default_currency='USD')
+    payer_id = models.CharField(max_length=15, blank=False, null=False, editable=False)
+    email = models.EmailField(null=False, editable=False)
+    given_name = models.CharField(max_length=30, blank=False, null=False, editable=False)
+    surname = models.CharField(max_length=30, blank=False, null=False, editable=False)
