@@ -9,12 +9,12 @@ def cart_context_processor(request):
 
     if request.user.id:
         try:
-            cart_dict['cart'] = Order.objects.get(owner__id=request.user.id, is_ordered=False)
+            cart_dict['cart'] = Order.objects.get(owner__id=request.user.id, status=Order.IN_CART)
         except Order.DoesNotExist:
             pass
     elif request.session.session_key:
         try:
-            cart_dict['cart'] = Order.objects.get(session_key=request.session.session_key, is_ordered=False)
+            cart_dict['cart'] = Order.objects.get(session_key=request.session.session_key, status=Order.IN_CART)
         except Order.DoesNotExist:
             pass
 
