@@ -37,16 +37,15 @@ LOGOUT_REDIRECT_URL = 'logout'
 
 # HTTPS and cookies
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-SECURE_SSL_REDIRECT = True              # The SecurityMiddleware redirects all non-HTTPS requests to HTTPS
-SESSION_COOKIE_SECURE = True            # Cookies will only be sent via HTTPS connection
-SESSION_COOKIE_AGE = 3600               # The age of session cookies, in seconds. Set to 1 hour.
-CSRF_COOKIE_SECURE = True               # CSRF cookies will only be sent via HTTPS connection
+SECURE_SSL_REDIRECT = True  # The SecurityMiddleware redirects all non-HTTPS requests to HTTPS
+SESSION_COOKIE_SECURE = True  # Cookies will only be sent via HTTPS connection
+SESSION_COOKIE_AGE = 3600  # The age of session cookies, in seconds. Set to 1 hour.
+CSRF_COOKIE_SECURE = True  # CSRF cookies will only be sent via HTTPS connection
 SECURE_HSTS_SECONDS = 3600
 
 # Expire date of session cookie will be extended after every request
 # Save session after every request
 SESSION_SAVE_EVERY_REQUEST = True
-
 
 # Twitter social auth
 SOCIAL_AUTH_TWITTER_KEY = os.getenv('SOCIAL_AUTH_TWITTER_KEY')
@@ -56,11 +55,11 @@ SOCIAL_AUTH_TWITTER_SECRET = os.getenv('SOCIAL_AUTH_TWITTER_SECRET')
 SOCIAL_AUTH_FACEBOOK_KEY = os.getenv('SOCIAL_AUTH_FACEBOOK_KEY')
 SOCIAL_AUTH_FACEBOOK_SECRET = os.getenv('SOCIAL_AUTH_FACEBOOK_SECRET')
 SOCIAL_AUTH_FACEBOOK_SCOPE = ['email', 'user_link']  # add this
-SOCIAL_AUTH_FACEBOOK_PROFILE_EXTRA_PARAMS = {       # add this
-  'fields': 'id, name, email, picture.type(large), link'
+SOCIAL_AUTH_FACEBOOK_PROFILE_EXTRA_PARAMS = {  # add this
+    'fields': 'id, name, email, picture.type(large), link'
 }
 SOCIAL_AUTH_POSTGRES_JSONFIELD = True
-SOCIAL_AUTH_FACEBOOK_EXTRA_DATA = [                 # add this
+SOCIAL_AUTH_FACEBOOK_EXTRA_DATA = [  # add this
     ('name', 'name'),
     ('email', 'email'),
     ('picture', 'picture'),
@@ -82,8 +81,8 @@ SOCIAL_AUTH_PIPELINE = (
 SOCIAL_AUTH_FACEBOOK_FIELD_SELECTORS = ['email', ]
 
 # Celery configuration
-CELERY_BROKER_URL = 'amqp://rabbitmq' # todo go back to this when fix problem with redis
-CELERY_RESULT_BACKEND = 'redis://redis' # todo go back to this when fix problem with redis
+CELERY_BROKER_URL = 'amqp://rabbitmq'  # todo go back to this when fix problem with redis
+CELERY_RESULT_BACKEND = 'redis://redis'  # todo go back to this when fix problem with redis
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
@@ -105,7 +104,6 @@ DEBUG = int(os.getenv('DEBUG', 1))
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
-
 # Application definition
 DJANGO_APPS = (
     'django.contrib.admin',
@@ -116,18 +114,17 @@ DJANGO_APPS = (
     'django.contrib.staticfiles',
 )
 THIRD_PARTY_APPS = (
-    'sslserver',        # AN SSL-ENABLED DEVELOPMENT SERVER FOR DJANGO
-    'social_django',    # SOCIAL MEDIA USER AUTHENTIFICATION
-    'djmoney',          # PRODUCT PRICE MONEY FIELD IN MODEL
-    'crispy_forms',     # HANDLING BOOTSTRAP4 IN DJANGO FORMS
-    'ckeditor',         # HTML EDITOR FOR TEXT FIELDS (e.g. product's description)
-    'rest_framework',   # REST API FRAMEWORK FOR DJANGO
-    'django_filters',   # REST API FILTER BACKEND
+    'sslserver',  # AN SSL-ENABLED DEVELOPMENT SERVER FOR DJANGO
+    'social_django',  # SOCIAL MEDIA USER AUTHENTIFICATION
+    'djmoney',  # PRODUCT PRICE MONEY FIELD IN MODEL
+    'crispy_forms',  # HANDLING BOOTSTRAP4 IN DJANGO FORMS
+    'ckeditor',  # HTML EDITOR FOR TEXT FIELDS (e.g. product's description)
+    'rest_framework',  # REST API FRAMEWORK FOR DJANGO
+    'django_filters',  # REST API FILTER BACKEND
     'celery',
     'django_celery_results',
     'django_celery_beat',
     'debug_toolbar',
-    'paypal.standard.ipn',
 )
 LOCAL_APPS = (
     'accounts',
@@ -140,9 +137,7 @@ LOCAL_APPS = (
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
-
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
-
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -184,7 +179,6 @@ AUTHENTICATION_BACKENDS = (
     'social_core.backends.facebook.FacebookOAuth2',
 )
 
-
 WSGI_APPLICATION = 'gallop.wsgi.application'
 
 # Database
@@ -219,7 +213,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/2.2/topics/i18n/
 
@@ -233,14 +226,13 @@ USE_L10N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 # Custom static files for every apps at the project level
 STATICFILES_DIRS = (
-     os.path.join(BASE_DIR, 'static/'),
-     # os.path.join('static'),
+    os.path.join(BASE_DIR, 'static/'),
+    # os.path.join('static'),
 )
 STATIC_URL = '/static/'
 STATIC_ROOT = '/'
@@ -248,7 +240,6 @@ STATIC_ROOT = '/'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
-
 
 # Haystack configuration
 HAYSTACK_CONNECTIONS = {
@@ -277,43 +268,55 @@ CACHES = {
     }
 }
 
-
 REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 2
 }
 
-#
-# LOGGING = {
-#     'version': 1,
-#     # Version of logging
-#     'disable_existing_loggers': False,
-#     # disable logging
-#     # Handlers #############################################################
-#     'handlers': {
-#         'file': {
-#             'level': 'DEBUG',
-#             'class': 'logging.FileHandler',
-#             'filename': 'gallop-debug.log',
-#         },
-#     ########################################################################
-#         'console': {
-#             'class': 'logging.StreamHandler',
-#         },
-#     },
-#     # Loggers ##############################################################
-#     'loggers': {
-#         'django': {
-#             'handlers': ['file', 'console'],
-#             'level': 'DEBUG',
-#             'propagate': True,
-#             'level': os.getenv('DJANGO_LOG_LEVEL', 'DEBUG')
-#         },
-#     },
-# }
+LOGGING = {
+    'version': 1,
+    # Version of logging
+    'disable_existing_loggers': False,
+    'filters': {
+        'require_debug_true': {
+            '()': 'django.utils.log.RequireDebugTrue',
+        }
+    },
+    'handlers': {
+        # 'file': {
+        #     'level': 'DEBUG',
+        #     'class': 'logging.FileHandler',
+        #     'filename': 'gallop-debug.log',
+        # },
+        'console': {
+            'level': 'DEBUG',
+            'filters': ['require_debug_true'],
+            'class': 'logging.StreamHandler',
+        },
+        'mail_admins': {
+            'level': 'ERROR',
+            'class': 'django.utils.log.AdminEmailHandler',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],  # ['file', 'console'],
+            'propagate': True,
+        },
+        'django.request': {
+            'handlers': ['mail_admins'],
+            'level': 'ERROR',
+            'propagate': False,
+        },
+    },
+}
 
+# SANDBOX API CREDENTIALS
 PAYPAL_RECEIVER_EMAIL = os.getenv('PAYPAL_RECEIVER_EMAIL', ''),
 PAYPAL_TEST = True
 PAYPAL_API_KEY = os.getenv('PAYPAL_API_KEY', ''),
+PAYPAL_SECRET = os.getenv('PAYPAL_SECRET', ''),
 
+DB_INTEGRITY_RETRIES = 10
+INTEGRITY_RETRY_BACKOFF = 60

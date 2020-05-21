@@ -19,5 +19,5 @@ urlpatterns = [
     path('success/', success, name='success'),
     path('payment_done', payment_done, name='payment_done'),
     path('payment_cancelled', payment_cancelled, name='payment_cancelled'),
-    path('process_payment', process_payment, name='process_payment'),
+    path('process_payment/', process_payment, name='process_payment'),
 ]
