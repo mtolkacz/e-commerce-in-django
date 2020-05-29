@@ -159,7 +159,11 @@ img {
   .section-heading.text-left {
     text-align: left !important; }
 
-/* Miscellaneous */
+div.search_deps {
+   display: flex;align-items: center; height:100%; }
+div.search_deps select {
+   margin: 0; height:100%; }
+
 .bg-img {
   background-position: center center;
   background-size: cover;
@@ -315,16 +319,16 @@ img {
     .header_area .classynav ul li .megamenu li a:hover,
     .header_area .classynav ul li .dropdown li a:hover {
       color: #000000; }
-  .header_area .search-area form {
+  .header_area .search-area {
     position: relative;
     z-index: 1;
     height: 85px;
     border-left: 1px solid #ebebeb; }
     @media only screen and (max-width: 767px) {
-      .header_area .search-area form {
+      .header_area .search-area {
         height: 40px;
         border-left: none; } }
-    .header_area .search-area form input {
+    .header_area .search-area input {
       border: none;
       background-color: #ffffff;
       width: 200px;
@@ -336,26 +340,26 @@ img {
       -webkit-transition-duration: 500ms;
       transition-duration: 500ms; }
       @media only screen and (max-width: 767px) {
-        .header_area .search-area form input {
+        .header_area .search-area input {
           width: 170px;
           height: 40px;
           padding: 0 10px 0 30px; } }
-      .header_area .search-area form input:focus {
+      .header_area .search-area input:focus {
         outline: none !important;
         width: 350px; }
         @media only screen and (min-width: 768px) and (max-width: 991px) {
-          .header_area .search-area form input:focus {
+          .header_area .search-area input:focus {
             width: 300px; } }
         @media only screen and (max-width: 767px) {
-          .header_area .search-area form input:focus {
+          .header_area .search-area input:focus {
             width: 170px; } }
         @media only screen and (min-width: 480px) and (max-width: 767px) {
-          .header_area .search-area form input:focus {
+          .header_area .search-area input:focus {
             width: 270px; } }
         @media only screen and (min-width: 576px) and (max-width: 767px) {
-          .header_area .search-area form input:focus {
+          .header_area .search-area input:focus {
             width: 300px; } }
-    .header_area .search-area form button {
+    .header_area .search-area button {
       position: absolute;
       z-index: 10;
       top: 50%;
@@ -367,7 +371,7 @@ img {
       color: #787878;
       font-size: 14px; }
       @media only screen and (max-width: 767px) {
-        .header_area .search-area form button {
+        .header_area .search-area button {
           left: 10px;
           height: 40px; } }
   .header_area .favourite-area a,

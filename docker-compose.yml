@@ -69,7 +69,7 @@ services:
       - TZ=Europe/Warsaw
   elasticsearch:
     container_name: gallop_elasticsearch
-    image: launcher.gcr.io/google/elasticsearch2
+    image: blacktop/elasticsearch:6.7.1
     environment:
       - TZ="Europe/Warsaw"
     ports:

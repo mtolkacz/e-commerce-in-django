@@ -190,6 +190,71 @@ $('#delete-filter').click(function() {
         }
     });
 
+$("div.search-area").on('touchstart click' ,function() {
+    if ( $('#headerSearch').val() ) {
+        if (!$('#search-result').is(':visible')){
+            if(!$('#search-result').is(':empty')) {
+                $('#search-result').show();
+            }
+        }
+    }
+});
+
+$(document).mouseup(function(e)
+{
+    var container = $("div.search-area");
+    if (!container.is(e.target) && container.has(e.target).length === 0)
+    {
+        if(!$('#search-result').is(':empty')) {
+            $('#search-result').hide();
+        }
+    }
+});
+
+function search_ajax(){
+        $.ajax({
+            url: '/search/',
+            type: 'POST',
+            headers: {
+                'X-CSRFTOKEN': getCookie('csrftoken')
+            },
+            data: {
+                'search_text': $('#headerSearch').val()
+            },
+            success: searchSuccess,
+            dataType: 'html',
+        });
+}
+
+$("#search-button").on('touchstart click' ,function() {
+    var search_text = document.getElementById('headerSearch');
+    if (search_text.value.length > 1) {
+        search_ajax()
+    } else if (length < 1) {
+        $("#search-result").html('');
+        $("#search-result").hide();
+    }
+});
+
+$("#headerSearch").on('keypress', function(e) {
+    var search_text = document.getElementById('headerSearch');
+    var length = search_text.value.length
+    if (length > 1) {
+        if (e.which == 13){
+            search_ajax();
+        }
+    } else if (length < 1) {
+        $("#search-result").html('');
+        $("#search-result").hide();
+    }
+});
+
+function searchSuccess(data, textStatus, jqXHR)
+{
+    $("#search-result").show();
+    $('#search-result').html(data);
+}
+
     // :: Sliders Active Code
     if ($.fn.owlCarousel) {
         $('.category-popular-products-slides').owlCarousel({

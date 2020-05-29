@@ -63,10 +63,9 @@ class Subdepartment(models.Model):
 
     def __str__(self):
         return self.name
-    
+
     def get_categories(self):
         return Category.objects.filter(subdepartment=self.id).distinct('name').order_by('name')
-
 
     def save(self, *args, **kwargs):
         value = self.name
@@ -124,7 +123,8 @@ class Product(models.Model):
     brand = models.ForeignKey(Brand, on_delete=models.PROTECT, null=True)
     description = RichTextField()
     price = MoneyField(max_digits=6, decimal_places=2, default_currency='USD', null=False)
-    discounted_price = MoneyField(max_digits=14, decimal_places=2, default_currency='USD', editable=False, null=True, blank=True)
+    discounted_price = MoneyField(max_digits=14, decimal_places=2, default_currency='USD', editable=False, null=True,
+                                  blank=True)
     department = models.ForeignKey(Department, on_delete=models.PROTECT, null=True)
     subdepartment = models.ForeignKey(Subdepartment, on_delete=models.PROTECT, null=True)
     category = models.ForeignKey(Category, on_delete=models.PROTECT, null=True)
@@ -200,6 +200,15 @@ class Product(models.Model):
                            'category': self.category.slug,
                            'pk': self.pk,
                            'slug': self.slug, })
+
+    def get_absolute_url_str(self):
+        return str(reverse('product',
+                           kwargs={
+                               'department': self.department.slug,
+                               'subdepartment': self.subdepartment.slug,
+                               'category': self.category.slug,
+                               'pk': self.pk,
+                               'slug': self.slug, }))
 
     def get_add_to_cart_url(self):
         return reverse("add_item_to_cart", kwargs={

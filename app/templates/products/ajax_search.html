@@ -1,0 +1,16 @@
+<div class="container">
+    <div class="row">
+        <div class="py-2 px-2">
+        {% if products.count > 0 %}
+            <ul>
+        {% for product in products %}
+        <li class="py-2"><a href="{{ product.url }}"><img src="{{ product.thumbnail }}" alt="{{ product.name }}"
+                                                      style="width:100px;"> {{ product.name }}</a></li>
+        {% endfor %}
+                </ul>
+        {% else %}
+            <h4 class="mx-2">No products found</h4>
+        {% endif %}
+        </div>
+    </div>
+</div>

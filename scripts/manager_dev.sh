@@ -38,6 +38,9 @@ while [ ! $number -eq 0 ]; do
  	echo "28.redis container IP"
         echo "29.celery mail"
         echo "30.build celery container"
+	echo "31.db container ip"
+	echo "32.elasticsearch container log"
+	echo "33.rebuild indexes"
 	printf "\nChoose: "
     read number
     case "$number" in
@@ -101,6 +104,12 @@ while [ ! $number -eq 0 ]; do
            ;;
 	30) docker-compose up -d --build celery | docker-compose up -d --build celery-beat
            ;;
+	31) docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' gallop_db
+	   ;;
+	32) docker-compose logs | grep -E "elastic"
+	   ;;
+	33) docker-compose exec web python manage.py search_index --rebuild
+	   ;;
 	0) exit 0
 	   ;;
 	*) echo

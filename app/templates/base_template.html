@@ -168,15 +168,17 @@
             <div class="header-meta d-flex clearfix justify-content-end">
                 <!-- Search Area -->
                 <div class="search-area">
-                    <form action="#" method="post">
-                        <input type="search" name="search" id="headerSearch" placeholder="Type for search">
-                        <button type="submit"><i class="fa fa-search" aria-hidden="true"></i></button>
-                    </form>
+                        <input type="search-area search" name="search" id="headerSearch" placeholder="Type for search">
+                        <button id="search-button"><i class="fa fa-search" aria-hidden="true"></i></button>
+                    <div id='search-result' style="display:none;color:black; background-color:white;"></div>
                 </div>
+                {% if user.is_authenticated %}
                 <!-- Favourite Area -->
                 <div class="favourite-area">
                     <a href="#"><img src="{% static 'img/core-img/heart.svg' %}" alt=""></a>
                 </div>
+                {% endif %}
+
                                 <!-- Cart Area -->
                 <div class="cart-area">
                     <a href="#" id="essenceCartBtn"><img src="{% static 'img/core-img/bag.svg' %}" alt=""> <span id="cart-qty">{% if cart %}{{ cart.get_cart_qty }}{% endif %}</span></a>

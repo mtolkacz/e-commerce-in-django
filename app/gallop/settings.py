@@ -120,6 +120,8 @@ THIRD_PARTY_APPS = (
     'crispy_forms',  # HANDLING BOOTSTRAP4 IN DJANGO FORMS
     'ckeditor',  # HTML EDITOR FOR TEXT FIELDS (e.g. product's description)
     'rest_framework',  # REST API FRAMEWORK FOR DJANGO
+    'django_elasticsearch_dsl',
+    'django_elasticsearch_dsl_drf',
     'django_filters',  # REST API FILTER BACKEND
     'celery',
     'django_celery_results',
@@ -241,12 +243,9 @@ STATIC_ROOT = '/'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 
-# Haystack configuration
-HAYSTACK_CONNECTIONS = {
+ELASTICSEARCH_DSL = {
     'default': {
-        'ENGINE': 'haystack.backends.elasticsearch2_backend.Elasticsearch2SearchEngine',
-        'URL': 'http://127.0.0.1:9200/',
-        'INDEX_NAME': 'haystack',
+        'hosts': 'elasticsearch:9200'
     },
 }
 
