@@ -8,7 +8,7 @@ from djmoney.models.fields import MoneyField
 from accounts.validators import ZipCodeValidator
 from accounts.models import Voivodeship, Country
 from django.utils import timezone
-from .signals import shipment_pre_save
+from .signals import shipment_pre_save, order_pre_delete
 from django.db.models import signals
 
 
@@ -58,8 +58,6 @@ class Order(models.Model):
     date_ordered = models.DateTimeField(auto_now=True)
     session_key = models.ForeignKey(Session, on_delete=models.CASCADE, null=True, editable=False)
     access_code = models.SmallIntegerField(null=True, blank=False, editable=False)
-    confirmed = models.BooleanField(default=False, editable=False)
-    booked = models.BooleanField(default=False, null=False, editable=False)
     status = models.PositiveSmallIntegerField(
         choices=STATUS,
         default=IN_CART,
@@ -68,14 +66,15 @@ class Order(models.Model):
     # save email for client without account which don't want to create one
     email = models.EmailField(null=True)
 
-    def delete_order(self, delete_booked=False):
+    def delete(self):
         items = self.items.all()
         for item in items:
-            if delete_booked:
+            if self.status == self.BOOKED:
                 if item.booked:
                     item.product.undo_book()
             item.delete()
         self.delete()
+        super(Order, self).delete()
 
     def get_cart_items(self):
         return self.items.all().order_by('id')
@@ -97,13 +96,14 @@ class Order(models.Model):
         items = self.items.all()
         for item in items:
             item.product.book(amount=item.amount)
+            item.booked = True
+            item.save(update_fields=['booked'])
         self.update_status(self.BOOKED)
 
     def __str__(self):
         return '{}'.format(self.ref_code)
 
     def confirm(self):
-        self.confirmed = True
         self.status = self.CONFIRMED
         self.save(update_fields=['confirmed', 'status', ])
 
@@ -118,6 +118,9 @@ class Order(models.Model):
     def delete_access_code(self):
         self.access_code = None
         self.save(update_fields=['access_code'])
+
+
+signals.pre_delete.connect(order_pre_delete, sender=Order)
 
 
 class ShipmentType(models.Model):

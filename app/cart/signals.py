@@ -9,3 +9,12 @@ def shipment_pre_save(sender, instance, signal, *args, **kwargs):
         instance.sentdate = now
     elif instance.status == instance.DELIVERED:
         instance.delivereddate = now
+
+
+def order_pre_delete(sender, instance, signal, *args, **kwargs):
+    items = instance.items.all()
+    for item in items:
+        if instance.status == instance.BOOKED:
+            if item.booked:
+                item.product.undo_book()
+        item.delete()
