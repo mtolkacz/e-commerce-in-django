@@ -239,12 +239,14 @@ function process_promo_code(){
                 'code': $('#promo-code-input').val()
             },
             success: function(data) { promoCodeSuccess(data); },
+            error: function() {$("div.loading_contener").remove(); alert('Unexcpected error');},
             dataType: 'json',
         });
 }
 
 $("#promo-code-button").on('click' ,function() {
     if ( $('#promo-code-input').val() ) {
+        add_loader();
         process_promo_code()
     } else {
         alert('Incorrect input value');
@@ -253,7 +255,6 @@ $("#promo-code-button").on('click' ,function() {
 
 
 function promoCodeSuccess(data){
-    alert(data['message']);
     if(data['promo_value']){
         $("#product-list-checkout").append(`<li class="list-group-item d-flex justify-content-between bg-light">
                 <div class="text-success">
@@ -263,12 +264,20 @@ function promoCodeSuccess(data){
                 <span class="text-success">` + data['promo_value'] + `</span>
               </li>`
         );
+        var promo_div = document.getElementById("promo-div");
+        if (promo_div) {
+            var delete_button = `<button id="delete_promo_button" onclick="removePromo(` + data['cart_id'] + `); return false;" class="btn btn-danger ml-2 btn-sm"> Delete promo code</button>`;
+            $("#promo-div").html(delete_button);
+            console.log(delete_button);
+        }
+
         var cart_total = document.getElementById("checkout-cart-total")
         if(cart_total){
-            cart_total.innerText=data['cart_total_value'];
+            cart_total.innerText= data['cart_total_value'];
         }
-        $("#promo-div").remove();
     }
+    $("div.loading_contener").remove();
+    alert(data['message']);
 }
 
 $("#search-button").on('touchstart click' ,function() {

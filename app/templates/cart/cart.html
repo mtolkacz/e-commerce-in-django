@@ -85,7 +85,7 @@
                     <div class="col-lg-3 col-md-8 col-sm-6 col-6 pt-2 pb-3">
                         <div class="float-right" style="margin: 5px">
                             {% if cart.promo_code %}Promo code: <b>{{ cart.promo_code.code }}</b>
-                            <br>Promo value: <b>{{ cart.get_promo_code_value_str }}</b><br>{% endif %}
+                            <br>Promo value: <b>-{{ cart.get_promo_code_value_str }}</b><br>{% endif %}
                             Total price: <b><span id="cart_total_value">{{ order.get_cart_total }}</span></b>
                         </div>
                     </div>

@@ -116,6 +116,29 @@ function updateValue(item_id) {
     calculate_cart(cart_value, item_id);
 }
 
+function removePromo(cart_id) {
+    add_loader();
+    $.ajax({
+        url: '/purchase/checkout/delete_promo_code/',
+        type: 'POST',
+        headers: {
+                'X-CSRFTOKEN': getCookie('csrftoken')
+        },
+        data: {
+            'cart_id': cart_id
+        },
+        dataType: 'json',
+        success: function() { location.reload(); },
+        error: function() {
+            console.log("Error!");
+            $("div.loading_contener").remove();
+            alert("Something went wrong! Try again later");
+        }
+    });
+}
+
+
+
 function removeItem(item_id) {
     var elem1 = document.getElementById("row" + item_id);
     if (elem1) {

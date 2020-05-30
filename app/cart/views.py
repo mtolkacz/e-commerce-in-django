@@ -9,7 +9,6 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib import messages
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
-from moneyed import Money
 from products.models import Product
 from .models import *
 from .extras import generate_order_id
@@ -20,11 +19,10 @@ from accounts.tasks import send_email
 from .paypal import PaypalManager
 from paypalcheckoutsdk.orders import paypalhttp
 import json
-import datetime
-from decimal import Decimal
 from .checkout import Checkout
 from .promocode import PromoCodeManager
 from .summary import Summary
+from sales.sale import SaleManager
 
 User = get_user_model()
 
@@ -426,24 +424,18 @@ def process_payment(request):
     ref_code = request.GET.get('ref_code', 0)
     details_string = request.GET.get('details', 0)
     payment_details = json.loads(details_string)
-    print("DJANGOTEST: payment_manager details {}".format(payment_details))
-    print("DJANGOTEST: dict {}".format(isinstance(payment_details, dict)))
     if payment_details and isinstance(payment_details, dict):
-        print("DJANGOTEST: det{}".format(payment_details))
         payment_manager = PaypalManager(payment_details)
-        print("DJANGOTEST: det{}".format(payment_manager.details))
         try:
             payment_confirmed = payment_manager.confirm_payment()
         except paypalhttp.http_error.HttpError:
             payment_confirmed = None
-        print("DJANGOTEST: {}".format(payment_confirmed))
         if payment_confirmed:
             try:
                 order = Order.objects.get(ref_code=ref_code)
             except Order.DoesNotExist:
                 order = None
             if order:
-                print("DJANGOTEST: {}".format(order))
                 payment = payment_manager.create_payment(order)
                 if payment:
                     try:
@@ -452,8 +444,9 @@ def process_payment(request):
                         shipment = None
                     if shipment:
                         shipment.update_status(Shipment.IN_PREPARATION)
+                    sale = SaleManager(order)
+                    sale.create_sale()
                 order.update_status(Order.PAID)
-                print("DJANGOTEST: order.status: {}".format(order.status))
                 data['success'] = True
                 data['order_id'] = order.id
     return JsonResponse(data)
@@ -462,24 +455,41 @@ def process_payment(request):
 @require_http_methods(['POST'])
 def process_promo_code(request):
     data = {}
-    print("DJANGOTEST: sukces2")
-    data['success'] = True
-    code = request.POST['code']
-    print("DJANGOTEST: code {}".format(code))
-    promo_code_manager = PromoCodeManager(request, code)
-    if promo_code_manager.promo_code:
-        already_used = promo_code_manager.is_already_used()
-        print("DJANGOTEST: already_used {}".format(already_used))
-        if not already_used:
-            order = get_pending_cart(request)
-            order.apply_promo_code(promo_code_manager.promo_code)
-            promo_usage = PromoCodeUsage(user=order.owner, order=order, promocode=promo_code_manager.promo_code)
-            promo_usage.save()
-            data['promo_value'] = str(order.get_promo_code_value())
-            data['cart_total_value'] = order.get_cart_total_str()
-            data['message'] = 'Promo code added successfully'
-        else:
-            data['message'] = 'Promo code already used'
+    code = request.POST.get('code', None)
+    if not code:
+        data['message'] = 'Promo code not provided'
     else:
-        data['message'] = 'Incorrect promo code'
+        order = get_pending_cart(request)
+        manager = PromoCodeManager(request, order, code)
+        if not manager.promo_code:
+            data['message'] = 'Incorrect promo code'
+        else:
+            already_used = manager.is_already_used()
+            if already_used:
+                data['message'] = 'Promo code already used'
+            else:
+                order = get_pending_cart(request)
+                cart_total = order.get_cart_total()
+                if not manager.meets_requirements(cart_total):
+                    data['message'] = f"Minimum purchase total value for this promo code is " \
+                                      f"{manager.promo_code.minimum_order_value}{str(cart_total.currency)}"
+                else:
+                    order.apply_promo_code(manager.promo_code)
+                    manager.save_code_usage()
+                    data = manager.get_context_data()
+    return JsonResponse(data)
+
+
+@require_http_methods(['POST'])
+def delete_promo_code(request):
+    data = {}
+    order = get_pending_cart(request)
+    code = request.POST.get('cart_id', None)
+    if order and code:
+        order.promo_code = None
+        order.save(update_fields=['promo_code'])
+        usage = PromoCodeUsage.objects.get(order=order)
+        usage.delete()
+        data['success'] = True
+        messages.success(request, 'Promo code has been deleted')
     return JsonResponse(data)

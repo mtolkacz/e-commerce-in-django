@@ -12,3 +12,7 @@ function getCookie(name) {
     }
     return cookieValue;
 }
+
+function add_loader(){
+$("header").append('<div class="loading_contener"><div class="loader"></div></div>');
+}

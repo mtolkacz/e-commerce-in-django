@@ -107,14 +107,14 @@ class Order(models.Model):
                           * item.amount for item in self.items.all()])
         if self.promo_code:
             if self.promo_code.type == PromoCode.VALUE:
-                new_value = Decimal(cart_total.amount) - self.promo_code.value
+                new_value = Decimal(cart_total.amount) - Decimal(self.promo_code.value)
             elif self.promo_code.type == PromoCode.PERCENTAGE:
-                new_value = Decimal(cart_total.amount) * Decimal(round((100 - self.promo_code.value)/100, 2))
+                new_value = Decimal(round(Decimal(cart_total.amount) * Decimal((100 - self.promo_code.value)/100)), 2)
             cart_total = Money(new_value, str(cart_total.currency))
         return cart_total
 
     def get_cart_total_str(self):
-        return str(round(self.get_cart_total().amount,2))
+        return str(self.get_cart_total().amount)
 
     def get_cart_total_no_promo(self):
         cart_total = sum([(item.product.discounted_price if item.product.discounted_price else item.product.price)
@@ -158,9 +158,10 @@ class Order(models.Model):
         self.save(update_fields=['promo_code'])
 
     def get_promo_code_value(self):
-        cart_total = sum([(item.product.discounted_price if item.product.discounted_price else item.product.price)
-                          * item.amount for item in self.items.all()])
-        return Money((Decimal(self.get_cart_total().amount) - Decimal(cart_total.amount)), cart_total.currency)
+        # cart_total = sum([(item.product.discounted_price if item.product.discounted_price else item.product.price)
+        #                   * item.amount for item in self.items.all()])
+        # return Money((Decimal(self.get_cart_total().amount) - Decimal(cart_total.amount)), cart_total.currency)
+        return self.get_cart_total_no_promo() - self.get_cart_total()
 
     def get_promo_code_value_str(self):
         return str(self.get_promo_code_value())
@@ -271,3 +272,4 @@ class Payment(models.Model):
     email = models.EmailField(null=False, editable=False)
     given_name = models.CharField(max_length=30, blank=False, null=False, editable=False)
     surname = models.CharField(max_length=30, blank=False, null=False, editable=False)
+
