@@ -1,17 +1,54 @@
 from collections import defaultdict
 from random import random
-
+from django.db import models
+from django.db.models import Count
 from django.apps import apps
 from django.utils import timezone
 import datetime as dt
 import random
 from calendar import monthrange
-
-from products.models import Product
+from products.models import Product, Brand
 from cart.models import PromoCode
-from .models import Sale
+from sales.models import Sale
 
 
+def get_popular_products(how_much=10, where=None):
+    # where = {'area': 'department', 'object': department_object}
+    lookup_field = 'product__' + where['area'] if where else None
+    if lookup_field:
+        product_list = list(Product.objects.filter(**{where['area']: where['object']})
+                            .values_list('id', flat=True))
+        sale_list = list(Sale.objects.filter(product__in=product_list)
+                         .values_list('product', flat=True)
+                         .annotate(total=Count('product'))
+                         .order_by('-total')[:how_much])
+    else:
+        sale_list = list(Sale.objects.all()
+                         .values_list('product', flat=True)
+                         .annotate(total=Count('product'))
+                         .order_by('-total')[:how_much])
+    whens = []
+    for sort_index, value in enumerate(sale_list):
+        whens.append(models.When(id=value, then=sort_index))
+
+    products = Product.objects.annotate(_sort_index=models.Case(*whens, output_field=models.IntegerField()))
+    return products.order_by('_sort_index')[:how_much]
+
+
+def get_popular_brands(amount=10):
+    brand_list = list(Sale.objects.all()
+                      .values_list('product__brand', flat=True)
+                      .annotate(total=Count('product__brand'))
+                      .order_by('-total')[:amount])
+    whens = []
+    for sort_index, value in enumerate(brand_list):
+        whens.append(models.When(id=value, then=sort_index))
+
+    brands = Brand.objects.annotate(_sort_index=models.Case(*whens, output_field=models.IntegerField()))
+    return brands.order_by('_sort_index')[:amount]
+
+
+# class from https://www.caktusgroup.com/blog/2019/01/09/django-bulk-inserts/
 class BulkCreateManager(object):
     """
     This helper class keeps track of ORM objects to be created for multiple
@@ -69,7 +106,8 @@ class SaleGenerator:
         year = random.choice(self.years)
         month = random.randint(1, 12) if year != self.now.year else random.randint(1, self.now.month) \
             if self.now.month > 1 else 1
-        day = random.randint(1, self.now.day if year == self.now.year and month == self.now.month else monthrange(year, month)[1])
+        day = random.randint(1, self.now.day if year == self.now.year and month == self.now.month else
+        monthrange(year, month)[1])
         return dt.datetime(year, month, day, tzinfo=timezone.utc)
 
     def generate_promo(self):
@@ -85,7 +123,8 @@ class SaleGenerator:
             product = self.products.get(id=random.choice(self.product_list))
             promo = self.generate_promo()
             if self.printonly:
-                print(f"Product: {product.name}, price: {product.price.amount}, date: {date}, promo: {promo.code if promo else None}")
+                print(
+                    f"Product: {product.name}, price: {product.price.amount}, date: {date}, promo: {promo.code if promo else None}")
             else:
                 new_object = Sale(product=product, price=product.price, promo_code=promo, date=date)
                 self.manager.add(new_object)

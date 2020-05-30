@@ -1,4 +1,6 @@
-from products.models import Product, ProductImage
+from products.models import Product, ProductImage, Department, Category
+
+from .database import get_popular_products
 from .error_views import *
 from django.contrib.auth import get_user_model
 from django.shortcuts import render_to_response
@@ -25,10 +27,9 @@ def search(request):
 
 
 def index(request):
-    products = Product.objects.all()[:10]
-
+    popular_products = get_popular_products()
     index_dict = {
-        'products': products,
+        'products': popular_products,
     }
 
     return render(request, 'products/index.html', index_dict)

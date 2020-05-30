@@ -74,7 +74,7 @@ class BrandAdmin(admin.ModelAdmin):
     list_display = ['id', 'name', 'get_brand_name', ]
 
     def get_brand_name(self, obj):
-        return obj.brand.name
+        return obj.name
     get_brand_name.admin_order_field = 'brand'
     get_brand_name.short_description = 'Brand Name'
 
