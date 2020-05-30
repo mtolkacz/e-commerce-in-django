@@ -1,0 +1,17 @@
+<div id="shipment-status-area">
+    <table class="table">
+        <thead class="thead-dark">
+        <tr>
+            <th scope="col">Order status</th>
+            <th scope="col">Shipment status</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>{{ order.get_status_display }}
+            </th>
+            <td>{{ shipment.get_status_display }}</td>
+        </tr>
+        </tbody>
+    </table>
+</div>

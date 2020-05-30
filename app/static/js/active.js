@@ -125,6 +125,7 @@ $('#delete-purchase').on('click', function() {
 function deletePurchase(data)
 {
     location.reload();
+    alert("Purchase has been deleted.")
 }
 
 $('#delete-filter').click(function() {
@@ -224,6 +225,50 @@ function search_ajax(){
             success: searchSuccess,
             dataType: 'html',
         });
+}
+
+function process_promo_code(){
+        var CSRF_TOKEN = getCookie('csrftoken');
+        $.ajax({
+            url: '/purchase/checkout/process_promo_code/',
+            type: 'POST',
+            headers: {
+                'X-CSRFTOKEN': CSRF_TOKEN
+            },
+            data: {
+                'code': $('#promo-code-input').val()
+            },
+            success: function(data) { promoCodeSuccess(data); },
+            dataType: 'json',
+        });
+}
+
+$("#promo-code-button").on('click' ,function() {
+    if ( $('#promo-code-input').val() ) {
+        process_promo_code()
+    } else {
+        alert('Incorrect input value');
+    }
+});
+
+
+function promoCodeSuccess(data){
+    alert(data['message']);
+    if(data['promo_value']){
+        $("#product-list-checkout").append(`<li class="list-group-item d-flex justify-content-between bg-light">
+                <div class="text-success">
+                  <h6 class="my-0">Promo code</h6>
+                  <small>` + $('#promo-code-input').val() + `</small>
+                </div>
+                <span class="text-success">` + data['promo_value'] + `</span>
+              </li>`
+        );
+        var cart_total = document.getElementById("checkout-cart-total")
+        if(cart_total){
+            cart_total.innerText=data['cart_total_value'];
+        }
+        $("#promo-div").remove();
+    }
 }
 
 $("#search-button").on('touchstart click' ,function() {

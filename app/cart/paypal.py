@@ -149,7 +149,19 @@ class PaypalManager(PayPalClient):
             given_name = None
         return given_name
 
-    def create_payment_object(self, order):
+    # def update_shipment(self):
+    #     try:
+    #         shipment = Shipment.objects.get(order__id=order_id)
+    #     except Shipment.DoesNotExist:
+    #         logger.error("Can't find shipment after payment for order {}".format(order_id))
+    #     else:
+    #         shipment.status = Shipment.IN_PREPARATION
+    #         try:
+    #             shipment.save(update_fields=['status'], )
+    #         except IntegrityError as ex:
+    #             logger.error('Problem during saving shipment after payment: {}'.format(shipment.id))
+
+    def create_payment(self, order):
         paypal_payment_id = self.get_id()
         payment = Payment(id=paypal_payment_id,
                           order=order,
@@ -163,18 +175,8 @@ class PaypalManager(PayPalClient):
                           surname=self.get_payer_surname())
         try:
             payment.save()
-            order_id = payment.order.id
         except IntegrityError as ex:
            logger.error('Problem during saving payment: {}'.format(paypal_payment_id))
-        else:
-            try:
-                shipment = Shipment.objects.get(order__id=order_id)
-            except Shipment.DoesNotExist:
-                logger.error("Can't find shipment after payment for order {}".format(order_id))
-            else:
-                shipment.status = Shipment.IN_PREPARATION
-                try:
-                    shipment.save(update_fields=['status'], )
-                except IntegrityError as ex:
-                    logger.error('Problem during saving shipment after payment: {}'.format(shipment.id))
+           payment = None
+        return payment if payment else False
 

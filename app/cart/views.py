@@ -8,6 +8,7 @@ from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib import messages
 from django.http import JsonResponse
+from django.views.decorators.http import require_http_methods
 from moneyed import Money
 from products.models import Product
 from .models import *
@@ -22,6 +23,7 @@ import json
 import datetime
 from decimal import Decimal
 from .checkout import Checkout
+from .promocode import PromoCodeManager
 from .summary import Summary
 
 User = get_user_model()
@@ -111,15 +113,21 @@ def add_item_to_cart(request):
     return JsonResponse(data)
 
 
-def delete_cart(request):
+# def delete_cart(request):
+#     data = {}
+#     existing_cart = get_pending_cart(request)
+#     cart_deleted = existing_cart.delete()
+#     if cart_deleted:
+#         data['success'] = cart_deleted
+#     return JsonResponse(data)
+
+
+def delete_purchase(request):
     data = {}
     existing_cart = get_pending_cart(request)
-    delete_cart_items = Order.objects.get(id=existing_cart.id).items.all().delete()
-    if delete_cart_items:
-        cart_deleted = existing_cart.delete()
-        if cart_deleted:
-            data['success'] = cart_deleted
-
+    cart_deleted = existing_cart.delete()
+    if cart_deleted:
+        data['success'] = cart_deleted
     return JsonResponse(data)
 
 
@@ -370,30 +378,13 @@ def summary(request, ref_code, oidb64):
                 if summary.permission == summary.TEMP_ACCESS:
                     summary.has_access.delete()
                     summary.order.delete_access_code()
-                    if summary.order.confirmed is False:
+                    if summary.order.status < summary.order.CONFIRMED:
                         summary.order.update_status(Order.CONFIRMED)
                 return render(request, 'cart/summary.html', summary.context)
             elif summary.permission == summary.NEED_ACCESS_CODE:
                 summary.order.create_access_code()
                 summary.send_link_with_access_code()
     return redirect(reverse('index'))
-
-
-@login_required()
-def update_transaction_records(request, cart_id):
-    order_to_purchase = Order.objects.filter(pk=cart_id).first()
-    order_to_purchase.is_completed = True
-    order_to_purchase.date_completed = datetime.datetime.now()
-    order_to_purchase.save()
-    order_items = order_to_purchase.items.all()
-    order_items.update(is_completed=True, date_completed=datetime.datetime.now())
-
-    return redirect(reverse('success'))
-
-
-@login_required()
-def success(request):
-    return render(request, 'cart/success.html', {})
 
 
 def purchase_activate(request, uidb64, token, oidb64):
@@ -414,7 +405,7 @@ def purchase_activate(request, uidb64, token, oidb64):
             oid = int(force_text(urlsafe_base64_decode(oidb64)))
         except(TypeError, ValueError, OverflowError):
             oid = None
-        else:
+        if oid:
             try:
                 from .models import Order
                 order = Order.objects.get(id=oid)
@@ -430,42 +421,19 @@ def purchase_activate(request, uidb64, token, oidb64):
         return redirect('login')
 
 
-def delete_purchase(request):
-    data = {}
-    cart = get_pending_cart(request)
-    if not cart.is_ordered:
-        cart.delete_order()
-        data['success'] = True
-        messages.success(request, 'Purchase has been deleted')
-    return JsonResponse(data)
-
-
-def get_payment_value(details):
-    value = None
-    if 'purchase_units' in details:
-        if 'amount' in details['purchase_units']:
-            amount_value = details['purchase_units']['amount']['value'] if 'value' in details['purchase_units'][
-                'amount'] else ''
-            currency = details['purchase_units']['amount']['currency_code'] if 'currency_code' in \
-                                                                               details['purchase_units'][
-                                                                                   'amount'] else 'USD'
-            value = Money(amount=Decimal(amount_value), currency=currency)
-    return value
-
-
 def process_payment(request):
     data = {}
     ref_code = request.GET.get('ref_code', 0)
     details_string = request.GET.get('details', 0)
     payment_details = json.loads(details_string)
-    print("DJANGOTEST: payment details {}".format(payment_details))
+    print("DJANGOTEST: payment_manager details {}".format(payment_details))
     print("DJANGOTEST: dict {}".format(isinstance(payment_details, dict)))
     if payment_details and isinstance(payment_details, dict):
         print("DJANGOTEST: det{}".format(payment_details))
-        payment = PaypalManager(payment_details)
-        print("DJANGOTEST: det{}".format(payment.details))
+        payment_manager = PaypalManager(payment_details)
+        print("DJANGOTEST: det{}".format(payment_manager.details))
         try:
-            payment_confirmed = payment.confirm_payment()
+            payment_confirmed = payment_manager.confirm_payment()
         except paypalhttp.http_error.HttpError:
             payment_confirmed = None
         print("DJANGOTEST: {}".format(payment_confirmed))
@@ -476,8 +444,42 @@ def process_payment(request):
                 order = None
             if order:
                 print("DJANGOTEST: {}".format(order))
-                payment.create_payment_object(order)
-                order.update_status(order.PAID)
+                payment = payment_manager.create_payment(order)
+                if payment:
+                    try:
+                        shipment = Shipment.objects.get(order=order)
+                    except Shipment.DoesNotExist:
+                        shipment = None
+                    if shipment:
+                        shipment.update_status(Shipment.IN_PREPARATION)
+                order.update_status(Order.PAID)
+                print("DJANGOTEST: order.status: {}".format(order.status))
                 data['success'] = True
                 data['order_id'] = order.id
+    return JsonResponse(data)
+
+
+@require_http_methods(['POST'])
+def process_promo_code(request):
+    data = {}
+    print("DJANGOTEST: sukces2")
+    data['success'] = True
+    code = request.POST['code']
+    print("DJANGOTEST: code {}".format(code))
+    promo_code_manager = PromoCodeManager(request, code)
+    if promo_code_manager.promo_code:
+        already_used = promo_code_manager.is_already_used()
+        print("DJANGOTEST: already_used {}".format(already_used))
+        if not already_used:
+            order = get_pending_cart(request)
+            order.apply_promo_code(promo_code_manager.promo_code)
+            promo_usage = PromoCodeUsage(user=order.owner, order=order, promocode=promo_code_manager.promo_code)
+            promo_usage.save()
+            data['promo_value'] = str(order.get_promo_code_value())
+            data['cart_total_value'] = order.get_cart_total_str()
+            data['message'] = 'Promo code added successfully'
+        else:
+            data['message'] = 'Promo code already used'
+    else:
+        data['message'] = 'Incorrect promo code'
     return JsonResponse(data)

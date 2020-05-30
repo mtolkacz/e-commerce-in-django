@@ -3,7 +3,7 @@ from django.contrib.sessions.models import Session
 from django.utils.encoding import force_text
 from django.utils.http import urlsafe_base64_decode
 from accounts.models import User
-from .models import Order, OrderAccess, Shipment
+from .models import Order, OrderAccess, Shipment, Payment
 from gallop import settings
 
 
@@ -87,7 +87,11 @@ class Summary:
                 self.context['shipment'] = self.shipment
                 self.context['order'] = self.order
                 if self.order.status == Order.PAID:
-                    pass
+                    try:
+                        payment = Payment.objects.get(order__id=self.order.id)
+                    except Payment.DoesNotExist:
+                        payment = True
+                    self.context['payment'] = payment
                 else:
                     self.context['api_key'] = str(settings.PAYPAL_API_KEY[0]) if settings.PAYPAL_API_KEY else ''
             elif self.permission == self.NO_ACCESS:

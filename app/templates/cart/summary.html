@@ -67,6 +67,7 @@
             <strong>{{ order.get_cart_total }}</strong>
           </li>
         </ul>
+        {% include "cart/checkout/order_status.html" %}
       </div>
       <div class="col-md-5 order-md-1">
         {% if user %}
@@ -85,7 +86,7 @@
         {{ shipment.zip_code }} {{ shipment.city }}<br>
 
           <!-- Payment -->
-          {% include "cart/checkout/paypal_button.html" %}
+          {% include "cart/checkout/payment.html" %}
         </form>
 
         {% else %}
@@ -112,7 +113,7 @@
         </form>
 
         <!-- Payment -->
-        {% include "cart/checkout/paypal_button.html" %}
+        {% include "cart/checkout/payment.html" %}
 
         {% endif %}
       </div>

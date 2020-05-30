@@ -1,5 +1,28 @@
     <h4 class="mb-3 pt-3">Payment</h4>
     <!-- Set up a container element for the button -->
+    <div id="payment-area">
+    {% if payment %}
+        {% if payment.id %}
+        <table class="table">
+          <thead class="thead-dark">
+            <tr>
+              <th scope="col">ID</th>
+              <th scope="col">Date</th>
+              <th scope="col">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="row">{{ payment.id }}</th>
+              <td>{{ payment.updatedate }}</td>
+              <td>{{ payment.status }}</td>
+            </tr>
+          </tbody>
+        </table>
+        {% else %}
+        <b>Payment completed.</b><br>No payment details available currently.
+        {% endif %}
+    {% else %}
     <div id="paypal-button-container"></div>
 
     <hr class="mb-4">
@@ -65,3 +88,5 @@
 
         }).render('#paypal-button-container');
     </script>
+    </div>
+    {% endif %}

@@ -115,9 +115,11 @@
                                             <span>-{{ product.discount }}%</span>
                                         </div>
                                         {% endif %}
+                                        {% if user.authenticated %}
                                         <div class="product-favourite">
                                             <a href="#" class="favme fa fa-heart"></a>
                                         </div>
+                                        {% endif %}
                                     </div>
 
                                     <div class="product-description">
@@ -131,7 +133,10 @@
 
                                         <div class="hover-content">
                                             <div class="add-to-cart-btn">
-                                                <button onclick="add_to_cart({{ product.id }}); return false;" class="btn btn-primary">Add to cart</button>
+                                                {% if product.stock > 0 %} <button onclick="add_to_cart({{ product.id }}); return false;" class="btn btn-primary">Add to cart</button>
+                                                {% else %}
+                                                <button class="btn btn-danger btn-sm" style="cursor: default;">Not available currently</button>
+                                                {% endif %}
                                             </div>
                                         </div>
                                     </div>
@@ -192,9 +197,11 @@
                             <!-- Hover Thumb -->
                             <img class="hover-img" src="{{ item.thumbnail.url }}" alt="">
                             <!-- Favourite -->
+                            {% if user.authenticated %}
                             <div class="product-favourite">
                                 <a href="#" class="favme fa fa-heart"></a>
                             </div>
+                            {% endif %}
                         </div>
                         <!-- Product Description -->
                         <div class="product-description">
@@ -203,7 +210,10 @@
                                 <h6 style="height:55px;display:block;">{{ item.name }}</h6>
                             </a>
                             <p class="product-price">{{ item.price }}</p>
-                            <button onclick="add_to_cart({{ item.id }}); return false;" class="btn-primary btn-sm"><i class="fas fa-shopping-cart"></i> Add to cart</button>
+                            {% if item.stock > 0 %} <button onclick="add_to_cart({{ item.id }}); return false;" class="btn-primary btn-sm"><i class="fas fa-shopping-cart"></i> Add to cart</button>
+                            {% else %}
+                            <button class="btn btn-danger btn-sm" style="cursor:default">Not available</button>
+                             {% endif %}
                         </div>
                     </div>
                     {% endfor %}

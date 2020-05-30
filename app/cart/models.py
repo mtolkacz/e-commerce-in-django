@@ -1,6 +1,9 @@
 import random
+from decimal import Decimal
+
 from django.db import models, transaction
 from django.conf import settings
+from djmoney.money import Money
 from products.models import Product, Category
 from django.contrib.auth import get_user_model, signals
 from django.contrib.sessions.models import Session
@@ -8,12 +11,32 @@ from djmoney.models.fields import MoneyField
 from accounts.validators import ZipCodeValidator
 from accounts.models import Voivodeship, Country
 from django.utils import timezone
+
 from .signals import shipment_pre_save, order_pre_delete
 from django.db.models import signals
 
-
 User = get_user_model()
 MAX_ITEMS_IN_CART = 30
+
+
+class PromoCode(models.Model):
+    PERCENTAGE = 1
+    VALUE = 2
+    TYPE = (
+        (PERCENTAGE, 'Percentage cart discount'),
+        (VALUE, 'Value cart discount'),
+    )
+    code = models.CharField(max_length=15, blank=False, null=False)
+    type = models.PositiveSmallIntegerField(
+        choices=TYPE,
+        default=PERCENTAGE,
+    )
+    value = models.PositiveSmallIntegerField(null=False)
+    minimum_order_value = models.PositiveSmallIntegerField(null=True)
+    active = models.BooleanField(default=False)
+
+    def __str__(self):
+        return '{}'.format(self.code)
 
 
 class OrderItem(models.Model):
@@ -58,6 +81,7 @@ class Order(models.Model):
     date_ordered = models.DateTimeField(auto_now=True)
     session_key = models.ForeignKey(Session, on_delete=models.CASCADE, null=True, editable=False)
     access_code = models.SmallIntegerField(null=True, blank=False, editable=False)
+    promo_code = models.ForeignKey(PromoCode, on_delete=models.SET_NULL, null=True)
     status = models.PositiveSmallIntegerField(
         choices=STATUS,
         default=IN_CART,
@@ -73,18 +97,32 @@ class Order(models.Model):
                 if item.booked:
                     item.product.undo_book()
             item.delete()
-        self.delete()
-        super(Order, self).delete()
+        return super(Order, self).delete()
 
     def get_cart_items(self):
         return self.items.all().order_by('id')
 
     def get_cart_total(self):
-        return sum([(item.product.discounted_price if item.product.discounted_price else item.product.price)
-                    * item.amount for item in self.items.all()])
+        cart_total = sum([(item.product.discounted_price if item.product.discounted_price else item.product.price)
+                          * item.amount for item in self.items.all()])
+        if self.promo_code:
+            if self.promo_code.type == PromoCode.VALUE:
+                new_value = Decimal(cart_total.amount) - self.promo_code.value
+            elif self.promo_code.type == PromoCode.PERCENTAGE:
+                new_value = Decimal(cart_total.amount) * Decimal(round((100 - self.promo_code.value)/100, 2))
+            cart_total = Money(new_value, str(cart_total.currency))
+        return cart_total
 
     def get_cart_total_str(self):
-        return str(self.get_cart_total().amount)
+        return str(round(self.get_cart_total().amount,2))
+
+    def get_cart_total_no_promo(self):
+        cart_total = sum([(item.product.discounted_price if item.product.discounted_price else item.product.price)
+                          * item.amount for item in self.items.all()])
+        return cart_total
+
+    def get_cart_total_no_promo_str(self):
+        return str(self.get_cart_total_no_promo().amount)
 
     def get_cart_currency(self):
         return self.get_cart_total().currency if self.get_cart_total().currency else 'USD'
@@ -103,10 +141,6 @@ class Order(models.Model):
     def __str__(self):
         return '{}'.format(self.ref_code)
 
-    def confirm(self):
-        self.status = self.CONFIRMED
-        self.save(update_fields=['confirmed', 'status', ])
-
     def update_status(self, status):
         self.status = status
         self.save(update_fields=['status', ])
@@ -119,8 +153,26 @@ class Order(models.Model):
         self.access_code = None
         self.save(update_fields=['access_code'])
 
+    def apply_promo_code(self, promo_code):
+        self.promo_code = promo_code
+        self.save(update_fields=['promo_code'])
+
+    def get_promo_code_value(self):
+        cart_total = sum([(item.product.discounted_price if item.product.discounted_price else item.product.price)
+                          * item.amount for item in self.items.all()])
+        return Money((Decimal(self.get_cart_total().amount) - Decimal(cart_total.amount)), cart_total.currency)
+
+    def get_promo_code_value_str(self):
+        return str(self.get_promo_code_value())
+
 
 signals.pre_delete.connect(order_pre_delete, sender=Order)
+
+
+class PromoCodeUsage(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=False)
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, null=False)
+    promocode = models.ForeignKey(PromoCode, on_delete=models.CASCADE, null=False)
 
 
 class ShipmentType(models.Model):
@@ -194,6 +246,10 @@ class Shipment(models.Model):
 
     def __str__(self):
         return '{} - {}'.format(self.order.ref_code, self.get_status_display())
+
+    def update_status(self, status):
+        self.status = status
+        self.save(update_fields=['status', ])
 
 
 signals.pre_save.connect(shipment_pre_save, sender=Shipment)

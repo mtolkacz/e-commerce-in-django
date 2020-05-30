@@ -74,16 +74,22 @@
                 </div>
             </div>
             {% endfor %}
+            <div class="row">
+
+            </div>
         </div>
-        <div id="card-footer" class="ca0rd-footer">
+        <div id="card-footer" class="card-footer">
             <div class="coupon col-md-12 col-sm-12 no-padding-left pull-left">
                 <div class="row">
-                    <div class="col-lg-6 d-none d-sm-block pt-2 pb-5"></div>
-                    <div class="col-lg-3 col-md-8 col-sm-6 col-6 pt-2 pb-5">
-                        <div class="float-right" style="margin: 5px">Total price: <b><span id="cart_total_value">{{ order.get_cart_total }}</span></b>
+                    <div class="col-lg-6 d-none d-sm-block pt-2 pb-3"></div>
+                    <div class="col-lg-3 col-md-8 col-sm-6 col-6 pt-2 pb-3">
+                        <div class="float-right" style="margin: 5px">
+                            {% if cart.promo_code %}Promo code: <b>{{ cart.promo_code.code }}</b>
+                            <br>Promo value: <b>{{ cart.get_promo_code_value_str }}</b><br>{% endif %}
+                            Total price: <b><span id="cart_total_value">{{ order.get_cart_total }}</span></b>
                         </div>
                     </div>
-                    <div class="col-lg-3 col-md-4 col-sm-6 col-6 pt-2 pb-5">
+                    <div class="col-lg-3 col-md-4 col-sm-6 col-6 pt-2 pb-3">
                         <a href="{% url 'checkout' %}"><button class="btn btn-success" type="button">Checkout</button></a>
                         <a id="delete_item" title="Click to delete shipping cart" href="#"
                            onclick="delete_cart(); return false;">

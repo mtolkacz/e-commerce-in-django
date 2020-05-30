@@ -197,4 +197,3 @@ class Checkout:
             else:
                 self.valid_forms = False
                 print('DJANGOTEST: nie valid')
-

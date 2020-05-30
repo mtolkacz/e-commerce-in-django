@@ -318,7 +318,7 @@ function delete_cart() {
     var q = confirm("Do you want to delete shipping cart?");
     if (q == true) {
         $.ajax({
-            url: '/purchase/cart/delete_cart/',
+            url: '/purchase/delete/',
             dataType: 'json',
             success: function(data) {
                 if (data.success) {
@@ -351,6 +351,7 @@ function delete_cart() {
                         cart_list.insertAdjacentHTML("beforeend", right_side_empty_cart);
                     }
                     console.log("Removed cart");
+                    alert("Shipping cart has been deleted.")
                 }
             }
         });
