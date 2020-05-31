@@ -44,6 +44,11 @@ function set_price_parameters(){
 
     search_params.set('price_min', document.getElementById("min_price").value.substring(1));
     search_params.set('price_max', document.getElementById("max_price").value.substring(1));
+    if (search_params.get('page')) {
+        search_params.delete('page')
+    }
+
+    var url = new URL(window.location.href);
 
     // change the search property of the main url
     url.search = search_params.toString();
@@ -137,14 +142,10 @@ $('#delete-filter').click(function() {
     new_url.search = '';
     var new_params = new_url.searchParams
 
-    if (search_params.get('ordering')) {
+    if (search_params.get('ordering') || search_params.get('page')) {
         search_params.forEach(function(value, key) {
-            if (key == 'ordering') {
-                if (new_params.get('ordering')) {
-                    new_params.append(key, value);
-                } else {
-                    new_params.append(key, value);
-                }
+            if (key == 'ordering' || key == 'page') {
+                new_params.append(key, value);
             }
         });
         url.search = new_params.toString();

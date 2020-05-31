@@ -1,5 +1,6 @@
 from decimal import Decimal
 
+from django.http import Http404
 from rest_framework.generics import ListAPIView
 from .serializers import ProductSerializer, BrandSerializer, \
     DepartmentSerializer, SubdepartmentSerializer, CategorySerializer
@@ -11,6 +12,8 @@ from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend, FilterSet, CharFilter, RangeFilter
 from django.shortcuts import get_object_or_404
 import math
+
+from gallop.database import get_popular_products
 
 
 class ProductDepartmentDetail(ListAPIView):
@@ -68,7 +71,6 @@ class ProductFilter(FilterSet):
 
 
 class ProductCategoryDetail(ListAPIView):
-    queryset = Product.objects.all()
     lookup_fields = ['department', 'subdepartment', 'category']
     serializer_class = ProductSerializer
     renderer_classes = [TemplateHTMLRenderer]
@@ -78,14 +80,22 @@ class ProductCategoryDetail(ListAPIView):
     filterset_fields = ['price', 'brand', ]
     ordering_fields = ['price', 'creationdate', 'rating', ]
     pagination_class = PageNumberPagination
+    department = None
+    subdepartment = None
+    category = None
+
+    def get_product_hierarchy(self):
+        try:
+            self.department = get_object_or_404(Department, slug=self.kwargs[self.lookup_fields[0]])
+            self.subdepartment = get_object_or_404(Subdepartment, slug=self.kwargs[self.lookup_fields[1]])
+            self.category = get_object_or_404(Category, slug=self.kwargs[self.lookup_fields[2]])
+        except(Department.DoesNotExist, Subdepartment.DoesNotExist, Category.DoesNotExist):
+            return False
+        else:
+            return True
 
     def get_queryset(self, **kwargs):
-        dep = get_object_or_404(Department, slug=self.kwargs[self.lookup_fields[0]])
-        subdep = get_object_or_404(Subdepartment, slug=self.kwargs[self.lookup_fields[1]])
-        cat = get_object_or_404(Category, slug=self.kwargs[self.lookup_fields[2]])
-        if dep is None or subdep is None or cat is None:
-            return 0
-        queryset = self.queryset.filter(department=dep.id, subdepartment=subdep.id, category=cat.id)
+        queryset = Product.objects.filter(department=self.department.id, subdepartment=self.subdepartment.id, category=self.category.id)
         return queryset
 
     def get_additional_data(self, request, queryset, **kwargs):
@@ -122,9 +132,12 @@ class ProductCategoryDetail(ListAPIView):
             additional['filtered_price'] = filtered_price
 
         if not filtered_queryset:
-            popular_products = self.get_serializer(self.queryset[:10], many=True)
-            additional['popular_products'] = popular_products.data
-
+            # uncomment when more products
+            # subdepartment = {'area': 'subdepartment', 'object': self.subdepartment}
+            # popular_products = get_popular_products(where=subdepartment)
+            popular_products = get_popular_products()
+            serialized_products = self.get_serializer(popular_products, many=True)
+            additional['popular_products'] = serialized_products.data
         return additional
 
     def list(self, request, *args, **kwargs):
@@ -158,7 +171,10 @@ class ProductCategoryDetail(ListAPIView):
         return Response(data)
 
     def get(self, request, *args, **kwargs):
-        return self.list(request, *args, **kwargs)
+        if self.get_product_hierarchy():  # will raise 404 if url not correct
+            return self.list(request, *args, **kwargs)
+        else:
+            raise Http404
 
 
 class ProductDetail(ListAPIView):

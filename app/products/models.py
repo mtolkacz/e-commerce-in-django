@@ -104,6 +104,12 @@ class Category(models.Model):
 class Brand(models.Model):
     name = models.CharField(max_length=100, unique=True)
     slug = models.SlugField(max_length=100)
+    image1 = models.ImageField(upload_to='pic_folder/brands/', default='pic_folder/None/no-img.jpg')
+
+    def image_tag1(self):
+        return mark_safe('<img src="/media/%s" width="160" height="80" />' % self.image1)
+
+    image_tag1.short_description = 'Image1'
 
     def __unicode__(self):
         return '%s' % self.name
@@ -175,7 +181,7 @@ class Product(models.Model):
     def get_discount_value(self):
         if self.discounted_price:
             try:
-                discount_line = DiscountLine.objects.get(product=self, status__name='Active')
+                discount_line = DiscountLine.objects.get(product=self, status=DiscountLine.ACTIVE)
             except DiscountLine.DoesNotExist:
                 return ''
             else:
@@ -275,14 +281,17 @@ class DiscountType(models.Model):
         return self.name
 
 
-class DiscountStatus(models.Model):
-    name = models.CharField(max_length=15, default='Inactive', null=False, blank=False)
-
-
 class Discount(models.Model):
+    INACTIVE = 1
+    ACTIVE = 2
+    FINISHED = 3
+    STATUS = (
+        (INACTIVE, 'Inactive'),
+        (ACTIVE, 'Active'),
+        (FINISHED, 'Finished'),
+    )
     name = models.CharField(max_length=150, default='Discount name', null=False, blank=False)
     type = models.ForeignKey(DiscountType, on_delete=models.PROTECT, null=False, blank=False)
-    status = models.ForeignKey(DiscountStatus, on_delete=models.PROTECT, default=1, editable=False, null=False)
     # e.g. id of department, subdepartment, category and other levels or None if global for all products
     set_id = models.IntegerField(null=False, blank=False, validators=[MinValueValidator(1)])
     value = models.IntegerField(null=False, validators=[MaxValueValidator(99), MinValueValidator(1)])
@@ -291,12 +300,14 @@ class Discount(models.Model):
     enddate = models.DateTimeField(null=False, default=datetime(2020, 7, 17))
     description = models.CharField(max_length=300, null=True, blank=True)
     priority = models.ForeignKey(DiscountPriorityType, on_delete=models.PROTECT, null=False)
+    status = models.PositiveSmallIntegerField(
+        choices=STATUS,
+        default=INACTIVE,
+    )
 
-    def is_not_inactive(self):
-        return self.status.name != 'Inactive'
-
-    def is_finished(self):
-        return self.status.name == 'Finished'
+    def update_status(self, status):
+        self.status = status
+        self.save(update_fields=['status'])
 
     def clean(self):
         super().clean()
@@ -314,33 +325,6 @@ class Discount(models.Model):
             raise ValidationError('End date must be greater than start date')
         if self.enddate <= timezone.now():
             raise ValidationError('End date must be greater than current datetime')
-
-    def activate(self):
-        try:
-            new_status = DiscountStatus.objects.get(name='Active')
-            if self.status != new_status:
-                self.status = new_status
-                self.save(update_fields=['status'])
-        except DiscountStatus.DoesNotExist:
-            raise Exception('Cannot activate discount!')
-
-    def deactivate(self):
-        try:
-            new_status = DiscountStatus.objects.get(name='Inactive')
-            if self.status != new_status:
-                self.status = new_status
-                self.save(update_fields=['status'])
-        except DiscountStatus.DoesNotExist:
-            raise Exception('Cannot deactivate discount!')
-
-    def finish(self):
-        try:
-            new_status = DiscountStatus.objects.get(name='Finished')
-            if self.status != new_status:
-                self.status = DiscountStatus.objects.get(name='Finished')
-                self.save(update_fields=['status'])
-        except DiscountStatus.DoesNotExist:
-            raise Exception('Cannot finish discount!')
 
     def __unicode__(self):
         return '%s' % self.name
@@ -362,39 +346,27 @@ class DiscountProductList(models.Model):
 
 
 class DiscountLine(models.Model):
+    INACTIVE = 1
+    ACTIVE = 2
+    FINISHED = 3
+    STATUS = (
+        (INACTIVE, 'Inactive'),
+        (ACTIVE, 'Active'),
+        (FINISHED, 'Finished'),
+    )
     discount = models.ForeignKey(Discount, on_delete=models.CASCADE, null=False)
     product = models.ForeignKey(Product, on_delete=models.CASCADE, null=False)
-    status = models.ForeignKey(DiscountStatus, on_delete=models.PROTECT, default=1, editable=False, null=False)
+    status = models.PositiveSmallIntegerField(
+        choices=STATUS,
+        default=INACTIVE,
+    )
 
     def __str__(self):
         return '{}, {}, {}'.format(self.id, self.discount.name, self.product.name)
 
-    def activate(self):
-        try:
-            new_status = DiscountStatus.objects.get(name='Active')
-            if self.status != new_status:
-                self.status = new_status
-                self.save(update_fields=['status'])
-        except DiscountStatus.DoesNotExist:
-            raise Exception('Cannot activate product discount!')
-
-    def deactivate(self):
-        try:
-            new_status = DiscountStatus.objects.get(name='Inactive')
-            if self.status != new_status:
-                self.status = new_status
-                self.save(update_fields=['status'])
-        except DiscountStatus.DoesNotExist:
-            raise Exception('Cannot deactivate product discount!')
-
-    def finish(self):
-        try:
-            new_status = DiscountStatus.objects.get(name='Finished')
-            if self.status != new_status:
-                self.status = new_status
-                self.save(update_fields=['status'])
-        except DiscountStatus.DoesNotExist:
-            raise Exception('Cannot finish product discount!')
+    def update_status(self, status):
+        self.status = status
+        self.save(update_fields=['status'])
 
 
 class DiscountCustom(models.Model):

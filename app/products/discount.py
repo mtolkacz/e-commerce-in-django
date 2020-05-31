@@ -17,12 +17,11 @@ class DiscountManager:
 
     # return current most important product discount line or False if does not exist
     def get_current_discount_of(self, **kwargs):
-        from .models import Discount, DiscountLine
         try:
             current_discount = None
             for key, value in kwargs.items():
                 product_discount = DiscountLine.objects. \
-                    exclude(discount=self.discount).exclude(status__name='Finished'). \
+                    exclude(discount=self.discount).exclude(status=Discount.FINISHED). \
                     filter(**{key: value}). \
                     order_by('discount__priority__value'). \
                     first()
@@ -40,17 +39,11 @@ class DiscountManager:
 
     @staticmethod
     def update_line_status(status, **kwargs):
-        from .models import DiscountLine, Product
         discount = kwargs.get('discount')
         product = kwargs['product'] if 'product' in kwargs else Product.objects.get(id=kwargs['product_id'])
         discount_lines = DiscountLine.objects.filter(product=product, discount=discount)
         for discount_line in discount_lines:
-            if status == 'Active':
-                discount_line.activate()
-            elif status == 'Inactive':
-                discount_line.deactivate()
-            elif status == 'Finished':
-                discount_line.finish()
+            discount_line.update_status(status)
 
     # activate line and set new price for one or many products
     # dict parameter can contain one product (queryset object or its id)
@@ -63,12 +56,11 @@ class DiscountManager:
             for product in products:
 
                 # activate discount line
-                self.update_line_status(status='Active', product=product, discount=discount)
+                self.update_line_status(status=DiscountLine.ACTIVE, product=product, discount=discount)
 
                 product.discounted_price = product.get_discounted_price(self.discount.value)
                 product.save()
         else:
-            from .models import Product
             try:
                 product = [dict['product'] if 'product' in dict else Product.objects.get(id=dict['product_id'])]
             except Product.DoesNotExist:
@@ -77,7 +69,7 @@ class DiscountManager:
                 product = product[0] if isinstance(product, list) else product
 
                 # activate discount line
-                self.update_line_status(status='Active', product=product, discount=discount)
+                self.update_line_status(status=DiscountLine.ACTIVE, product=product, discount=discount)
 
                 # update product price
                 product.discounted_price = product.get_discounted_price(discount.value)
@@ -94,7 +86,7 @@ class DiscountManager:
             more_important_discount = self.choose_more_important_discount(current_discount) if current_discount else new_discount
             if more_important_discount.id == new_discount.id:
                 self.activate_line_and_update_price(dict)
-                self.update_line_status(status='Inactive', product=product, discount=current_discount)
+                self.update_line_status(status=DiscountLine.INACTIVE, product=product, discount=current_discount)
 
     def process_lines(self):
 
@@ -112,25 +104,21 @@ class DiscountManager:
             self.set_discount_for_discounted_products(discounted_products)
 
     def delete_discount(self):
-        from .models import Discount
         # if not Discount.objects.filter(id=self.discount.id)
         return Discount.objects.get(id=self.discount.id).delete()
 
     def save_product_list(self):
         product_list = ';'.join(map(str, list([int(product[0]) for product in list(self.queryset.values_list('id'))])))
-        from .models import DiscountProductList
         product_list = DiscountProductList(discount=self.discount, ids=product_list)
         product_list.save()
 
     def create_product_queryset(self):
-        from .models import Product
         # standard discounts e.g. department, category
         if self.lookup_field:
             self.queryset = Product.objects.filter(**{self.lookup_field: self.discount.set_id})
 
         # custom discounts e.g. list of random special products imported via forms
         elif self.discount.set_id:
-            from .models import DiscountCustom
             try:
                 custom_set = DiscountCustom.objects.get(id=self.discount.set_id)
             except DiscountCustom.DoesNotExist:
@@ -151,23 +139,21 @@ class DiscountManager:
             self.save_product_list()
 
     def create_lines(self):
-        from .models import DiscountLine
         for product in self.queryset:
             discount_line = DiscountLine(discount=self.discount, product=product)
             discount_line.save()
 
     @staticmethod
     def reset_product_price(**kwargs):
-        from .models import Product
         product = kwargs['product'] if 'product' in kwargs else Product.objects.get(id=kwargs['product_id'])
         product.reset_price()
 
     def process(self):
 
-        if self.discount.is_not_inactive():
+        if self.discount.status != Discount.INACTIVE:
             return
 
-        self.discount.activate()
+        self.discount.update_status(Discount.ACTIVE)
 
         # 1. Create discount's queryset of product objects
         self.create_product_queryset()
@@ -179,18 +165,17 @@ class DiscountManager:
         self.process_lines()
 
     def finish(self):
-        from .models import DiscountLine, DiscountProductList
 
         discount = self.discount
 
-        if discount.is_finished():
+        if discount.status == Discount.FINISHED:
             return
 
         # Get discount lines
         lines = DiscountLine.objects.filter(discount=discount)
 
         # Change discount lines status to Finished
-        finished_lines = [line.finish() for line in lines] if lines else False
+        finished_lines = [line.update_status(DiscountLine.FINISHED) for line in lines] if lines else False
 
         if finished_lines:
 
@@ -210,7 +195,7 @@ class DiscountManager:
                     }
                     self.activate_line_and_update_price(dict) if next_discount \
                         else self.reset_product_price(product_id=product_id)
-                    self.update_line_status(status='Finished', product_id=product_id, discount=discount)
+                    self.update_line_status(status=DiscountLine.FINISHED, product_id=product_id, discount=discount)
 
         # Change discount status to Finished
-        discount.finish()
+        discount.update_status(Discount.FINISHED)

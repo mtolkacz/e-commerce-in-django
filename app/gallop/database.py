@@ -14,24 +14,26 @@ from sales.models import Sale
 
 def get_popular_products(how_much=10, where=None):
     # where = {'area': 'department', 'object': department_object}
-    lookup_field = 'product__' + where['area'] if where else None
+    lookup_field = where['area'] if where else None
     if lookup_field:
-        product_list = list(Product.objects.filter(**{where['area']: where['object']})
+        product_list = list(Product.objects.filter(**{lookup_field: where['object']})
                             .values_list('id', flat=True))
         sale_list = list(Sale.objects.filter(product__in=product_list)
                          .values_list('product', flat=True)
                          .annotate(total=Count('product'))
-                         .order_by('-total')[:how_much])
+                         .order_by('-total'))
     else:
         sale_list = list(Sale.objects.all()
                          .values_list('product', flat=True)
                          .annotate(total=Count('product'))
-                         .order_by('-total')[:how_much])
+                         .order_by('-total'))
     whens = []
     for sort_index, value in enumerate(sale_list):
         whens.append(models.When(id=value, then=sort_index))
 
     products = Product.objects.annotate(_sort_index=models.Case(*whens, output_field=models.IntegerField()))
+    # todo when more products
+    # return products.order_by('_sort_index')[:len(product_list) if len(product_list) < how_much else how_much]
     return products.order_by('_sort_index')[:how_much]
 
 

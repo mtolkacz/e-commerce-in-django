@@ -1,5 +1,5 @@
 from django_elasticsearch_dsl import (
-    DocType,
+    Document,
     fields,
     Index,
 )
@@ -12,7 +12,7 @@ product_index = Index('products')
 
 
 @product_index.doc_type
-class ProductDocument(DocType):
+class ProductDocument(Document):
     name = fields.TextField(
         attr='name',
         fields={
@@ -21,7 +21,7 @@ class ProductDocument(DocType):
     )
     url = fields.TextField(attr='get_absolute_url_str')
 
-    class Meta:
+    class Django:
         model = Product
         fields = [
             'id',

@@ -40,4 +40,6 @@ def active_request_get(request):
     dict = request.GET.copy()
     if 'ordering' in dict:
         del dict['ordering']
+    if 'page' in dict:
+        del dict['page']
     return len(dict) if len(dict) else False

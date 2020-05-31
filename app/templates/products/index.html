@@ -57,7 +57,7 @@
                             <div class="cta--text">
                                 <h6>-60%</h6>
                                 <h2>Global Sale</h2>
-                                <a href="#" class="btn essence-btn">Buy Now</a>
+                                <button class="btn-primary btn">Buy Now</button>
                             </div>
                         </div>
                     </div>
@@ -119,26 +119,15 @@
             </div>
         </div>
     </section>
-
+{% if brands %}
     <div class="brands-area d-flex align-items-center justify-content-between">
-        <div class="single-brands-logo">
-            <img src="{% static 'img/core-img/brand1.png' %}" alt="">
+        {% for brand in brands %}
+        <div  class="single-brands-logo">
+            <img src="{{ brand.image1.url }}" style="height:50px;-webkit-filter: grayscale(100%); filter: grayscale(100%);" alt="{{ brand.name }}">
         </div>
-        <div class="single-brands-logo">
-            <img src="{% static 'img/core-img/brand2.png' %}" alt="">
-        </div>
-        <div class="single-brands-logo">
-            <img src="{% static 'img/core-img/brand3.png' %}" alt="">
-        </div>
-        <div class="single-brands-logo">
-            <img src="{% static 'img/core-img/brand4.png' %}" alt="">
-        </div>
-        <div class="single-brands-logo">
-            <img src="{% static 'img/core-img/brand5.png' %}" alt="">
-        </div>
-        <div class="single-brands-logo">
-            <img src="{% static 'img/core-img/brand6.png' %}" alt="">
-        </div>
+        {% endfor %}
     </div>
+{% endif %}
 
 {% endblock %}
+// set_price_parameters
