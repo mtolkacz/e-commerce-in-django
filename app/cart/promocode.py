@@ -34,10 +34,10 @@ class PromoCodeManager:
     def meets_requirements(self, total):
         return False if Decimal(self.promo_code.minimum_order_value) > total.amount else True
 
-    def get_context_data(self):
+    def get_context_data(self, order):
         data = {}
-        cart_total = self.order.get_cart_total()
-        data['promo_value'] = f"-{str(Money(Decimal(self.promo_code.value), cart_total.currency))}"
+        cart_total = order.get_cart_total()
+        data['promo_value'] = f"-{str(order.get_promo_code_value())}"
         data['cart_total_value'] = str(cart_total)
         data['cart_id'] = str(self.order.id)
         data['message'] = 'Promo code added successfully'

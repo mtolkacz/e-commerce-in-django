@@ -20,13 +20,7 @@
             </ul>
             {% endfor %}
             {% endif %}
-            <h4 class="card-title mt-3 text-center">Create Account</h4>
-            <p class="text-center">Get started with your free account</p>
-            {% crispy registration_form %}
-            <p class="divider-text">
-                <span class="bg-light">OR</span>
-            </p>
-            <h4 class="card-title my-3 text-center">Sing in</h4>
+                        <h4 class="card-title my-3 text-center">Sing in</h4>
             <p style="line-height: 50%;">
                 <a href="{% url 'social:begin' 'twitter' %}">
                     <button class="btn btn-block btn-twitter"><i class="fab fa-twitter"></i>   Twitter login
@@ -53,8 +47,14 @@
             <div id="login_username" style="display:none;">
                 {% crispy login_form %}
                 <p class="text-center"><input type="checkbox" class="checkbox" name="remember_me">Keep me signed in</p>
-                <p class="text-center"><a href="">Forgot password?</a></p>
+                <p class="text-center"><a href="{% url 'password_reset' %}">Forgot password?</a></p>
             </div>
+            <p class="divider-text">
+                <span class="bg-light">OR</span>
+            </p>
+            <h4 class="card-title mt-3 text-center">Create Account</h4>
+            <p class="text-center">Get started with your free account</p>
+            {% crispy registration_form %}
         </article>
     </div> <!-- card.// -->
 </div>

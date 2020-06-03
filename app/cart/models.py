@@ -3,6 +3,9 @@ from decimal import Decimal
 
 from django.db import models, transaction
 from django.conf import settings
+from django.urls import reverse
+from django.utils.encoding import force_bytes
+from django.utils.http import urlsafe_base64_encode
 from djmoney.money import Money
 from products.models import Product, Category
 from django.contrib.auth import get_user_model, signals
@@ -78,7 +81,7 @@ class Order(models.Model):
     is_ordered = models.BooleanField(default=False)
     items = models.ManyToManyField(OrderItem)
     # payment_details = models.ForeignKey(Payment, null=True)
-    date_ordered = models.DateTimeField(auto_now=True)
+    date_ordered = models.DateTimeField(default=timezone.now)
     session_key = models.ForeignKey(Session, on_delete=models.CASCADE, null=True, editable=False)
     access_code = models.SmallIntegerField(null=True, blank=False, editable=False)
     promo_code = models.ForeignKey(PromoCode, on_delete=models.SET_NULL, null=True)
@@ -89,6 +92,11 @@ class Order(models.Model):
 
     # save email for client without account which don't want to create one
     email = models.EmailField(null=True)
+
+    def get_summary_url(self):
+        return reverse('summary', kwargs={'ref_code': self.ref_code,
+                                          'oidb64': urlsafe_base64_encode(
+                                              force_bytes(self.id)), })
 
     def delete(self):
         items = self.items.all()
@@ -109,7 +117,7 @@ class Order(models.Model):
             if self.promo_code.type == PromoCode.VALUE:
                 new_value = Decimal(cart_total.amount) - Decimal(self.promo_code.value)
             elif self.promo_code.type == PromoCode.PERCENTAGE:
-                new_value = Decimal(round(Decimal(cart_total.amount) * Decimal((100 - self.promo_code.value)/100)), 2)
+                new_value = Decimal(cart_total.amount * Decimal((100 - self.promo_code.value) / 100))
             cart_total = Money(new_value, str(cart_total.currency))
         return cart_total
 
@@ -158,9 +166,6 @@ class Order(models.Model):
         self.save(update_fields=['promo_code'])
 
     def get_promo_code_value(self):
-        # cart_total = sum([(item.product.discounted_price if item.product.discounted_price else item.product.price)
-        #                   * item.amount for item in self.items.all()])
-        # return Money((Decimal(self.get_cart_total().amount) - Decimal(cart_total.amount)), cart_total.currency)
         return self.get_cart_total_no_promo() - self.get_cart_total()
 
     def get_promo_code_value_str(self):
@@ -272,4 +277,3 @@ class Payment(models.Model):
     email = models.EmailField(null=False, editable=False)
     given_name = models.CharField(max_length=30, blank=False, null=False, editable=False)
     surname = models.CharField(max_length=30, blank=False, null=False, editable=False)
-

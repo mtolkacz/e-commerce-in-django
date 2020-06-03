@@ -72,13 +72,21 @@
         {% csrf_token %}
         {% if user_data %}
         <h4 class="mb-3">Billing address</h4>
-        {{ user.first_name }} {{ user.last_name }}<br>
-        {{ user.address_1 }}<br>
-        {% if user.address_2 %}{{ user.address_2 }}<br>{% endif %}
-        {{ user.country }}, {{ user.voivodeship }}<br>
-        {{ user.zip_code }} {{ user.city }}<br>
-
-          <hr class="mb-4">
+        <table class="table table-striped">
+            <tbody>
+            <tr>
+                <td>
+                    {{ user.first_name }} {{ user.last_name }}<br>
+                    {{ user.address_1 }}<br>
+                    {% if user.address_2 %}{{ user.address_2 }}<br>{% endif %}
+                    {{ user.country }}, {{ user.voivodeship }}<br>
+                    {{ user.zip_code }} {{ user.city }}
+                </td>
+                <td><a href="{% url 'profile' %}"><button type="button" class="btn btn-primary btn-sm">Edit personal data</button></a></td>
+            </tr>
+            </tbody>
+        </table>
+          <hr class="mb-2">
           <!-- Shippment address chechbox-->
           <div class="custom-control custom-checkbox pb-4">
               <input type="checkbox" class="custom-control-input" autocomplete="off" name="same-address" value="same-address" {% if same_address %}{{ same_address }}{% endif %} id="same-address">

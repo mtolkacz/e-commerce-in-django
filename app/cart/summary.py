@@ -2,9 +2,11 @@ from django.contrib import messages
 from django.contrib.sessions.models import Session
 from django.utils.encoding import force_text
 from django.utils.http import urlsafe_base64_decode
+
 from accounts.models import User
 from .models import Order, OrderAccess, Shipment, Payment
 from gallop import settings
+from gallop.functions import get_user_object
 
 
 class Summary:
@@ -30,23 +32,13 @@ class Summary:
         self.ref_code = ref_code
         self.oidb64 = oidb64
         self.user_authenticated = request.user.is_authenticated
-        self.user = self.get_user_object()
+        self.user = get_user_object(self.request)
         self.session = self.get_or_create_user_session()
         self.context = {}
         self.order = None
         self.shipment = None
         self.has_access = None
         self.permission = None
-
-    # 0.a) init
-    def get_user_object(self):
-        user = None
-        if self.request:
-            try:
-                user = User.objects.get(id=self.request.user.id)
-            except User.DoesNotExist:
-                pass
-        return user
 
     # 0.b) init
     def get_or_create_user_session(self):
@@ -72,7 +64,7 @@ class Summary:
     def set_shipment(self):
         self.shipment = self.get_shipment()
         if not self.shipment:
-            messages.error("Couldn't find the shipment. Please contact with administrator.")
+            messages.error(self.request, "Couldn't find the shipment. Please contact with administrator.")
         return self.shipment
 
     # 3.

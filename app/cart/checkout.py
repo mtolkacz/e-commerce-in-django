@@ -8,6 +8,7 @@ from .models import Shipment, Order
 from .forms import BillingForm, ShipmentForm
 from accounts.tasks import send_email
 from accounts.views import create_user_from_form
+from gallop import functions as glp
 
 
 class Checkout:
@@ -160,40 +161,10 @@ class Checkout:
     def update_context_when_billing_form_failed(self):
         self.context['billing_form'] = self.billing_form
 
-    def update_user_from_billing_form(self):
-        if 'billing_form' in self.context:
-            self.billing_form = BillingForm(self.request.POST, without_new_account=True)
-            if self.billing_form.is_valid():
-                fields_to_update = []
+    def update_user(self):
+        self.billing_form = BillingForm(self.request.POST, without_new_account=True)
+        if self.billing_form.is_valid():
+            glp.update_user_from_form(self.billing_form, self.user)
+        else:
+            self.valid_forms = False
 
-                # todo probably not to elegant approach, but potentially save time on db operations
-                if self.user.first_name != self.billing_form.cleaned_data['first_name']:
-                    self.user.first_name = self.billing_form.cleaned_data['first_name']
-                    fields_to_update.append('first_name')
-                if self.user.last_name != self.billing_form.cleaned_data['last_name']:
-                    self.user.last_name = self.billing_form.cleaned_data['last_name']
-                    fields_to_update.append('last_name')
-                if self.user.address_1 != self.billing_form.cleaned_data['address_1']:
-                    self.user.address_1 = self.billing_form.cleaned_data['address_1']
-                    fields_to_update.append('address_1')
-                if self.user.address_2 != self.billing_form.cleaned_data['address_2']:
-                    self.user.address_2 = self.billing_form.cleaned_data['address_2']
-                    fields_to_update.append('address_2')
-                if self.user.country != self.billing_form.cleaned_data['country']:
-                    self.user.country = self.billing_form.cleaned_data['country']
-                    fields_to_update.append('country')
-                if self.user.voivodeship != self.billing_form.cleaned_data['voivodeship']:
-                    self.user.voivodeship = self.billing_form.cleaned_data['voivodeship']
-                    fields_to_update.append('voivodeship')
-                if self.user.city != self.billing_form.cleaned_data['city']:
-                    self.user.city = self.billing_form.cleaned_data['city']
-                    fields_to_update.append('city')
-                if self.user.zip_code != self.billing_form.cleaned_data['zip_code']:
-                    self.user.zip_code = self.billing_form.cleaned_data['zip_code']
-                    fields_to_update.append('zip_code')
-
-                self.user.save(update_fields=fields_to_update)
-
-            else:
-                self.valid_forms = False
-                print('DJANGOTEST: nie valid')

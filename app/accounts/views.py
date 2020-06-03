@@ -1,72 +1,20 @@
+from django.contrib.auth.decorators import login_required
+from django.core.exceptions import FieldDoesNotExist
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect
-from .forms import LoginForm, RegisterForm
-from django.contrib.sites.shortcuts import get_current_site
-from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
-from django.utils.encoding import force_bytes, force_text
-from .tokens import account_activation_token
+from django.utils.http import urlsafe_base64_decode
+from django.utils.encoding import force_text
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from django.contrib import messages
 from django.views.decorators.http import require_http_methods
-from django.template.loader import render_to_string
+
+from .forms import LoginForm, RegisterForm
+from . import functions as act
+from .tokens import account_activation_token
 from .models import User
-from .tasks import send_email
-
-
-def create_user_from_form(form):
-    # Save form but not commit yet
-    user = form.save(commit=False)
-
-    # Set deactivated till mail confirmation
-    user.is_active = False
-
-    # Create new user
-    user.save()
-
-    return user
-
-
-def send_activation_link(request, user, **kwargs):
-
-    # Look up the current site based on request.get_host() if the SITE_ID setting is not defined
-    current_site = get_current_site(request)
-
-    # # Create Email object, prepare mail content and generate user token
-    # # Email class includes custom predefined SMTP settings
-
-    print('DJANGOTEST: Username = {}, mail = {}'.format(user.username, user.email))
-    # receiver = form.cleaned_data.get('email')
-    receiver = user.email
-    subject = 'Activate your Gallop account'
-    if 'order' in kwargs:
-        context = {
-            'user': user,
-            'domain': current_site.domain,
-            # Return a bytestring version of user.pk and encode a bytestring to a base64 string
-            # for use in URLs, stripping any trailing equal signs.
-            'uid': urlsafe_base64_encode(force_bytes(user.pk)),
-            # Generate user token
-            'token': account_activation_token.make_token(user),
-            # Generate user token
-            'oid': urlsafe_base64_encode(force_bytes(kwargs['order'].id)),
-        }
-        print('DJANGOTEST: kwargs = {}'.format(kwargs['order'].id))
-        message = render_to_string('accounts/purchase_activate.html', context)
-    else:
-        context = {
-            'user': user,
-            'domain': current_site.domain,
-            # Return a bytestring version of user.pk and encode a bytestring to a base64 string
-            # for use in URLs, stripping any trailing equal signs.
-            'uid': urlsafe_base64_encode(force_bytes(user.pk)),
-            # Generate user token
-            'token': account_activation_token.make_token(user)
-        }
-        message = render_to_string('accounts/activate.html', context)
-
-    # Celery sending mail
-    send_email.apply_async((receiver, subject, message), countdown=0)
-    messages.success(request, 'Please confirm your email address to complete the registration.')
+from accounts.forms import ProfileForm
+from cart.models import Order
+from gallop import functions as glp
 
 
 # Multiple view for signing in and registration
@@ -143,9 +91,9 @@ def login(request):
             # Return True if the form has no errors, or False otherwise
             if registration_form.is_valid():
 
-                user = create_user_from_form(registration_form)
+                user = glp.create_user_from_form(registration_form)
 
-                send_activation_link(request, user)
+                act.send_activation_link(request, user)
 
     # Load login view with forms and display form messages
     return render(request, 'accounts/login.html',
@@ -160,11 +108,57 @@ def logout(request):
     return redirect('index')
 
 
-def profile(request):
-    if request.user.is_authenticated:
-        return render(request, 'accounts/profile.html')
+def update_obj_from_form(obj, form):
+    fields_to_update = []
+    for form_field in form.fields:
+        try:
+            obj_field = obj._meta.get_field(form_field)
+        except FieldDoesNotExist:
+            obj_field = None
+        if obj_field:
+            if obj_field.many_to_one:
+                new_model = getattr(obj, form_field)._meta.model
+                new_object = new_model.objects.get(id=obj_field.value_from_object(obj))
+                obj_field_value = str(new_object)
+            else:
+                obj_field_value = obj_field.value_from_object(obj)
+                obj_field_value = None if obj_field_value == "" else obj_field_value
+            cleaned = str(form.cleaned_data[form_field]) if form.cleaned_data[form_field] else None
+            if obj_field_value != cleaned:
+                setattr(obj, form_field, form.cleaned_data[form_field])
+                fields_to_update.append(form_field)
+    if fields_to_update:
+        obj.save(update_fields=fields_to_update)
+        return True
     else:
-        return redirect('login')
+        return False
+
+
+@login_required
+def favorite(request):
+    pass
+
+
+@login_required
+def profile(request):
+    user = glp.get_user_object(request)
+    print(f'DJANGOTEST: test')
+    if request.method == 'POST':
+        form = ProfileForm(request.POST, request.FILES, instance=user)
+        if form.is_valid():
+            print(f'DJANGOTEST: fgfgfg')
+            messages.success(request, 'Data saved') if form.save() else None
+            return HttpResponseRedirect(request.path)
+        else:
+            print(f'DJANGOTEST: ff')
+    else:
+        form = ProfileForm(instance=user)
+
+    context = {
+        'form': form,
+        'orders': Order.objects.filter(owner=request.user)
+    }
+    return render(request, 'accounts/profile.html', context)
 
 
 def activate(request, uidb64, token):

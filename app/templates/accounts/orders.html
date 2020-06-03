@@ -1,0 +1,29 @@
+{% if orders %}<div class="tab-pane" id="orders">
+    <hr>
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th scope="col">Refcode</th>
+            <th scope="col">Status</th>
+            <th scope="col">Date ordered</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for order in orders %}
+        <tr>
+            <th scope="row">
+                <a href="
+                {% if order.status < 2 %}
+                    {% url 'checkout' %}
+                {% else %}
+                    {{ order.get_summary_url }}
+                {% endif %}">
+                    <h5>{{ order.ref_code }}</h5>
+                </a></th>
+            <td>{{ order.get_status_display }}</td>
+            <td>{{ order.date_ordered }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>{% endif %}

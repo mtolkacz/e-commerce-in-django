@@ -19,7 +19,7 @@ class VoivodeshipAdmin(admin.ModelAdmin):
 
 class UserAdmin(admin.ModelAdmin):
     model = User
-    list_display = ['username', 'first_name', 'last_name', 'email', 'country',
+    list_display = ['username', 'first_name', 'last_name', 'image_tag', 'email', 'country',
                     'voivodeship', 'address_1', 'address_2', 'zip_code', 'city', ]
 
 

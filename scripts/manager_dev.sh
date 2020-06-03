@@ -86,7 +86,7 @@ while [ ! $number -eq 0 ]; do
 	   ;;
 	21) docker network inspect gallop
 	   ;;
-	22) docker-compose logs --tail="100" | grep -E "DJANGOTEST:|Error"
+	22) docker-compose logs --tail="100" | grep -E "DJANGOTEST:"
 	   ;;
 	23) docker-compose exec web python manage.py clearsessions
 	   ;;

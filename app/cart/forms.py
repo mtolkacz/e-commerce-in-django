@@ -39,10 +39,6 @@ class BillingForm(UserCreationForm):
             self.fields['password1'].required = False
             self.fields['password2'].required = False
 
-    # def save(self, commit=True):
-    #     self.cleaned_data = dict([(k, v) for k, v in self.cleaned_data.items() if k not in ['email', 'username', 'password1', 'password2', ]])
-    #     return super(BillingForm, self).save(commit=commit)
-
 
 class ShipmentForm(forms.ModelForm):
     first_name = forms.CharField()

@@ -4,6 +4,7 @@ from django.contrib.auth.base_user import BaseUserManager, AbstractBaseUser
 from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.core.mail import send_mail
 from django.utils import timezone
+from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 from .validators import ZipCodeValidator
 
@@ -77,6 +78,18 @@ class User(AbstractBaseUser, PermissionsMixin):
     zip_code = models.CharField(max_length=6, validators=[ZipCodeValidator], blank=False, null=False)
     address_1 = models.CharField(max_length=100, blank=False, null=False)
     address_2 = models.CharField(max_length=100, blank=True, null=True)
+    picture = models.ImageField(upload_to='users/', default="avatar.png", null=True, blank=True)
+
+    def image_tag(self):
+        return mark_safe('<img src="/media/%s" width="80" height="80" />' % self.picture)
+
+    @property
+    def get_picture_url(self):
+        if self.picture and hasattr(self.picture, 'url'):
+            return self.picture.url
+        else:
+            return "/media/avatar.png"
+
     # phone = models.IntegerField(default=0)
     is_staff = models.BooleanField(
         _('staff status'),
