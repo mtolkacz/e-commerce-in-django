@@ -1,49 +1,22 @@
-from django.contrib.auth.decorators import login_required
-from django.contrib.sites.shortcuts import get_current_site
-from django.shortcuts import render, get_object_or_404, redirect
+from django.shortcuts import render, redirect
 from django.contrib.auth import login as auth_login
-from django.template.loader import render_to_string
 from django.utils.encoding import force_text
 from django.utils.http import urlsafe_base64_decode
 from django.contrib import messages
 
-from .forms import BillingForm
+from . import functions as crt
 from .models import *
 from .models import Order
 from accounts.tokens import account_activation_token
-from accounts.views import send_activation_link
-from accounts.tasks import send_email
+from accounts.functions import send_activation_link
 from .checkout import Checkout
 from .summary import Summary
 
 User = get_user_model()
 
 
-# return user/anonymous order object in cart if exists
-def get_pending_cart(request):
-    order = None
-    if request.user.id:
-        if request.user.is_authenticated:
-            user = get_object_or_404(User, id=request.user.id)
-            try:
-                order = Order.objects.get(owner=user, is_ordered=False)
-            except Order.DoesNotExist:
-                pass
-    elif request.session.session_key:
-        try:
-            session = Session.objects.get(session_key=request.session.session_key)
-        except Session.DoesNotExist:
-            pass
-        else:
-            try:
-                order = Order.objects.get(session_key=session)
-            except Order.DoesNotExist:
-                pass
-    return order
-
-
 def cart(request):
-    order = get_pending_cart(request)
+    order = crt.get_pending_cart(request)
 
     context = {
         'order': order,
@@ -52,7 +25,7 @@ def cart(request):
 
 
 def checkout(request):
-    cart = get_pending_cart(request)
+    cart = crt.get_pending_cart(request)
     if not cart:
         return redirect(reverse('index'))
     checkout = Checkout(request, cart)
@@ -74,6 +47,9 @@ def checkout(request):
                     else:
                         # send link to purchase with access key
                         checkout.send_access_link()
+
+                    # save shipment only when everything else finished successfully
+                    checkout.shipment.save()
                 else:
                     messages.error(request,
                                    'There was a problem creating the shipment. Administrator has been informed.')
@@ -91,7 +67,7 @@ def checkout(request):
                 # if saved shipment then go to finalize
                 if checkout.shipment:
                     checkout.update_cart(user=checkout.user)
-                    send_purchase_link(request, cart)
+                    crt.send_purchase_link(request, cart)
                     # go to checkout
                     return redirect(reverse('summary', kwargs={'ref_code': checkout.cart.ref_code,
                                                                'oidb64': urlsafe_base64_encode(
@@ -106,37 +82,6 @@ def checkout(request):
     checkout.context['shipment_form'] = checkout.shipment_form
 
     return render(request, 'cart/checkout.html', checkout.context)
-
-
-def send_purchase_link(request, order):
-    # Look up the current site based on request.get_host() if the SITE_ID setting is not defined
-    current_site = get_current_site(request)
-
-    first_name = order.owner.first_name if order.owner else None
-    if not first_name:
-        try:
-            shipment = Shipment.objects.get(order=order)
-        except Shipment.DoesNotExist:
-            return False
-        else:
-            first_name = shipment.first_name
-
-    receiver = order.email
-    subject = 'Gallop purchase - {}'.format(order.ref_code)
-    context = {
-        'domain': current_site.domain,
-        'oidb64': urlsafe_base64_encode(force_bytes(order.id)),
-        'order': order,
-        'first_name': first_name
-    }
-
-    message = render_to_string('cart/access_link.html', context)
-
-    # Celery sending mail
-    send_email.apply_async((receiver, subject, message), countdown=0)
-    send_email.apply_async(('michal.tolkacz@gmail.com', subject, message), countdown=0)
-
-    return True
 
 
 def summary(request, ref_code, oidb64):

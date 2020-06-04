@@ -64,7 +64,7 @@
                         </div>
                         <div class="col-2 col-sm-2 col-md-2">
                             <a id="delete_item" title="Click to delete item from cart" href="#"
-                               onclick="removeItem({{ item.product.id }}); return false;">
+                               onclick="delete_from_cart({{ item.product.id }}); return false;">
                                 <button class="btn btn-outline-danger btn-xs" type="button">
                                     <i aria-hidden="true" class="fa fa-trash"></i>
                                 </button>
@@ -90,7 +90,7 @@
                         </div>
                     </div>
                     <div class="col-lg-3 col-md-4 col-sm-6 col-6 pt-2 pb-3">
-                        <a href="{% url 'checkout' %}"><button class="btn btn-success" type="button">Checkout</button></a>
+                        <a href="{% url 'checkout' %}"><button id="go_to_checkout" class="btn btn-success" type="button">Checkout</button></a>
                         <a id="delete_item" title="Click to delete shipping cart" href="#"
                            onclick="delete_cart(); return false;">
                             <button class="btn btn-danger btn-xs float-right mr-4" type="button">

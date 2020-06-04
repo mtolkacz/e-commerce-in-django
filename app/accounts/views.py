@@ -15,9 +15,9 @@ from .models import User
 from accounts.forms import ProfileForm
 from cart.models import Order
 from gallop import functions as glp
+from products.models import Product, Favorites
 
 
-# Multiple view for signing in and registration
 @require_http_methods(["GET", "POST"])
 def login(request):
 
@@ -135,11 +135,6 @@ def update_obj_from_form(obj, form):
 
 
 @login_required
-def favorite(request):
-    pass
-
-
-@login_required
 def profile(request):
     user = glp.get_user_object(request)
     print(f'DJANGOTEST: test')
@@ -156,7 +151,8 @@ def profile(request):
 
     context = {
         'form': form,
-        'orders': Order.objects.filter(owner=request.user)
+        'favorites': Favorites.objects.filter(user=user),
+        'orders': Order.objects.filter(owner=user)
     }
     return render(request, 'accounts/profile.html', context)
 

@@ -175,7 +175,7 @@
                 {% if user.is_authenticated %}
                 <!-- Favourite Area -->
                 <div class="favourite-area">
-                    <a href="#"><img src="{% static 'img/core-img/heart.svg' %}" alt=""></a>
+                    <a href="{% url 'profile' %}#favorites"><img src="{% static 'img/core-img/heart.svg' %}" alt=""></a>
                 </div>
                 {% endif %}
 
@@ -192,22 +192,19 @@
                             {% if user.is_authenticated %}
                                 {% for ass in backends.associated %}
                                     {% if ass.provider == 'facebook' %}
-                                    <img src="{{ass.extra_data.picture.data.url}}" alt=""
-                                         style="border-radius: 50%;">
+                                    <img src="{{ass.extra_data.picture.data.url}}" alt="{{ user.username }}"
+                                         class="user_pic">
                                     {% endif %}
                                 {% endfor %}
                             {% else %}
-                            <img src="{% static 'img/core-img/user.svg' %}" alt="">
+                            <img src="{{ user.get_picture_url }}" class="user_pic" alt="{{ user.username }}">
                             {% endif %}
                         {% else %}
-                        <img src="{% static 'img/core-img/user.svg' %}" alt="">
+                        <img src="{{ user.get_picture_url }}" class="user_pic" alt="{{ user.username }}">
                         {% endif %}
                     </a>
                     <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu">
                         <a class="dropdown" href="{% url 'profile' %}">Profile</a>
-                        <a class="dropdown" href="{% url 'logout' %}">Logout</a>
-                        <a class="dropdown" href="{% url 'logout' %}">Logout</a>
-                        <a class="dropdown" href="{% url 'logout' %}">Logout</a>
                         <a class="dropdown" href="{% url 'logout' %}">Logout</a>
                     </div>
                     {% else %}

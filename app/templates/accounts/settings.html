@@ -1,0 +1,11 @@
+{% if orders %}
+<div class="tab-pane" id="account_settings">
+    <hr>
+    <table class="table table-striped">
+        <tbody>
+        <tr>
+            <th scope="col"><a href="{% url 'password_change' %}">Password change</a></th>
+        </tr>
+        </tbody>
+    </table>
+</div>{% endif %}

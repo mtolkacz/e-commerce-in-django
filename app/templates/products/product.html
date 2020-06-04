@@ -56,17 +56,19 @@
                             {% endif %}
                         </div>
                         <div class="cart-fav-box d-flex align-items-center">
-                            {% if object.stock > 0 %}<button id="add_item_button" onclick="add_to_cart({{ object.id }}); return false;"
-                                    class="btn btn-primary mr-2"><i class="fas fa-shopping-cart"></i> Add to cart
+                            {% if object.stock > 0 %}{% if not exists_in_cart %}<button id="add_item_button{{ object.id }}" onclick="add_to_cart({{ object.id }}); return false;"
+                                    class="btn btn-primary mx-2"><i class="fas fa-shopping-cart"></i> Add to cart
                             </button>
-                            {% if exists_in_cart %}
-                            <button id="delete_item_button" onclick="removeItem({{ object.id }}); return false;"
-                                    class="btn btn-danger ml-2"><i class="fas fa-trash-alt"></i> Delete from cart
+                            {% else %}
+                            <button id="delete_item_button{{ object.id }}" onclick="delete_from_cart({{ object.id }}); return false;"
+                                    class="btn btn-danger mx-2"><i class="fas fa-trash-alt"></i> Delete from cart
                             </button>
                             {% endif %}
                                 {% else %}
                             {% endif %}
-                            {% if user.username %}<button class="btn btn-info ml-2"><i class="fas fa fa-heart"></i> Add to favorite</button>{% endif %}
+                            {% if user.username %}{% if not favorite %}<button id="add_fav{{object.id}}" onclick="addFavorite({{ object.id }}); return false;" class="btn btn-info ml-2"><i class="fas fa fa-heart"></i> Add to favorites</button>
+                            {% else %}<button id="remove_fav{{object.id}}" onclick="removeFavorite({{ object.id }}); return false;" class="btn btn-outline-danger btn-xs"><i class="fas fa-heart"></i> Delete from favorites</button>
+                            {% endif %}{% endif %}
                         </div>
                     </div>
                 </section>

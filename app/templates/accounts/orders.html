@@ -1,5 +1,6 @@
-{% if orders %}<div class="tab-pane" id="orders">
+<div class="tab-pane" id="orders">
     <hr>
+{% if orders %}
     <table class="table table-striped">
         <thead>
         <tr>
@@ -26,4 +27,7 @@
         {% endfor %}
         </tbody>
     </table>
-</div>{% endif %}
+    {% else %}
+<h4 class="py-3">You don't have any orders</h4>
+{% endif %}
+</div>

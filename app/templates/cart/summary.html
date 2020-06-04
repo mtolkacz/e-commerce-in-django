@@ -28,6 +28,7 @@
       <div class="col-md-7 order-md-2 mb-4">
         <h4 class="d-flex justify-content-between align-items-center mb-3">
           <span>Purchase {{ order.ref_code }}</span>
+          {% if user.username %}<a href="{% url 'profile' %}#orders"><button class="btn btn-dark ml-2 btn-sm"><i class="fas fa-shopping-bag"></i> My orders</button></a>{% endif %}
           <span class="badge badge-dark badge-pill">{{ order.get_cart_qty }}</span>
         </h4>
         <ul class="list-group mb-3">

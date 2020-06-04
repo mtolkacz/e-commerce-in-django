@@ -4,100 +4,103 @@
 {% load static %}
 {% load crispy_forms_tags %}
 <hr>
-<div class="container bootstrap snippet">
-    <div class="row">
-  		<div class="col-sm-12"><h1>{{ user.username }}</h1></div>
+<div class="container">
+    <div class="row" >
+        <div class="col-sm-12 pb-4 pt-3"><h1>{{ user.username }}</h1></div>
     </div>
-    <form action="{% url 'profile' %}" class="form" method="post" id="registrationForm" enctype="multipart/form-data">
-                      {% csrf_token %}
-    <div class="row">
-  		<div class="col-sm-3"><!--left col-->
-
-      <div class="text-center">
-        <img src="{{ request.user.get_picture_url }}" class="avatar img-circle img-thumbnail" alt="avatar">
-          {{ form.picture|as_crispy_field }}
-      </div></hr><br>
-
-        </div><!--/col-3-->
-    	<div class="col-sm-9">
+        <div class="row">
             <ul class="nav nav-tabs mx-2">
                 <li class="active mx-3"><a data-toggle="tab" href="#personaldata"><h5>Personal data</h5></a></li>
-                {% if orders %}<li class="mx-3"><a data-toggle="tab" href="#orders"><h5>Orders</h5></a></li>{% endif %}
-                <li class="mx-3"><a data-toggle="tab" href="#settings"><h5>Settings</h5></a></li>
-              </ul>
-
-
-          <div class="tab-content">
-            <div class="tab-pane active" id="personaldata">
-                <hr>
-                      <div id="personal_data" style="display:block">
-          <!-- First and Last name -->
-                          <div class="row">
-
-                              <div class="col-md-6">
-                                  {{ form.first_name|as_crispy_field }}
-                              </div>
-                              <div class="col-md-6">
-                                  {{ form.last_name|as_crispy_field }}
-                              </div>
-                          </div>
-                          <!-- Address 1 -->
-                          <div class="mb-3">
-                              {{ form.address_1|as_crispy_field }}
-                          </div>
-                          <!-- Address 2 -->
-                          <div class="mb-3">
-                              {{ form.address_2|as_crispy_field }}
-                          </div>
-                          <!-- Country, Voivodeship -->
-                          <div class="row">
-                              <div class="col-6 mb-3">
-                                  {{ form.country|as_crispy_field }}
-                              </div>
-                              <div class="col-6 mb-3">
-                                  {{ form.voivodeship|as_crispy_field }}
-                              </div>
-                          </div>
-                          <!-- Zip-code, City -->
-                          <div class="row">
-                              <div class="col-6 mb-3">
-                                  {{ form.zip_code|as_crispy_field }}
-                              </div>
-                              <div class="col-6">
-                                  {{ form.city|as_crispy_field }}
-                              </div>
-                          </div>
-                          {% if not user.email %}
-                          <!-- Email -->
-                          <div class="pb-3">
-                              {{ form.email|as_crispy_field }}
-                          </div>
-                          {% endif %}
-                      </div>
-                      <div class="form-group">
-                           <div class="col-xs-12">
-                                <br>
-                              	<button class="btn btn-lg btn-success" type="submit"><i class="glyphicon glyphicon-ok-sign"></i> Save</button>
-                               	<button class="btn btn-lg" type="reset"><i class="glyphicon glyphicon-repeat"></i> Reset</button>
-                            </div>
-                      </div>
-                    </form>
-               <hr>
-             </div>
-              {% include "accounts/orders.html" %}
-             <div class="tab-pane" id="settings">
-                  <hr>
-                     <table class="table table-striped">
-                         <tbody>
-                         <tr>
-                             <td><a href="{% url 'password_change' %}">Password change</a></td>
-                         </tr>
-                         </tbody>
-                     </table>
-              </div>
-              </div>
-          </div>
-
+                <li class="mx-3"><a data-toggle="tab" href="#orders"><h5>Orders</h5></a></li>
+                <li class="mx-3"><a data-toggle="tab" href="#favorites"><h5>Favorites products</h5></a></li>
+                <li class="mx-3"><a data-toggle="tab" href="#account_settings"><h5>Settings</h5></a></li>
+            </ul>
         </div>
-    </div>
+
+            <div class="tab-content pb-4" style="max-width: 600px;">
+                <div class="tab-pane active" id="personaldata">
+                    <hr>
+                    <form action="{% url 'profile' %}" class="" method="post" id="registrationForm" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div id="personal_data" style="display:block">
+                        <!-- First and Last name -->
+                        <div class="row">
+                            <div class="text-center">
+                                {% if backends.associated %}
+                                {% for ass in backends.associated %}
+                                {% if ass.provider == 'facebook' %}
+                                <img src="{{ass.extra_data.picture.data.url}}" style="max-width: 150px" class="avatar img-circle img-thumbnail"
+                                     alt="avatar">
+                                {% endif %}
+                                {% endfor %}
+                                {% else %}
+                                <img src="{{ request.user.get_picture_url }}" style="max-width: 150px" class="avatar img-circle img-thumbnail"
+                                     alt="avatar">
+                                {% endif %}
+                                {{ form.picture|as_crispy_field }}
+                            </div>
+                            </hr><br>
+                        </div>
+
+                        <div class="row">
+
+                            <div class="col-md-6">
+                                {{ form.first_name|as_crispy_field }}
+                            </div>
+                            <div class="col-md-6">
+                                {{ form.last_name|as_crispy_field }}
+                            </div>
+                        </div>
+                        <!-- Address 1 -->
+                        <div class="mb-3">
+                            {{ form.address_1|as_crispy_field }}
+                        </div>
+                        <!-- Address 2 -->
+                        <div class="mb-3">
+                            {{ form.address_2|as_crispy_field }}
+                        </div>
+                        <!-- Country, Voivodeship -->
+                        <div class="row">
+                            <div class="col-6 mb-3">
+                                {{ form.country|as_crispy_field }}
+                            </div>
+                            <div class="col-6 mb-3">
+                                {{ form.voivodeship|as_crispy_field }}
+                            </div>
+                        </div>
+                        <!-- Zip-code, City -->
+                        <div class="row">
+                            <div class="col-6 mb-3">
+                                {{ form.zip_code|as_crispy_field }}
+                            </div>
+                            <div class="col-6">
+                                {{ form.city|as_crispy_field }}
+                            </div>
+                        </div>
+                        {% if not user.email %}
+                        <!-- Email -->
+                        <div class="pb-3">
+                            {{ form.email|as_crispy_field }}
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <div class="col-xs-12">
+                            <br>
+                            <button class="btn btn-lg btn-success" type="submit"><i
+                                    class="glyphicon glyphicon-ok-sign"></i> Save
+                            </button>
+                            <button class="btn btn-lg" type="reset"><i class="glyphicon glyphicon-repeat"></i> Reset
+                            </button>
+                        </div>
+                    </div>
+                    </form>
+                    <hr>
+                </div>
+                {% include "accounts/orders.html" %}
+                {% include "accounts/favorite_products.html" %}
+                {% include "accounts/settings.html" %}
+            </div>
+</div>
+
 {% endblock %}

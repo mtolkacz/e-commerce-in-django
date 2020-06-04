@@ -137,25 +137,72 @@ function removePromo(cart_id) {
     });
 }
 
-
-
-function removeItem(item_id) {
-    var elem1 = document.getElementById("row" + item_id);
-    if (elem1) {
-        elem1.parentNode.removeChild(elem1);
-    }
-    var elem2 = document.getElementById("right-side-item" + item_id);
-    if (elem2) {
-        elem2.parentNode.removeChild(elem2);
-    }
-    var elem3 = document.getElementById("delete_item_button");
-    if (elem3) {
-        elem3.remove()
-    }
-    delete_from_cart(item_id);
+function errorAjax()
+{
+    alert("Something went wrong! Try again later");
+    $("div.loading_contener").remove();
 }
 
+function addFavorite(prod_id) {
+    add_loader();
+    $.ajax({
+        url: '/account/add_favorite_product/',
+        type: 'POST',
+        headers: {
+                'X-CSRFTOKEN': getCookie('csrftoken')
+        },
+        data: {
+            'prod_id': prod_id
+        },
+        dataType: 'json',
+        success: function(data) {
+            if(data.success){
+                $("#add_fav"+prod_id).remove();
+                var elem = document.getElementById("remove_fav"+prod_id);
+                if(!elem){
+                    var delete_item_button = '<button id="remove_fav'+ prod_id +'" onclick="removeFavorite('+ prod_id +'); return false;" class="btn btn-outline-danger btn-xs mx-2"><i class="fas fa-heart"></i> Delete from favorites</button>'
+                    var x = document.getElementsByClassName("cart-fav-box");
+                    x[0].insertAdjacentHTML("beforeEnd", delete_item_button);
+                }
+                alert("Product added to favorites");
+                $("div.loading_contener").remove();
+            }
+        },
+        error: errorAjax
+    });
+}
+
+function removeFavorite(prod_id) {
+    add_loader();
+    $.ajax({
+        url: '/account/delete_favorite_product/',
+        type: 'POST',
+        headers: {
+                'X-CSRFTOKEN': getCookie('csrftoken')
+        },
+        data: {
+            'prod_id': prod_id
+        },
+        dataType: 'json',
+        success: function() {
+            $("#favorite"+prod_id).remove();
+            $("#remove_fav"+prod_id).remove();
+            var elem = document.getElementById("add_fav"+prod_id);
+            if(elem){
+                var add_item_button = '<button id="add_fav'+ prod_id +'" onclick="addFavorite('+ prod_id +'); return false;" class="btn btn-info mx-2"><i class="fas fa fa-heart"></i> Add to favorites</button>'
+                var x = document.getElementsByClassName("cart-fav-box");
+                x[0].insertAdjacentHTML("beforeEnd", add_item_button);
+            }
+            alert("Product deleted from favorites");
+            $("div.loading_contener").remove();
+        },
+        error: errorAjax
+    });
+}
+
+
 function calculate_cart(cart_value, item_id) {
+    add_loader();
     $.ajax({
         url: '/purchase/cart/calculate/',
         data: {
@@ -183,21 +230,15 @@ function calculate_cart(cart_value, item_id) {
                 console.log("No success");
                 //window.location.replace("/cart/");
             }
-        }
+            $("div.loading_contener").remove();
+        },
+        error: errorAjax
     });
 }
 
 function add_to_cart(item_id) {
+    add_loader();
     var CSRF_TOKEN = getCookie('csrftoken');
-    var elem3 = document.getElementById("delete_item_button");
-    if(!elem3){
-        var add_item_button = document.getElementById("add_item_button");
-        if(add_item_button){
-            var delete_item_button = '<button id="delete_item_button" onclick="removeItem('+ item_id +'); return false;" class="btn btn-danger ml-2">Delete from cart</button>'
-            add_item_button.insertAdjacentHTML("afterend", delete_item_button);
-        }
-
-    }
     $.ajax({
         url: '/purchase/cart/add_item/',
         headers: {
@@ -211,6 +252,15 @@ function add_to_cart(item_id) {
             if (data.success) {
                 console.log("Success");
                 console.log(data.success);
+                var elem = document.getElementById("delete_item_button"+item_id);
+                if(!elem){
+                    var add_item_button = document.getElementById("add_item_button"+item_id);
+                    if(add_item_button){
+                        var delete_item_button = '<button id="delete_item_button'+ item_id +'" onclick="delete_from_cart('+ item_id +'); return false;" class="btn btn-danger mx-2">Delete from cart</button>'
+                        add_item_button.insertAdjacentHTML("afterend", delete_item_button);
+                        add_item_button.remove();
+                    }
+                }
                 console.log(data.item_id);
                 document.getElementById("cart-qty").innerText = data.cart_qty;
                 if (data.new_cart) {
@@ -254,7 +304,7 @@ function add_to_cart(item_id) {
                                 <span class="price">` + data.product_price + `
                                     <item-price id="right-side-item-price` + data.item_id + `"></item-price>
                                 </span>
-                                <br><button id="delete_item_button" onclick="removeItem(` + data.item_id + `); return false;" class="btn btn-danger btn-sm"><i class="fas fa-trash-alt"></i> Delete from cart</button>
+                                <br><button id="delete_item_button" onclick="delete_from_cart(` + data.item_id + `); return false;" class="btn btn-danger btn-sm"><i class="fas fa-trash-alt"></i> Delete from cart</button>
                             </div>
                     </div>
                     `;
@@ -267,16 +317,15 @@ function add_to_cart(item_id) {
             } else {
                 console.log("Failed");
             }
+            $("div.loading_contener").remove();
         },
-        error: function() {
-            console.log("Error!");
-            alert("Something went wrong!");
-        }
+        error: errorAjax
     });
 }
 
 function delete_from_cart(item_id) {
     var CSRF_TOKEN = getCookie('csrftoken');
+    add_loader();
     $.ajax({
         url: '/purchase/cart/delete_item/',
         headers: {
@@ -288,6 +337,23 @@ function delete_from_cart(item_id) {
         dataType: 'json',
         success: function(data) {
             if (data.success) {
+                var elem1 = document.getElementById("row" + item_id);
+                if (elem1) {
+                    elem1.parentNode.removeChild(elem1);
+                }
+                var elem2 = document.getElementById("right-side-item" + item_id);
+                if (elem2) {
+                    elem2.parentNode.removeChild(elem2);
+                }
+                var elem = document.getElementById("add_item_button" + item_id);
+                if (!elem) {
+                    var delete_item_button = document.getElementById("delete_item_button" + item_id);
+                    if (delete_item_button) {
+                        var add_item_button = '<button id="add_item_button' + item_id + '" onclick="add_to_cart(' + item_id + '); return false;" class="btn btn-primary mx-2"><i class="fas fa-shopping-cart"></i> Add to cart</button>'
+                        delete_item_button.insertAdjacentHTML("afterend", add_item_button);
+                        delete_item_button.remove();
+                    }
+                }
                 console.log("Success");
                 if (data.cart_total_value) {
                     var cart_total_value = document.getElementById("cart_total_value")
@@ -300,6 +366,7 @@ function delete_from_cart(item_id) {
                     document.getElementById("cart-qty").innerText = data.cart_qty;
                     document.getElementById("right-side-cart-qty").innerText = data.cart_qty;
                 }
+                alert("Product deleted from cart");
             } else if (data.remove_cart) {
                 var card_body = document.getElementById("card-body");
                 if (card_body) {
@@ -333,12 +400,15 @@ function delete_from_cart(item_id) {
             if (data.ups) {
                 console.log("Ups!");
             }
-        }
+            $("div.loading_contener").remove();
+        },
+        error: errorAjax
     });
 }
 
 function delete_cart() {
     var q = confirm("Do you want to delete shipping cart?");
+    add_loader();
     if (q == true) {
         $.ajax({
             url: '/purchase/delete/',
@@ -375,10 +445,12 @@ function delete_cart() {
                     }
                     console.log("Removed cart");
                     alert("Shipping cart has been deleted.")
+                    $("div.loading_contener").remove();
                 }
-            }
+            },
+            error: errorAjax
         });
-    }
+    } else {$("div.loading_contener").remove();}
 }
 
 function getOrdering(selectObject) {

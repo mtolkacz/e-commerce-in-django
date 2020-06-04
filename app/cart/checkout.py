@@ -7,7 +7,7 @@ from accounts.models import Voivodeship, Country
 from .models import Shipment, Order
 from .forms import BillingForm, ShipmentForm
 from accounts.tasks import send_email
-from accounts.views import create_user_from_form
+from accounts import functions as glp
 from gallop import functions as glp
 
 
@@ -67,8 +67,8 @@ class Checkout:
                                     zip_code=source.zip_code,
                                     address_1=source.address_1,
                                     address_2=source.address_2, )
-        shipment.save() if shipment else None
-        result = shipment
+
+        result = shipment if shipment else None
         return result
 
     def set_context_data(self):
@@ -141,7 +141,7 @@ class Checkout:
 
                 # create user if user set checkbox
                 if self.account_checkbox:
-                    self.user = create_user_from_form(self.billing_form)
+                    self.user = glp.create_user_from_form(self.billing_form)
 
                     # pin existing cart to newly created user and clean session_key
                     self.cart.owner = self.user

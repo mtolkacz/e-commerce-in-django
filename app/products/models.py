@@ -232,6 +232,13 @@ class Product(models.Model):
     def __str__(self):
         return '{}, {}'.format(self.id, self.name)
 
+    def check_if_favorite(self, user):
+        try:
+            fav = Favorites.objects.get(product=self, user=user)
+        except Favorites.DoesNotExist:
+            fav = False
+        return True if fav else False
+
     # def __repr__(self):
     #     return 'Product name: ' + self.name + \
     #            ', Description: ' + self.description + \
@@ -255,6 +262,14 @@ class ProductRating(models.Model):
     rating = models.IntegerField(default=1, validators=[MaxValueValidator(5), MinValueValidator(1)])
     review = models.TextField(max_length=2000, null=True)
     product = models.ForeignKey(Product, on_delete=models.PROTECT, null=True)
+
+
+class Favorites(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, null=False)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=False)
+
+    class Meta:
+        unique_together = ('product', 'user')
 
 
 class DiscountPriorityType(models.Model):

@@ -4,8 +4,8 @@ from django.template.loader import render_to_string
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 
-from app.accounts.tasks import send_email
-from app.accounts.tokens import account_activation_token
+from accounts.tasks import send_email
+from accounts.tokens import account_activation_token
 
 
 def send_activation_link(request, user, **kwargs):

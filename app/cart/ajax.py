@@ -12,11 +12,11 @@ from django.views.decorators.http import require_http_methods
 from products.models import Product
 from sales.sale import SaleManager
 
-from .extras import generate_order_id
+from .functions import generate_order_id, get_pending_cart
 from .models import OrderItem, Order, MAX_ITEMS_IN_CART, OrderAccess, Shipment, PromoCodeUsage
 from .paypal import PaypalManager
 from .promocode import PromoCodeManager
-from .views import get_pending_cart, User
+from .views import User
 
 
 def add_item_to_cart(request):
@@ -203,6 +203,7 @@ def get_access(request):
                 new_order_access = OrderAccess(order=order, session_key=session)
                 new_order_access.save()
                 data['success'] = True
+                data['message'] = 'Access denied. Wrong access code.'
     return JsonResponse(data)
 
 

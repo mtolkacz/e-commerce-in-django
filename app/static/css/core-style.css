@@ -133,6 +133,10 @@ img {
 .height-800 {
   height: 800px !important; }
 
+.user_pic {
+    border-radius: 30%;
+}
+
 .loading_contener{
     opacity:0.5;
     height:100%;
@@ -438,7 +442,7 @@ div.search_deps select {
     .header_area .favourite-area a img,
     .header_area .user-login-info a img,
     .header_area .cart-area a img {
-      max-width: 25px; }
+      max-width: 30px; }
     .header_area .favourite-area a span,
     .header_area .user-login-info a span,
     .header_area .cart-area a span {

@@ -1,0 +1,22 @@
+<div class="tab-pane" id="favorites">
+    <hr>
+    {% if favorites %}
+    <table class="table table-striped">
+        <tbody>
+        {% for favorite in favorites %}
+        <tr id="favorite{{favorite.id}}">
+            <th scope="row"><img src="{{ favorite.product.thumbnail.url }}" style="width:100px;" alt="{{ favorite.product.name }}">
+                </th>
+            <td><a href="{{ favorite.product.get_absolute_url }}">
+                    <p>{{ favorite.product.name }}</p>
+                </a></td>
+            <td><button onclick="removeFavorite({{favorite.id}}); return false;"
+                                    class="btn btn-outline-danger btn-xs"><i class="fas fa-heart"></i></button></td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <h4 class="py-3">You don't have any favorite products</h4>
+    {% endif %}
+</div>

@@ -7,6 +7,7 @@ from accounts.models import User
 from .models import Order, OrderAccess, Shipment, Payment
 from gallop import settings
 from gallop.functions import get_user_object
+from . import functions as crt
 
 
 class Summary:
@@ -16,6 +17,7 @@ class Summary:
     USER_AUTHENTICATED = 3
     NEED_ACCESS_CODE = 4
     UNKNOWN_ERROR = None
+
     # permission level description
     # Order has access_code and no owner = no user and need access for session
     # 	1 - render access key page - no access
@@ -128,8 +130,7 @@ class Summary:
 
     def send_link_with_access_code(self):
         if self.order:
-            from .views import send_purchase_link
-            sent = send_purchase_link(self.request, self.order)
+            sent = crt.send_purchase_link(self.request, self.order)
             if sent:
                 messages.success(self.request, "Access code has been sent to your e-mail")
             else:

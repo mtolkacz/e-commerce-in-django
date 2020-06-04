@@ -14,6 +14,10 @@ from django.shortcuts import get_object_or_404
 import math
 
 from gallop.database import get_popular_products
+from cart import functions as crt
+from cart.models import OrderItem
+
+from gallop import functions as glp
 
 
 class ProductDepartmentDetail(ListAPIView):
@@ -95,7 +99,9 @@ class ProductCategoryDetail(ListAPIView):
             return True
 
     def get_queryset(self, **kwargs):
-        queryset = Product.objects.filter(department=self.department.id, subdepartment=self.subdepartment.id, category=self.category.id)
+        queryset = Product.objects.filter(department=self.department.id,
+                                          subdepartment=self.subdepartment.id,
+                                          category=self.category.id)
         return queryset
 
     def get_additional_data(self, request, queryset, **kwargs):
@@ -178,17 +184,32 @@ class ProductCategoryDetail(ListAPIView):
 
 
 class ProductDetail(ListAPIView):
-    lookup_fields = ['department', 'subdepartment', 'category', 'pk']
+    lookup_fields = ['department', 'subdepartment', 'category', 'pk', 'slug', ]
     serializer_class = ProductSerializer
     renderer_classes = [TemplateHTMLRenderer]
     template_name = 'products/product.html'
+    department = None
+    subdepartment = None
+    category = None
+    product = None
+
+    def get_product_hierarchy(self):
+        try:
+            self.department = get_object_or_404(Department, slug=self.kwargs[self.lookup_fields[0]])
+            self.subdepartment = get_object_or_404(Subdepartment, slug=self.kwargs[self.lookup_fields[1]])
+            self.category = get_object_or_404(Category, slug=self.kwargs[self.lookup_fields[2]])
+            self.product = get_object_or_404(Product,
+                                             id=self.kwargs[self.lookup_fields[3]],
+                                             slug=self.kwargs[self.lookup_fields[4]])
+        except(Department.DoesNotExist, Subdepartment.DoesNotExist, Category.DoesNotExist, Product.DoesNotExist):
+            return False
+        else:
+            return True
 
     @staticmethod
     def check_if_exist_in_cart(request, prod):
-        from cart.views import get_pending_cart
-        from cart.models import OrderItem
         result = None
-        cart = get_pending_cart(request)
+        cart = crt.get_pending_cart(request)
         try:
             result = OrderItem.objects.get(order=cart, product=prod).id if cart else False
         except OrderItem.DoesNotExist:
@@ -196,20 +217,22 @@ class ProductDetail(ListAPIView):
         return result
 
     def get(self, request, *args, **kwargs):
-        dep = get_object_or_404(Department, slug=self.kwargs[self.lookup_fields[0]])
-        subdep = get_object_or_404(Subdepartment, slug=self.kwargs[self.lookup_fields[1]])
-        cat = get_object_or_404(Category, slug=self.kwargs[self.lookup_fields[2]])
-        prod = get_object_or_404(Product, id=self.kwargs[self.lookup_fields[3]])
-        if dep is None or subdep is None or cat is None or prod is None:
-            return 0
-        object = get_object_or_404(Product, department=dep, subdepartment=subdep, category=cat, id=prod.id)
-        images = ProductImage.objects.filter(product=object)
+        if not self.get_product_hierarchy():
+            raise Http404
+        else:
+            images = ProductImage.objects.filter(product=self.product)
 
-        exist_in_cart = self.check_if_exist_in_cart(request, prod)
-        context = {
-            'object': object,
-            'images': images,
-            'exists_in_cart': exist_in_cart,
-        }
-        return Response(context)
+            favorite = None
+            if request.user.is_authenticated:
+                user = glp.get_user_object(request)
+                favorite = self.product.check_if_favorite(user)
+
+            exist_in_cart = self.check_if_exist_in_cart(request, self.product)
+            context = {
+                'object': self.product,
+                'images': images,
+                'exists_in_cart': exist_in_cart,
+                'favorite': favorite,
+            }
+            return Response(context)
 

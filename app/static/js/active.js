@@ -96,19 +96,22 @@ $('#access-button').on('keypress click', function(e) {
                 'purchase_key': $('#purchase_key').val(),
                 'access_code': $('#access_code').val()
             },
-            success: purchaseSuccess,
+            success: refreshSuccess,
             dataType: 'json',
         });
     }
 });
 
-function purchaseSuccess(data, textStatus, jqXHR)
+
+function refreshSuccess(data, textStatus, jqXHR)
 {
     if(data.success){
         location.reload();
         return false;
     } else {
-        alert('Access denied. Wrong access code.');
+        if(data.message){
+            alert(data.message);
+        }
     }
 }
 
@@ -201,6 +204,16 @@ $("div.search-area").on('touchstart click' ,function() {
         }
     }
 });
+
+var url = document.location.toString();
+if (url.match('#')) {
+    $('.nav-tabs a[href="#' + url.split('#')[1] + '"]').tab('show');
+}
+
+// Change hash for page-reload
+$('.nav-tabs a').on('shown.bs.tab', function (e) {
+    window.location.hash = e.target.hash;
+})
 
 $(document).mouseup(function(e)
 {
