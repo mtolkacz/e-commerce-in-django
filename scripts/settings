@@ -1,0 +1,1 @@
+[{"host":"http://127.0.0.1:9200","proxy":"","name":"localhost","trustSelfSigned":false,"batchSize":1000,"timeout":5}]

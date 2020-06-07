@@ -5,6 +5,7 @@ from django.utils.http import urlsafe_base64_decode
 from django.contrib import messages
 
 from . import functions as crt
+from .forms import ShipmentTypeForm
 from .models import *
 from .models import Order
 from accounts.tokens import account_activation_token
@@ -32,11 +33,15 @@ def checkout(request):
     checkout.set_context_data()
 
     if request.method == 'POST':
+        # shipment_type = request.POST.get('prod_id', None)
         if not checkout.same_address:
             checkout.check_shipment_form()
 
+        a = checkout.check_delivery_form()
+        print(f"DJANGOTEST: {a}")
+
         if not checkout.user:
-            if checkout.is_valid_billing_form():
+            if checkout.check_billing_form():
                 checkout.shipment = checkout.get_shipment()
                 if checkout.shipment:
                     checkout.cart.book()
@@ -68,6 +73,8 @@ def checkout(request):
                 if checkout.shipment:
                     checkout.update_cart(user=checkout.user)
                     crt.send_purchase_link(request, cart)
+                    # save shipment only when everything else finished successfully
+                    checkout.shipment.save()
                     # go to checkout
                     return redirect(reverse('summary', kwargs={'ref_code': checkout.cart.ref_code,
                                                                'oidb64': urlsafe_base64_encode(
@@ -80,6 +87,7 @@ def checkout(request):
             checkout.context['billing_form'] = checkout.billing_form
 
     checkout.context['shipment_form'] = checkout.shipment_form
+    checkout.context['delivery_type_form'] = checkout.shipmenttype_form
 
     return render(request, 'cart/checkout.html', checkout.context)
 

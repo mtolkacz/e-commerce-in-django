@@ -19,8 +19,9 @@ from .promocode import PromoCodeManager
 from .views import User
 
 
+@require_http_methods(['POST'])
 def add_item_to_cart(request):
-    item_id = request.GET.get('item_id', None)
+    item_id = request.POST.get('item_id', None)
 
     # create dictionary for JsonResponse data
     data = {'success': False}
@@ -89,8 +90,9 @@ def delete_purchase(request):
     return JsonResponse(data)
 
 
+@require_http_methods(['POST'])
 def delete_item_from_cart(request):
-    item_id = request.GET.get('item_id', None)
+    item_id = request.POST.get('item_id', None)
 
     # create empty dictionary for JsonResponse data
     data = {}
@@ -126,9 +128,10 @@ def delete_item_from_cart(request):
     return JsonResponse(data)
 
 
+@require_http_methods(['POST'])
 def calculate_item_in_cart(request):
-    item_id = request.GET.get('item_id', None)
-    new_cart_value = request.GET.get('cart_value', None)
+    item_id = request.POST.get('item_id', None)
+    new_cart_value = request.POST.get('cart_value', None)
 
     # create empty dictionary for JsonResponse data
     data = {}
@@ -173,15 +176,16 @@ def calculate_item_in_cart(request):
     return JsonResponse(data)
 
 
+@require_http_methods(['POST'])
 def get_access(request):
     data = {}
     try:
-        access_code = request.GET.get('access_code', 0)
+        access_code = request.POST.get('access_code', 0)
         access_code = int(access_code)
     except ValueError:
         access_code = None
-    ref_code = request.GET.get('ref_code', '')
-    purchase_key = request.GET.get('purchase_key', '')
+    ref_code = request.POST.get('ref_code', '')
+    purchase_key = request.POST.get('purchase_key', '')
     oid = int(force_text(urlsafe_base64_decode(purchase_key)))
     # if all parameters are correct then check order, instead return emtpy data dict
     if (access_code is None or
@@ -207,10 +211,11 @@ def get_access(request):
     return JsonResponse(data)
 
 
+@require_http_methods(['POST'])
 def process_payment(request):
     data = {}
-    ref_code = request.GET.get('ref_code', 0)
-    details_string = request.GET.get('details', 0)
+    ref_code = request.POST.get('ref_code', 0)
+    details_string = request.POST.get('details', 0)
     payment_details = json.loads(details_string)
     if payment_details and isinstance(payment_details, dict):
         payment_manager = PaypalManager(payment_details)

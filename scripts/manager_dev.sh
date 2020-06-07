@@ -41,6 +41,7 @@ while [ ! $number -eq 0 ]; do
 	echo "31.db container ip"
 	echo "32.elasticsearch container log"
 	echo "33.rebuild indexes"
+	echo "34.kazen"
 	printf "\nChoose: "
     read number
     case "$number" in
@@ -106,9 +107,11 @@ while [ ! $number -eq 0 ]; do
            ;;
 	31) docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' gallop_db
 	   ;;
-	32) docker-compose logs | grep -E "elastic"
+	32) docker-compose logs --tail="100" | grep -E "elastic"
 	   ;;
 	33) docker-compose exec web python manage.py search_index --rebuild
+	   ;;
+	34) gnome-terminal -- sudo "$(dirname $PWD)"/kaizen/jre/bin/java -jar "$(dirname $PWD)"/kaizen/kaizen.jar -Xms128M -Xmx2g
 	   ;;
 	0) exit 0
 	   ;;

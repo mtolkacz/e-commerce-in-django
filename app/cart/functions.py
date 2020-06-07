@@ -12,6 +12,7 @@ from django.utils.http import urlsafe_base64_encode
 
 from .models import OrderItem, Order, Shipment
 from .views import User
+from accounts import tasks
 
 
 def save_order_item(order):
@@ -74,7 +75,7 @@ def send_purchase_link(request, order):
     message = render_to_string('cart/access_link.html', context)
 
     # Celery sending mail
-    send_email.apply_async((receiver, subject, message), countdown=0)
-    send_email.apply_async(('michal.tolkacz@gmail.com', subject, message), countdown=0)
+    tasks.send_email.apply_async((receiver, subject, message), countdown=0)
+    tasks.send_email.apply_async(('michal.tolkacz@gmail.com', subject, message), countdown=0)
 
     return True

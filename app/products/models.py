@@ -239,12 +239,14 @@ class Product(models.Model):
             fav = False
         return True if fav else False
 
-    # def __repr__(self):
-    #     return 'Product name: ' + self.name + \
-    #            ', Description: ' + self.description + \
-    #            ', Price: ' + str(self.price) + \
-    #            ', Category: ' + str(self.category) + \
-    #            ', Image: ' + str(self.thumbnail)
+    def get_rate(self):
+        try:
+            values = ProductRating.objects.values_list('score', flat=True).get(product=self)
+        except ProductRating.DoesNotExist:
+            values = None
+        values_list = [values] if values else None
+
+        return sum(values_list) / len(values_list) if values_list else None
 
 
 class ProductImage(models.Model):
@@ -258,10 +260,13 @@ class ProductImage(models.Model):
 
 
 class ProductRating(models.Model):
-    user = models.ForeignKey(User, on_delete=models.PROTECT, null=True)
-    rating = models.IntegerField(default=1, validators=[MaxValueValidator(5), MinValueValidator(1)])
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    score = models.PositiveSmallIntegerField(default=1, validators=[MaxValueValidator(5), MinValueValidator(1)])
     review = models.TextField(max_length=2000, null=True)
-    product = models.ForeignKey(Product, on_delete=models.PROTECT, null=True)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, null=True)
+
+    class Meta:
+        unique_together = ('product', 'user')
 
 
 class Favorites(models.Model):

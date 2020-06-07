@@ -80,7 +80,7 @@ class Summary:
                 self.context['user'] = self.user if self.user else self.shipment
                 self.context['shipment'] = self.shipment
                 self.context['order'] = self.order
-                if self.order.status == Order.PAID:
+                if self.order.status >= Order.PAID:
                     try:
                         payment = Payment.objects.get(order__id=self.order.id)
                     except Payment.DoesNotExist:

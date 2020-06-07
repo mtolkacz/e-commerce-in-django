@@ -173,7 +173,9 @@ function addFavorite(prod_id) {
 }
 
 function removeFavorite(prod_id) {
+    var q = confirm("Do you want to delete product from favorites?");
     add_loader();
+    if (q == true) {
     $.ajax({
         url: '/account/delete_favorite_product/',
         type: 'POST',
@@ -187,17 +189,75 @@ function removeFavorite(prod_id) {
         success: function() {
             $("#favorite"+prod_id).remove();
             $("#remove_fav"+prod_id).remove();
-            var elem = document.getElementById("add_fav"+prod_id);
-            if(elem){
+            var elem = document.getElementById("add_fav");
+            if(!elem){
                 var add_item_button = '<button id="add_fav'+ prod_id +'" onclick="addFavorite('+ prod_id +'); return false;" class="btn btn-info mx-2"><i class="fas fa fa-heart"></i> Add to favorites</button>'
                 var x = document.getElementsByClassName("cart-fav-box");
-                x[0].insertAdjacentHTML("beforeEnd", add_item_button);
+                if(x[0]){
+                    x[0].insertAdjacentHTML("beforeEnd", add_item_button);
+                }
             }
             alert("Product deleted from favorites");
-            $("div.loading_contener").remove();
         },
         error: errorAjax
-    });
+    });}
+    $("div.loading_contener").remove();
+}
+
+function rateProduct(prod_id) {
+    var e = document.getElementById("select_rate");
+    var rating = e.options[e.selectedIndex].value;
+    if(rating>0){
+        add_loader();
+        $.ajax({
+            url: '/products/rate/',
+            type: 'POST',
+            headers: {
+                    'X-CSRFTOKEN': getCookie('csrftoken')
+            },
+            data: {
+                'prod_id': prod_id,
+                'score': rating
+            },
+            dataType: 'json',
+            success: function(data) {
+                $("#rating"+prod_id).remove();
+                var elem = document.getElementById("rated_products");
+                if(elem){
+                    body = elem.getElementsByTagName('tbody')[0];
+                    if(body){
+                        // Insert a row in the table at the last row
+                        //var newRow   = body.insertRow();
+
+                        // Insert a cell in the row at index 0
+                        //var newCell  = newRow.insertCell(0);
+
+                            //cart_list.innerText = "";
+                            var row_content = `<tr id="favorite`+ data.rating.product.id +`">
+                                <th style="width:15%" scope="row"><a href="`+ data.rating.product.get_absolute_url +`">
+                                <img src="`+ data.rating.product.thumbnail.url +`" alt="`+ data.rating.product.name +`"></a>
+                                    </th>
+                                <td style="width:60%"><a href="`+ data.rating.product.get_absolute_url +`">
+                                        <p>`+ data.rating.product.name +`</p>
+                                    </a></td>
+                                <td style="width:25%">Score: `+ data.rating.score  +`/5</td>
+                            </tr>`;
+
+                            body.insertAdjacentHTML("beforeend", row_content);
+                    }
+
+
+
+                        // Append a text node to the cell
+                        //var newText  = document.createTextNode('New row');
+                        //newCell.appendChild(newText);
+                }
+                alert("Product rated");
+            },
+            error: errorAjax
+        });
+        $("div.loading_contener").remove();
+    } else { alert('You need to choose number to rate')}
 }
 
 
@@ -205,6 +265,7 @@ function calculate_cart(cart_value, item_id) {
     add_loader();
     $.ajax({
         url: '/purchase/cart/calculate/',
+        type: 'POST',
         data: {
             'cart_value': cart_value,
             'item_id': item_id
@@ -231,16 +292,26 @@ function calculate_cart(cart_value, item_id) {
                 //window.location.replace("/cart/");
             }
             $("div.loading_contener").remove();
-        },
-        error: errorAjax
+            },
+            error: errorAjax
     });
 }
 
 function add_to_cart(item_id) {
     add_loader();
     var CSRF_TOKEN = getCookie('csrftoken');
+    var elem3 = document.getElementById("delete_item_button" + item_id);
+    if(!elem3){
+        var add_item_button = document.getElementById("add_item_button" + item_id);
+        if(add_item_button){
+            var delete_item_button = '<button id="delete_item_button'+ item_id +'" onclick="delete_from_cart('+ item_id +'); return false;" class="btn btn-danger ml-2">Delete from cart</button>'
+            add_item_button.insertAdjacentHTML("afterend", delete_item_button);
+        }
+
+    }
     $.ajax({
         url: '/purchase/cart/add_item/',
+        type: 'POST',
         headers: {
             'X-CSRFTOKEN': CSRF_TOKEN
         },
@@ -252,15 +323,6 @@ function add_to_cart(item_id) {
             if (data.success) {
                 console.log("Success");
                 console.log(data.success);
-                var elem = document.getElementById("delete_item_button"+item_id);
-                if(!elem){
-                    var add_item_button = document.getElementById("add_item_button"+item_id);
-                    if(add_item_button){
-                        var delete_item_button = '<button id="delete_item_button'+ item_id +'" onclick="delete_from_cart('+ item_id +'); return false;" class="btn btn-danger mx-2">Delete from cart</button>'
-                        add_item_button.insertAdjacentHTML("afterend", delete_item_button);
-                        add_item_button.remove();
-                    }
-                }
                 console.log(data.item_id);
                 document.getElementById("cart-qty").innerText = data.cart_qty;
                 if (data.new_cart) {
@@ -328,6 +390,7 @@ function delete_from_cart(item_id) {
     add_loader();
     $.ajax({
         url: '/purchase/cart/delete_item/',
+        type: 'POST',
         headers: {
             'X-CSRFTOKEN': CSRF_TOKEN
         },
@@ -336,6 +399,10 @@ function delete_from_cart(item_id) {
         },
         dataType: 'json',
         success: function(data) {
+            var delete_item_button = document.getElementById("delete_item_button" + item_id);
+            if (delete_item_button) {
+                delete_item_button.remove();
+            }
             if (data.success) {
                 var elem1 = document.getElementById("row" + item_id);
                 if (elem1) {
@@ -345,16 +412,6 @@ function delete_from_cart(item_id) {
                 if (elem2) {
                     elem2.parentNode.removeChild(elem2);
                 }
-                var elem = document.getElementById("add_item_button" + item_id);
-                if (!elem) {
-                    var delete_item_button = document.getElementById("delete_item_button" + item_id);
-                    if (delete_item_button) {
-                        var add_item_button = '<button id="add_item_button' + item_id + '" onclick="add_to_cart(' + item_id + '); return false;" class="btn btn-primary mx-2"><i class="fas fa-shopping-cart"></i> Add to cart</button>'
-                        delete_item_button.insertAdjacentHTML("afterend", add_item_button);
-                        delete_item_button.remove();
-                    }
-                }
-                console.log("Success");
                 if (data.cart_total_value) {
                     var cart_total_value = document.getElementById("cart_total_value")
                     if(cart_total_value){
@@ -396,6 +453,7 @@ function delete_from_cart(item_id) {
                     cart_list.insertAdjacentHTML("beforeend", right_side_empty_cart);
                 }
                 console.log("Removed cart");
+                alert("Product deleted from cart");
             }
             if (data.ups) {
                 console.log("Ups!");
@@ -412,6 +470,7 @@ function delete_cart() {
     if (q == true) {
         $.ajax({
             url: '/purchase/delete/',
+            type: 'POST',
             dataType: 'json',
             success: function(data) {
                 if (data.success) {

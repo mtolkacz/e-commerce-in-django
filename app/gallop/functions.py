@@ -17,8 +17,6 @@ def update_user_from_form(form, user, request=False):
     else:
         fields_to_update = []
 
-        print(f'DJANGOTEST: 34 {user.address_2}, {form.cleaned_data["address_2"]} {form.cleaned_data["picture"]}')
-
         # todo probably not to elegant approach, but potentially save time on db operations
         if user.first_name != form.cleaned_data['first_name']:
             user.first_name = form.cleaned_data['first_name']

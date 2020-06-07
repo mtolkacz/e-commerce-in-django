@@ -15,7 +15,7 @@ from .models import User
 from accounts.forms import ProfileForm
 from cart.models import Order
 from gallop import functions as glp
-from products.models import Product, Favorites
+from products.models import Product, Favorites, ProductRating
 
 
 @require_http_methods(["GET", "POST"])
@@ -136,7 +136,7 @@ def update_obj_from_form(obj, form):
 
 @login_required
 def profile(request):
-    user = glp.get_user_object(request)
+    user = request.user
     print(f'DJANGOTEST: test')
     if request.method == 'POST':
         form = ProfileForm(request.POST, request.FILES, instance=user)
@@ -149,10 +149,27 @@ def profile(request):
     else:
         form = ProfileForm(instance=user)
 
+    orders = Order.objects.filter(owner=user)
+
+    product_ids = []
+    for order in orders:
+        if order.status == Order.COMPLETED:
+            product_ids += order.items.all().values_list('product__id', flat=True)
+
+    product_ids = list(set(product_ids))
+    rated_products = ProductRating.objects\
+        .filter(product__in=product_ids, user=user)
+
+    products_to_rate = Product.objects\
+        .exclude(id__in=[rating.product.id for rating in rated_products])\
+        .filter(id__in=product_ids)
+
     context = {
         'form': form,
         'favorites': Favorites.objects.filter(user=user),
-        'orders': Order.objects.filter(owner=user)
+        'orders': orders,
+        'rated_products': rated_products,
+        'products_to_rate': products_to_rate,
     }
     return render(request, 'accounts/profile.html', context)
 

@@ -47,6 +47,7 @@
                         <p class="product-price">{% if object.discounted_price %}<span class="old-price">{{ object.price }}</span>{% endif %}
                             {% if object.discounted_price %}<b>{{ object.discounted_price }}</b>{% else %}<p style="color:#000;font-size:22px">{{ object.price }}</p>{% endif %}</p>
                         <p id="product-desc" class="product-desc">{{ object.description|safe }}</p>
+                        <p style="font-size:16px">Rating: {% if object.get_rate %}{{ object.get_rate }}/5.0{% else %}<i>not rated yet</i>{% endif %}</p>
                         <i class="fas fa-surprise"></i>
                         <div class="py-3">
                             {% if object.stock > 10 %}<span style="color: green"><i class="fas fa-check-circle fa-2x pr-2"></i> Product available</span>
@@ -56,18 +57,16 @@
                             {% endif %}
                         </div>
                         <div class="cart-fav-box d-flex align-items-center">
-                            {% if object.stock > 0 %}{% if not exists_in_cart %}<button id="add_item_button{{ object.id }}" onclick="add_to_cart({{ object.id }}); return false;"
+                            {% if object.stock > 0 %}<button id="add_item_button{{ object.id }}" onclick="add_to_cart({{ object.id }}); return false;"
                                     class="btn btn-primary mx-2"><i class="fas fa-shopping-cart"></i> Add to cart
                             </button>
-                            {% else %}
-                            <button id="delete_item_button{{ object.id }}" onclick="delete_from_cart({{ object.id }}); return false;"
+                            {% if exists_in_cart %}<button id="delete_item_button{{ object.id }}" onclick="delete_from_cart({{ object.id }}); return false;"
                                     class="btn btn-danger mx-2"><i class="fas fa-trash-alt"></i> Delete from cart
                             </button>
                             {% endif %}
-                                {% else %}
                             {% endif %}
                             {% if user.username %}{% if not favorite %}<button id="add_fav{{object.id}}" onclick="addFavorite({{ object.id }}); return false;" class="btn btn-info ml-2"><i class="fas fa fa-heart"></i> Add to favorites</button>
-                            {% else %}<button id="remove_fav{{object.id}}" onclick="removeFavorite({{ object.id }}); return false;" class="btn btn-outline-danger btn-xs"><i class="fas fa-heart"></i> Delete from favorites</button>
+                            {% else %}<button id="remove_fav{{ object.id }}" onclick="removeFavorite({{ object.id }}); return false;" class="btn btn-outline-danger btn-xs"><i class="fas fa-heart"></i> Delete from favorites</button>
                             {% endif %}{% endif %}
                         </div>
                     </div>

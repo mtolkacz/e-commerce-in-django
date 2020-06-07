@@ -1,0 +1,47 @@
+<div class="tab-pane" id="ratings">
+    <hr>
+
+{% if products_to_rate %}
+    <table id='products_to_rate' class="table table-striped" style="table-layout:fixed;">
+        <tbody>
+        {% for product in products_to_rate %}
+        <tr id="rating{{product.id}}">
+            <th scope="row" style="width:15%"><a href="{{ product.get_absolute_url }}"><img src="{{ product.thumbnail.url }}" style="width:100%" alt="{{ product.product.name }}"></a>
+                </th>
+            <td style="width:60%"><a href="{{ product.get_absolute_url }}">
+                    <p>{{ product.name }}</p>
+                </a></td>
+            <td style="width:15%; text-align:right;">
+                <select id="select_rate">
+                  <option value="0" selected>Select rate</option>
+                  <option value="1">1</option>
+                  <option value="2">2</option>
+                  <option value="3">3</option>
+                  <option value="4">4</option>
+                  <option value="5">5</option>
+                </select>
+            </td>
+            <td style="width:10%; text-align:left;"><button onclick="rateProduct({{product.id}}); return false;"
+                                    class="btn btn-success btn-xs"><i class="fas fa-heart"></i> Rate</button></td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+    <table id='rated_products' class="table table-striped" style="table-layout:fixed;">
+        <tbody>
+    {% if rated_products %}
+        {% for rating in rated_products %}
+        <tr id="favorite{{rating.product.id}}">
+            <th style="width:15%" scope="row"><a href="{{ product.get_absolute_url }}"><img src="{{ rating.product.thumbnail.url }}"  alt="{{ rating.product.name }}"></a>
+                </th>
+            <td style="width:60%"><a href="{{ rating.product.get_absolute_url }}">
+                    <p>{{ rating.product.name }}</p>
+                </a></td>
+            <td style="width:25%">Score: {{ rating.score }}/5</td>
+        </tr>
+        {% endfor %}
+    {% endif %}
+        </tbody>
+    </table>
+</div>

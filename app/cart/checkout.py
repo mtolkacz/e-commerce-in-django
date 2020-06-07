@@ -4,8 +4,8 @@ from django.template.loader import render_to_string
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 from accounts.models import Voivodeship, Country
-from .models import Shipment, Order
-from .forms import BillingForm, ShipmentForm
+from .models import Shipment, Order, ShipmentType
+from .forms import BillingForm, ShipmentForm, ShipmentTypeForm
 from accounts.tasks import send_email
 from accounts import functions as glp
 from gallop import functions as glp
@@ -18,6 +18,7 @@ class Checkout:
         # create billing and shipment form
         self.billing_form = BillingForm()
         self.shipment_form = ShipmentForm(prefix='sh')
+        self.shipmenttype_form = ShipmentTypeForm()
         self.context = {}  # template context dictionary
         self.user = self.cart.owner  # if no owner/NULL then None
         self.user_authenticated = request.user.is_authenticated  # check user authentication
@@ -37,50 +38,54 @@ class Checkout:
     # need to pass form or user key and object
     def create_shipment(self, **kwargs):
         shipment = None
-        if 'form' in kwargs:
-            source = kwargs['form']
-            if source:
-                try:
-                    voivodeship = Voivodeship.objects.get(name=source.cleaned_data['voivodeship'])
-                    country = Country.objects.get(name=source.cleaned_data['country'])
-                except (Voivodeship.DoesNotExist, Country.DoesNotExist):
-                    pass
-                else:
+        print(f"DJANGOTEST: {self.shipmenttype_form.cleaned_data['delivery']}")
+        shipment_type = self.shipmenttype_form.cleaned_data['delivery']
+        print(f"DJANGOTEST: {shipment_type}")
+        if shipment_type:
+            if 'form' in kwargs:
+                source = kwargs['form']
+                if source:
+                    try:
+                        voivodeship = Voivodeship.objects.get(name=source.cleaned_data['voivodeship'])
+                        country = Country.objects.get(name=source.cleaned_data['country'])
+                    except (Voivodeship.DoesNotExist, Country.DoesNotExist):
+                        pass
+                    else:
+                        shipment = Shipment(order=self.cart,
+                                            type=shipment_type,
+                                            first_name=source.cleaned_data['first_name'],
+                                            last_name=source.cleaned_data['last_name'],
+                                            city=source.cleaned_data['city'],
+                                            voivodeship=voivodeship,
+                                            country=country,
+                                            zip_code=source.cleaned_data['zip_code'],
+                                            address_1=source.cleaned_data['address_1'],
+                                            address_2=source.cleaned_data['address_2'], )
+            else:
+                source = self.user
+                if source:
                     shipment = Shipment(order=self.cart,
-                                        first_name=source.cleaned_data['first_name'],
-                                        last_name=source.cleaned_data['last_name'],
-                                        city=source.cleaned_data['city'],
-                                        voivodeship=voivodeship,
-                                        country=country,
-                                        zip_code=source.cleaned_data['zip_code'],
-                                        address_1=source.cleaned_data['address_1'],
-                                        address_2=source.cleaned_data['address_2'], )
-        else:
-            source = self.user
-            if source:
-                shipment = Shipment(order=self.cart,
-                                    first_name=source.first_name,
-                                    last_name=source.last_name,
-                                    city=source.city,
-                                    voivodeship=source.voivodeship,
-                                    country=source.country,
-                                    zip_code=source.zip_code,
-                                    address_1=source.address_1,
-                                    address_2=source.address_2, )
-
+                                        type=shipment_type,
+                                        first_name=source.first_name,
+                                        last_name=source.last_name,
+                                        city=source.city,
+                                        voivodeship=source.voivodeship,
+                                        country=source.country,
+                                        zip_code=source.zip_code,
+                                        address_1=source.address_1,
+                                        address_2=source.address_2, )
         result = shipment if shipment else None
         return result
 
     def set_context_data(self):
         self.context['checkout'] = True
+        self.context['delivery_type_form'] = self.shipmenttype_form
         if self.user_authenticated:
             if self.user.has_all_billing_data():
                 self.context['user_data'] = self.user
             else:
                 billing_form = BillingForm(instance=self.user, without_new_account=True)
                 self.context['billing_form'] = billing_form
-                # self.billing_form = billing_form
-            # print('DJANGOTEST: {}', format(self.user.has_all_billing_data()))
         else:
             self.context['billing_form'] = self.billing_form
 
@@ -88,13 +93,22 @@ class Checkout:
         self.shipment_form = ShipmentForm(self.request.POST, prefix='sh')
         if not self.shipment_form.is_valid():
             self.valid_forms = False
+        return self.valid_forms
 
-    def is_valid_billing_form(self):
+    def check_billing_form(self):
         if self.account_checkbox:
             self.billing_form = BillingForm(self.request.POST)
         else:
             self.billing_form = BillingForm(self.request.POST, without_new_account=True)
-        return True if self.billing_form.is_valid() and self.valid_forms else False
+        if not self.billing_form.is_valid() or not self.valid_forms:
+            self.valid_forms = False
+        return self.valid_forms
+
+    def check_delivery_form(self):
+        self.shipmenttype_form = ShipmentTypeForm(self.request.POST)
+        if not self.shipmenttype_form.is_valid():
+            self.valid_forms = False
+        return self.valid_forms
 
     def get_shipment(self, **kwargs):
         if 'user' in kwargs:
@@ -167,4 +181,5 @@ class Checkout:
             glp.update_user_from_form(self.billing_form, self.user)
         else:
             self.valid_forms = False
+
 

@@ -1,23 +1,26 @@
 from decimal import Decimal
+import logging
+import math
 
 from django.http import Http404
 from rest_framework.generics import ListAPIView
-from .serializers import ProductSerializer, BrandSerializer, \
-    DepartmentSerializer, SubdepartmentSerializer, CategorySerializer
-from .models import Product, ProductImage, Subdepartment, Department, Category, Brand
 from rest_framework.filters import OrderingFilter, SearchFilter
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.renderers import TemplateHTMLRenderer
 from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend, FilterSet, CharFilter, RangeFilter
 from django.shortcuts import get_object_or_404
-import math
+
 
 from gallop.database import get_popular_products
 from cart import functions as crt
 from cart.models import OrderItem
-
+from .serializers import ProductSerializer, BrandSerializer, \
+    DepartmentSerializer, SubdepartmentSerializer, CategorySerializer
+from .models import Product, ProductImage, Subdepartment, Department, Category, Brand
 from gallop import functions as glp
+
+logger = logging.getLogger(__name__)
 
 
 class ProductDepartmentDetail(ListAPIView):
@@ -198,8 +201,9 @@ class ProductDetail(ListAPIView):
             self.department = get_object_or_404(Department, slug=self.kwargs[self.lookup_fields[0]])
             self.subdepartment = get_object_or_404(Subdepartment, slug=self.kwargs[self.lookup_fields[1]])
             self.category = get_object_or_404(Category, slug=self.kwargs[self.lookup_fields[2]])
+            print(f"DJANGOTEST: 3: {self.kwargs[self.lookup_fields[3]]}, 4: {self.kwargs[self.lookup_fields[4]]}")
             self.product = get_object_or_404(Product,
-                                             id=self.kwargs[self.lookup_fields[3]],
+                                             pk=self.kwargs[self.lookup_fields[3]],
                                              slug=self.kwargs[self.lookup_fields[4]])
         except(Department.DoesNotExist, Subdepartment.DoesNotExist, Category.DoesNotExist, Product.DoesNotExist):
             return False

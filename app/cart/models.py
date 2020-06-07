@@ -84,7 +84,7 @@ class Order(models.Model):
     date_ordered = models.DateTimeField(default=timezone.now)
     session_key = models.ForeignKey(Session, on_delete=models.CASCADE, null=True, editable=False)
     access_code = models.SmallIntegerField(null=True, blank=False, editable=False)
-    promo_code = models.ForeignKey(PromoCode, on_delete=models.SET_NULL, null=True)
+    promo_code = models.ForeignKey(PromoCode, on_delete=models.SET_NULL, null=True, editable=False)
     status = models.PositiveSmallIntegerField(
         choices=STATUS,
         default=IN_CART,
@@ -110,16 +110,52 @@ class Order(models.Model):
     def get_cart_items(self):
         return self.items.all().order_by('id')
 
+    def get_shipment_cost(self):
+        try:
+            shipment_type = Shipment.objects.get(order=self)
+        except Shipment.DoesNotExist:
+            shipment_type = None
+        return shipment_type.cost if shipment_type else 0
+
+    def get_promo_code_value(self):
+        cart_total = sum([(item.product.discounted_price if item.product.discounted_price else item.product.price)
+                          * item.amount for item in self.items.all()])
+        promo_value = 0
+        if self.promo_code:
+            if self.promo_code.type == PromoCode.VALUE:
+                promo_value = Decimal(self.promo_code.value)
+            elif self.promo_code.type == PromoCode.PERCENTAGE:
+                promo_value = Decimal(cart_total.amount) - Decimal(cart_total.amount * Decimal((100 - self.promo_code.value) / 100))
+        promo = Money(promo_value, str(cart_total.currency))
+        return promo
+
+    def get_promo_code_value_str(self):
+        return str(self.get_promo_code_value())
+
     def get_cart_total(self):
         cart_total = sum([(item.product.discounted_price if item.product.discounted_price else item.product.price)
                           * item.amount for item in self.items.all()])
-        if self.promo_code:
-            if self.promo_code.type == PromoCode.VALUE:
-                new_value = Decimal(cart_total.amount) - Decimal(self.promo_code.value)
-            elif self.promo_code.type == PromoCode.PERCENTAGE:
-                new_value = Decimal(cart_total.amount * Decimal((100 - self.promo_code.value) / 100))
-            cart_total = Money(new_value, str(cart_total.currency))
+
+        cart_total = cart_total - self.get_promo_code_value() + self.get_shipment_cost()
+
         return cart_total
+
+    # def get_cart_total(self):
+    #     cart_total = sum([(item.product.discounted_price if item.product.discounted_price else item.product.price)
+    #                       * item.amount for item in self.items.all()])
+    #     try:
+    #         shipment_cost = Shipment.objects.values_list('type').get(order=self)
+    #     except Shipment.DoesNotExist:
+    #         shipment_cost = None
+    #     if shipment_cost:
+    #         cart_total = cart_total + shipment_cost.cost
+    #     if self.promo_code:
+    #         if self.promo_code.type == PromoCode.VALUE:
+    #             new_value = Decimal(cart_total.amount) - Decimal(self.promo_code.value)
+    #         elif self.promo_code.type == PromoCode.PERCENTAGE:
+    #             new_value = Decimal(cart_total.amount * Decimal((100 - self.promo_code.value) / 100))
+    #         cart_total = Money(new_value, str(cart_total.currency))
+    #     return cart_total
 
     def get_cart_total_str(self):
         return str(self.get_cart_total().amount)
@@ -165,12 +201,6 @@ class Order(models.Model):
         self.promo_code = promo_code
         self.save(update_fields=['promo_code'])
 
-    def get_promo_code_value(self):
-        return self.get_cart_total_no_promo() - self.get_cart_total()
-
-    def get_promo_code_value_str(self):
-        return str(self.get_promo_code_value())
-
 
 signals.pre_delete.connect(order_pre_delete, sender=Order)
 
@@ -186,7 +216,7 @@ class ShipmentType(models.Model):
     cost = MoneyField(max_digits=14, decimal_places=2, default_currency='USD', null=False)
 
     def __str__(self):
-        return '{}'.format(self.name)
+        return f'{self.name} - {self.cost}'
 
 
 class Shipment(models.Model):

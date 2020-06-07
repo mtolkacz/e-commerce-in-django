@@ -93,12 +93,12 @@ CELERYD_TASK_SOFT_TIME_LIMIT = 60
 CELERY_TIMEZONE = 'Europe/Warsaw'
 
 # Celery beat schedule
-CELERY_BEAT_SCHEDULE = {
-    'hello': {
-        'task': 'products.tasks.hello',
-        'schedule': crontab()  # execute every minute
-    }
-}
+# CELERY_BEAT_SCHEDULE = {
+#     'hello': {
+#         'task': 'products.tasks.hello',
+#         'schedule': crontab()  # execute every minute
+#     }
+# }
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = int(os.getenv('DEBUG', 1))

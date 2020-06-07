@@ -1,6 +1,6 @@
 from django import forms
 from accounts.models import User, Country, Voivodeship
-from cart.models import Shipment
+from cart.models import Shipment,ShipmentType
 from django.contrib.auth.forms import UserCreationForm
 
 
@@ -60,3 +60,10 @@ class ShipmentForm(forms.ModelForm):
     class Meta:
         model = Shipment
         fields = ('address_1', 'address_2', 'country', 'voivodeship', 'zip_code', )
+
+
+class ShipmentTypeForm(forms.Form):
+    delivery = forms.ModelChoiceField(label=False, queryset=ShipmentType.objects.all())
+
+    class Meta:
+        fields = 'delivery'

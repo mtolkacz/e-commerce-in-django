@@ -199,6 +199,7 @@
                             {% else %}
                             <img src="{{ user.get_picture_url }}" class="user_pic" alt="{{ user.username }}">
                             {% endif %}
+                    </a>
                         {% else %}
                         <img src="{{ user.get_picture_url }}" class="user_pic" alt="{{ user.username }}">
                         {% endif %}
@@ -208,7 +209,7 @@
                         <a class="dropdown" href="{% url 'logout' %}">Logout</a>
                     </div>
                     {% else %}
-                    <a href="{% url 'profile' %}">
+                    <a href="{% url 'login' %}">
                     <img src="{% static 'img/core-img/user.svg' %}" alt=""></a>
                     {% endif %}
                 </div>

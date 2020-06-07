@@ -114,6 +114,10 @@
           {% include "cart/checkout/shipment_address.html" %}
 
         {% endif %}
+          <hr class="mb-2">
+          <h4 class="mb-3">Delivery method</h4>
+          {{ delivery_type_form.delivery|as_crispy_field }}<br>
+          <hr class="mb-2">
          <button type="submit" class="btn btn-success btn-lg mt-3"><i class="fas fa-shopping-bag"></i> Go to Payment</button>
         </form>
          <button id="delete-purchase" class="btn btn-danger btn-sm mt-3"><i class="fas fa-trash"></i> Delete purchase</button>

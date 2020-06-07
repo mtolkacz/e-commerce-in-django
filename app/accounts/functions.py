@@ -45,7 +45,7 @@ def send_activation_link(request, user, **kwargs):
             'token': account_activation_token.make_token(user)
         }
         message = render_to_string('accounts/activate.html', context)
-
+    print('DJANGOTEST: next')
     # Celery sending mail
     send_email.apply_async((receiver, subject, message), countdown=0)
     messages.success(request, 'Please confirm your email address to complete the registration.')

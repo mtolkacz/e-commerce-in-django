@@ -14,10 +14,11 @@
                 <li class="mx-3"><a data-toggle="tab" href="#orders"><h5>Orders</h5></a></li>
                 <li class="mx-3"><a data-toggle="tab" href="#favorites"><h5>Favorites products</h5></a></li>
                 <li class="mx-3"><a data-toggle="tab" href="#account_settings"><h5>Settings</h5></a></li>
+                <li class="mx-3"><a data-toggle="tab" href="#ratings"><h5>Ratings</h5></a></li>
             </ul>
         </div>
 
-            <div class="tab-content pb-4" style="max-width: 600px;">
+            <div class="tab-content pb-4">
                 <div class="tab-pane active" id="personaldata">
                     <hr>
                     <form action="{% url 'profile' %}" class="" method="post" id="registrationForm" enctype="multipart/form-data">
@@ -100,7 +101,7 @@
                 {% include "accounts/orders.html" %}
                 {% include "accounts/favorite_products.html" %}
                 {% include "accounts/settings.html" %}
+                {% include "products/ratings.html" %}
             </div>
 </div>
-
 {% endblock %}

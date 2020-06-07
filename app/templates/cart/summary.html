@@ -66,6 +66,10 @@
           </li>
           {% endif %}
           <li class="list-group-item d-flex justify-content-between">
+            <span>Shipment - {{ shipment.type.name }}:</span>
+            <strong>{{ order.get_shipment_cost }}</strong>
+          </li>
+          <li class="list-group-item d-flex justify-content-between">
             <span>Total ({{ order.get_cart_currency }})</span>
             <strong>{{ order.get_cart_total }}</strong>
           </li>

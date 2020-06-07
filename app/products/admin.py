@@ -1,6 +1,6 @@
 from django.contrib import admin
 from .models import Product, Category, Subdepartment, Department, \
-    Brand, DiscountType, DiscountPriorityType, Discount, DiscountCustom
+    Brand, DiscountType, DiscountPriorityType, Discount, DiscountCustom, ProductRating
 from django.apps import apps
 
 
@@ -73,6 +73,20 @@ class BrandAdmin(admin.ModelAdmin):
     list_display = ['id', 'name', 'image_tag1', ]
 
 
+class ProductRatingAdmin(admin.ModelAdmin):
+    model = ProductRating
+    list_display = ['id', 'get_username', 'score', 'get_product_name', ]
+
+    def get_username(self, obj):
+        return obj.user.username
+
+    def get_product_name(self, obj):
+        return obj.product.name
+
+    get_product_name.short_description = 'Product Name'
+    get_username.short_description = 'Username'
+
+
 class DiscountAdmin(admin.ModelAdmin):
     model = Discount
     list_display = ['id', 'name', 'status', 'get_percentage_value', 'get_type_name', 'get_set_name',
@@ -124,6 +138,7 @@ admin.site.register(DiscountPriorityType, DiscountPriorityTypeAdmin)
 admin.site.register(DiscountType, DiscountTypeAdmin)
 admin.site.register(Discount, DiscountAdmin)
 admin.site.register(Brand, BrandAdmin)
+admin.site.register(ProductRating, ProductRatingAdmin)
 admin.site.register(Product, ProductAdmin)
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(Subdepartment, SubdepartmentAdmin)

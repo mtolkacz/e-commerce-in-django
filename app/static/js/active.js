@@ -88,6 +88,7 @@ $('#access-button').on('keypress click', function(e) {
     if (e.which === 13 || e.type === 'click') {
         $.ajax({
             url: '/purchase/get_access/',
+            type: 'POST',
             headers: {
                 'X-CSRFTOKEN': CSRF_TOKEN
             },
@@ -121,6 +122,7 @@ $('#delete-purchase').on('click', function() {
     var CSRF_TOKEN = getCookie('csrftoken');
         $.ajax({
             url: '/purchase/delete/',
+            type: 'POST',
             headers: {
                 'X-CSRFTOKEN': CSRF_TOKEN
             },

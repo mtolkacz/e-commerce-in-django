@@ -5,10 +5,6 @@ from .models import *
 import random
 
 
-@shared_task
-def hello():
-    print("Hej dziunia! {}")
-
 
 @app.task(bind=True, ignore_result=False)
 def process_discount(self, instance_id):

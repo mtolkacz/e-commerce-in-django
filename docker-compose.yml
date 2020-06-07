@@ -95,7 +95,7 @@ services:
       - TZ=Europe/Warsaw
   elasticsearch:
     container_name: gallop_elasticsearch
-    image: blacktop/elasticsearch:6.7.1
+    image: blacktop/elasticsearch:7.7
     environment:
       - TZ="Europe/Warsaw"
     ports:
