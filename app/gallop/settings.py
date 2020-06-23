@@ -237,11 +237,16 @@ USE_TZ = True
 # Custom static files for every apps at the project level
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'static/'),
-    # os.path.join('static'),
 )
+os.path.join('static'),
+
 STATIC_URL = '/static/'
 STATIC_ROOT = '/'
-# STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
+STATICFILES_FINDERS = (
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    #'django.contrib.staticfiles.finders.AppDirectoriesFinder',    #causes verbose duplicate notifications in django 1.9
+)
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
@@ -263,7 +268,7 @@ EMAIL_USE_TLS = True
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://redis:6379/",
+        "LOCATION": "redis://redis",
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient"
         },
@@ -273,7 +278,8 @@ CACHES = {
 REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 2
+    'PAGE_SIZE': 2,
+    'EXCEPTION_HANDLER': 'gallop.views.handler404',
 }
 
 # LOGGING = {

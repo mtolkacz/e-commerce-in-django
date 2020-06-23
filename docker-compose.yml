@@ -29,10 +29,7 @@ services:
     ports:
       - 8888:8888
     depends_on:
-      - worker1
-      - worker2
-      - worker3
-      - worker4
+      - celery
   db:
     container_name: gallop_db
     image: postgres
@@ -49,30 +46,14 @@ services:
       - pgadmin:/root/.pgadmin
     ports:
       - "5050:8001"
-  worker1:
+  celery:
     build: ./app
-    command: celery -A gallop worker -l debug -n worker1@%h
-    depends_on:
-      - db
+    command: celery -A gallop worker -l debug
+    links:
       - redis
-      - rabbitmq
-  worker2:
-    build: ./app
-    command: celery -A gallop worker -l debug -n worker2@%h
-    depends_on:
-      - db
-      - redis
-      - rabbitmq
-  worker3:
-    build: ./app
-    command: celery -A gallop worker -l debug -n worker3@%h
-    depends_on:
-      - db
-      - redis
-      - rabbitmq
-  worker4:
-    build: ./app
-    command: celery -A gallop worker -l debug -n worker4@%h
+    env_file: ./env/dev/.env
+    volumes:
+      - ./app/:/usr/src/app/
     depends_on:
       - db
       - redis

@@ -116,7 +116,7 @@ class ProductCategoryDetail(ListAPIView):
         additional = {}
         if queryset:
             additional = {'brands': BrandSerializer(brands, many=True).data,
-                          'page': int(request.GET.get('page', '1'))}
+                          'page': int(request.GET.get('page', '1')), }
             min = queryset.order_by('price')[0].price
             max = queryset.order_by('-price')[0].price
             price = {

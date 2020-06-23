@@ -5,7 +5,6 @@ from .models import *
 import random
 
 
-
 @app.task(bind=True, ignore_result=False)
 def process_discount(self, instance_id):
     from .models import Discount

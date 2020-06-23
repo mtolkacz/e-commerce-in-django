@@ -1,0 +1,60 @@
+{% extends "base_template.html" %}
+{% block content %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+<!-- Page Header -->
+  <header class="masthead pt-5 pb-3">
+    <div class="overlay"></div>
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-8 col-md-10 mx-auto">
+          <div class="post-heading">
+            <h1>{% block title %} {{ post.title }} {% endblock title %}</h1>
+            <span class="meta">Posted by
+              <a href="#">{{ post.author }}</a>
+              on {{ post.created_on }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+    <!-- Post Content -->
+  <article>
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-8 col-md-10 mx-auto">
+          <p class="card-text ">{{ post.content | safe }}</p>
+          <div class="card-body">
+            <h2>{{ comments.count }} {% if comments.count == 1 %}comment{% else %}comments{% endif %}</h2>
+
+            {% for comment in comments %}
+            <div class="comments" style="padding: 10px;">
+              <p class="font-weight-bold">
+                {{ comment.name }}
+                <span class=" text-muted font-weight-normal">
+                {{ comment.created_on }}
+              </span>
+              </p>
+              {{ comment.body | linebreaks }}
+            </div>
+            {% endfor %}
+          </div>
+          {% if user.is_authenticated %}
+          <div id="add_comment" class="card-body">
+            <h3>Leave a comment</h3>
+            <form id="comment_form" method="post" style="margin-top: 1.3em;">
+              {{ comment_form | crispy }}
+              {% csrf_token %}
+              <button id="comment_button" type="button" onclick="addComment({{ post.id }});return false" class="btn btn-primary mb-3 btn-lg">Submit</button>
+            </form>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </article>
+  <hr>
+
+{% endblock %}

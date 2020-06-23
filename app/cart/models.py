@@ -8,7 +8,7 @@ from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 from djmoney.money import Money
 from products.models import Product, Category
-from django.contrib.auth import get_user_model, signals
+from django.contrib.auth import get_user_model
 from django.contrib.sessions.models import Session
 from djmoney.models.fields import MoneyField
 from accounts.validators import ZipCodeValidator

@@ -1,6 +1,6 @@
 #!/bin/sh
 
-if ["$DATABASE" = "postgres" ]
+if [ "$DATABASE" = "postgres" ]
 then
     echo "Waiting for postgres..."
     while ! nc -z $SQL_HOST $SQL_PORT; do
@@ -13,7 +13,7 @@ fi
 # python manage.py migrate
 python manage.py collectstatic --no-input #--clear
 # python manage.py migrate django_celery_results
-python manage.py rebuild_index
-python manage.py update_index
+# python manage.py rebuild_index
+# python manage.py update_index
 
 exec "$@"

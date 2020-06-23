@@ -42,6 +42,7 @@ while [ ! $number -eq 0 ]; do
 	echo "32.elasticsearch container log"
 	echo "33.rebuild indexes"
 	echo "34.kazen"
+	echo "35.workers log"
 	printf "\nChoose: "
     read number
     case "$number" in
@@ -113,6 +114,8 @@ while [ ! $number -eq 0 ]; do
 	   ;;
 	34) gnome-terminal -- sudo "$(dirname $PWD)"/kaizen/jre/bin/java -jar "$(dirname $PWD)"/kaizen/kaizen.jar -Xms128M -Xmx2g
 	   ;;
+	35) docker-compose logs --tail="300" | grep -E "worker"
+           ;;
 	0) exit 0
 	   ;;
 	*) echo

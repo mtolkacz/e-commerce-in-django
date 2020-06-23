@@ -172,6 +172,33 @@ function addFavorite(prod_id) {
     });
 }
 
+function addComment(post_id) {
+    add_loader();
+    $.ajax({
+        url: '/comments/add/',
+        type: 'POST',
+        headers: {
+                'X-CSRFTOKEN': getCookie('csrftoken')
+        },
+        data: $("#comment_form").serialize()+"&post_id=" + post_id,
+        dataType: 'json',
+        success: function(data) {
+            $("#comment_message").remove();
+            if(data.success){
+                $("#add_comment").empty();
+                var comment_added = '<div id="comment_message" class="alert alert-success" role="alert">Your comment is awaiting moderation</div>'
+                $("#add_comment").html(comment_added);
+            }
+            else {
+                var comment_not_added = '<div id="comment_message" class="alert alert-danger pt-3" role="alert">'+ data.message +'</div>'
+                $("#add_comment").append(comment_not_added);
+            }
+            $("div.loading_contener").remove();
+        },
+        error: errorAjax
+    });
+}
+
 function removeFavorite(prod_id) {
     var q = confirm("Do you want to delete product from favorites?");
     add_loader();
