@@ -34,7 +34,7 @@ class BillingForm(UserCreationForm):
         without_new_account = kwargs.pop('without_new_account', False)
         super(BillingForm, self).__init__(*args, **kwargs)
         if without_new_account:
-            self.fields['email'].required = False
+            self.fields['email'].required = True
             self.fields['username'].required = False
             self.fields['password1'].required = False
             self.fields['password2'].required = False

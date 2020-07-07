@@ -1,0 +1,52 @@
+    <section class="new_arrivals_area pt-5 clearfix">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <div class="section-heading text-center">
+                        <h2>Popular Products</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="container_fluid px-5">
+            <div class="row">
+                <div class="col-12" style="text-align:center;">
+                    <div class="popular-products-slides owl-carousel">
+                        {% for product in products %}
+                        <!-- Single Product -->
+                        <div class="single-product-wrapper">
+                            <!-- Product Image -->
+                            <div class="product-img">
+                                <a href="{{ product.get_absolute_url }}">
+                                    <img src="{{ product.thumbnail.url }}" alt="">
+                                </a>
+                                <!-- Hover Thumb -->
+                                <img class="hover-img" src="{{ product.get_first_image_url }}" alt="">
+                                <!-- Favourite -->
+                                {% if user.authenticated %}
+                                <div class="product-favourite">
+                                    <a href="#" class="favme fa fa-heart"></a>
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="product-description">
+                                <span>{{ product.subdepartment.name }}</span>
+                                <a href="{{ product.get_absolute_url }}">
+                                    <h6 style="height:55px;display:block;">{{ product.name }}</h6>
+                                </a>
+                                <p class="product-price">
+                                            {% if product.discounted_price %}<span class="old-price">{{ product.price }}</span>{% endif %}
+                                            {% if product.discounted_price %}<text style="font-size:20px;font-weight: 700;color: #dc0345;">{{ product.discounted_price }}</text>{% else %}{{ product.price }}{% endif %}</p>
+                                {% if product.stock > 0 %} <button onclick="add_to_cart({{ product.id }}); return false;" class="btn-primary btn-sm"><i class="fas fa-shopping-cart"></i> Add to cart</button>
+                                {% else %}
+                                <button class="btn btn-danger btn-sm" style="cursor:default">Not available</button>
+                                 {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>

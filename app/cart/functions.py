@@ -7,12 +7,14 @@ from django.contrib.sessions.models import Session
 from django.contrib.sites.shortcuts import get_current_site
 from django.shortcuts import get_object_or_404
 from django.template.loader import render_to_string
+from django.urls import reverse
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
-
+from django.conf import settings
 from .models import OrderItem, Order, Shipment
 from .views import User
 from accounts import tasks
+from accounts.tasks import send_email
 
 
 def save_order_item(order):
@@ -25,6 +27,30 @@ def generate_order_id():
     date_str = date.today().strftime('%Y%m%d')[2:] + str(datetime.datetime.now().second)
     rand_str = "".join([random.choice(string.digits) for count in range(3)])
     return date_str + rand_str
+
+
+# cart saving
+# - get orders in cart older than one week
+def get_saved_carts():
+    week_ago = datetime.datetime.now() - datetime.timedelta(days=7)
+    return Order.objects.filter(date_ordered__lt=week_ago, status=1)
+
+
+def saved_carts_email(order):
+    # to avoid sending e-mail to order with different status than "in cart"
+    if order.status != 1:
+        return
+    else:
+        user = order.owner
+        receiver = user.email
+        subject = 'Gallop - You have products in cart'
+        context = {
+                'user': user,
+                'order': order,
+        }
+        message = render_to_string('cart/save_cart.html', context)
+        # Celery sending mail
+        send_email.apply_async((receiver, subject, message, message,), countdown=0)
 
 
 # return user/anonymous order object in cart if exists

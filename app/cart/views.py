@@ -41,7 +41,9 @@ def checkout(request):
         print(f"DJANGOTEST: {a}")
 
         if not checkout.user:
-            if checkout.check_billing_form():
+            if not checkout.check_billing_form():
+                checkout.update_context_when_billing_form_failed()
+            else:
                 checkout.shipment = checkout.get_shipment()
                 if checkout.shipment:
                     checkout.cart.book()
@@ -49,6 +51,7 @@ def checkout(request):
                     if checkout.account_checkbox:
                         # method from accounts app to confirm new user and redirect to purchase
                         send_activation_link(checkout.request, checkout.user, order=checkout.cart)
+
                     else:
                         # send link to purchase with access key
                         checkout.send_access_link()
@@ -58,9 +61,7 @@ def checkout(request):
                 else:
                     messages.error(request,
                                    'There was a problem creating the shipment. Administrator has been informed.')
-            else:
-                checkout.update_context_when_billing_form_failed()
-            return redirect(reverse('index'))
+                return redirect(reverse('index'))
         # if user logged in
         else:
             # if user had to fill billing form then update new personal data

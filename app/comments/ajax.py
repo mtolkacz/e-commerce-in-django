@@ -31,6 +31,7 @@ def add(request):
                 new_comment = comment_form.save(commit=False)
                 # Assign the current post to the comment
                 new_comment.post = post
+                new_comment.user = user
                 # Save the comment to the database
                 new_comment.save()
                 data['success'] = True

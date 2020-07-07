@@ -54,16 +54,19 @@
             <strong id="checkout-cart-total">{{ cart.get_cart_total }}</strong>
           </li></ul>
 
+          {% if user.username %}
           <div id="promo-div" class="input-group p-2">{% if not cart.promo_code %}
-            <input id="promo-code-input" autocomplete="false" type="text" size="10" placeholder="Promo code">
-            <div class="input-group-append">
-              <button id="promo-code-button" class="btn btn-primary">Redeem</button>
-            </div>{% else %}
+              <input id="promo-code-input" autocomplete="false" type="text" size="10" placeholder="Promo code">
+              <div class="input-group-append">
+                  <button id="promo-code-button" class="btn btn-primary">Redeem</button>
+              </div>
+              {% else %}
               <button id="delete_promo_button" onclick="removePromo({{ cart.id }}); return false;"
-                                    class="btn btn-danger ml-2 btn-sm"> Delete promo code
+                      class="btn btn-danger ml-2 btn-sm"> Delete promo code
               </button>
               {% endif %}
           </div>
+          {% endif %}
 
       </div>
       <div class="col-md-5 order-md-1">

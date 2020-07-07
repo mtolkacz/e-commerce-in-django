@@ -1,0 +1,10 @@
+{% if brands %}
+<h2 style="text-align: center">Popular brands</h2>
+    <div class="brands-area d-flex align-items-center justify-content-between">
+        {% for brand in brands %}
+        <div  class="single-brands-logo">
+            <img src="{{ brand.image1.url }}" style="height:50px;-webkit-filter: grayscale(100%); filter: grayscale(100%);" alt="{{ brand.name }}">
+        </div>
+        {% endfor %}
+    </div>
+{% endif %}

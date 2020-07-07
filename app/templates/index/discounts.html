@@ -1,0 +1,35 @@
+{% load static %}
+{% if discounts %}
+{% for discount in discounts %}
+    <div class="cta-area text-center">
+        <div class="container text-center">
+            <div class="row">
+                <div class="col-12">
+                    <div class="cta-content bg-img background-overlay text-center" style="background-image: url({{ discount.image.url }});">
+                        <div class="h-100 d-flex align-items-center justify-content-end">
+                            <div class="cta--text">
+                                <h6 style="text-shadow: 2px 2px 6px blue;">-{{ discount.value }}%</h6>
+                                <h3 style="color:white;text-shadow: 2px 2px 8px blue;">{{ discount.name }}</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="top_catagory_area py-3 clearfix">
+        <div class="container">
+            <div class="row justify-content-center">
+                {% for product in discount.get_top_products %}
+                <div class="col-12 col-sm-6 col-md-4">
+                    <a href="{{ product.get_absolute_url }}"><div class="single_catagory_area d-flex align-items-center justify-content-center bg-img"
+                         style="background-image: url({{ product.thumbnail.url}});">
+
+                    </div></a>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+{% endfor %}
+{% endif %}

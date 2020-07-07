@@ -80,7 +80,6 @@ class Order(models.Model):
     ref_code = models.CharField(max_length=20, editable=False)
     is_ordered = models.BooleanField(default=False)
     items = models.ManyToManyField(OrderItem)
-    # payment_details = models.ForeignKey(Payment, null=True)
     date_ordered = models.DateTimeField(default=timezone.now)
     session_key = models.ForeignKey(Session, on_delete=models.CASCADE, null=True, editable=False)
     access_code = models.SmallIntegerField(null=True, blank=False, editable=False)
@@ -136,26 +135,9 @@ class Order(models.Model):
         cart_total = sum([(item.product.discounted_price if item.product.discounted_price else item.product.price)
                           * item.amount for item in self.items.all()])
 
-        cart_total = cart_total - self.get_promo_code_value() + self.get_shipment_cost()
+        cart_total = round(cart_total - self.get_promo_code_value() + self.get_shipment_cost(), 2)
 
         return cart_total
-
-    # def get_cart_total(self):
-    #     cart_total = sum([(item.product.discounted_price if item.product.discounted_price else item.product.price)
-    #                       * item.amount for item in self.items.all()])
-    #     try:
-    #         shipment_cost = Shipment.objects.values_list('type').get(order=self)
-    #     except Shipment.DoesNotExist:
-    #         shipment_cost = None
-    #     if shipment_cost:
-    #         cart_total = cart_total + shipment_cost.cost
-    #     if self.promo_code:
-    #         if self.promo_code.type == PromoCode.VALUE:
-    #             new_value = Decimal(cart_total.amount) - Decimal(self.promo_code.value)
-    #         elif self.promo_code.type == PromoCode.PERCENTAGE:
-    #             new_value = Decimal(cart_total.amount * Decimal((100 - self.promo_code.value) / 100))
-    #         cart_total = Money(new_value, str(cart_total.currency))
-    #     return cart_total
 
     def get_cart_total_str(self):
         return str(self.get_cart_total().amount)

@@ -10,7 +10,6 @@ from django.shortcuts import reverse
 from django.utils.text import slugify
 from .validators import ProductIDsValidator
 from django.db.models import signals
-from .signals import discount_post_save, discount_pre_save
 from decimal import *
 from django.utils import timezone
 
@@ -324,10 +323,15 @@ class Discount(models.Model):
         choices=STATUS,
         default=INACTIVE,
     )
+    image = models.ImageField(upload_to='pic_folder/', default='pic_folder/None/no-img.jpg')
 
     def update_status(self, status):
         self.status = status
         self.save(update_fields=['status'])
+
+    def get_top_products(self):
+        ids = DiscountLine.objects.filter(discount=self).values_list('product', flat=True)
+        return Product.objects.filter(id__in=ids)[:3]
 
     def clean(self):
         super().clean()
@@ -351,10 +355,6 @@ class Discount(models.Model):
 
     def __str__(self):
         return '{}, {}'.format(self.id, self.name)
-
-
-signals.pre_save.connect(discount_pre_save, sender=Discount)
-signals.post_save.connect(discount_post_save, sender=Discount)
 
 
 class DiscountProductList(models.Model):
@@ -405,3 +405,13 @@ class DiscountCustom(models.Model):
     def get_products_id(self):
         ids = [int(x) for x in self.get_product_list()]
         return ids
+
+
+class LastViewedProducts(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=False)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, null=False)
+
+
+from .signals import discount_post_save, discount_pre_save
+signals.pre_save.connect(discount_pre_save, sender=Discount)
+signals.post_save.connect(discount_post_save, sender=Discount)

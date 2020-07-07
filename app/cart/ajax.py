@@ -132,6 +132,7 @@ def delete_item_from_cart(request):
 def calculate_item_in_cart(request):
     item_id = request.POST.get('item_id', None)
     new_cart_value = request.POST.get('cart_value', None)
+    print(f'DJANGOTEST: print {item_id}, {new_cart_value}')
 
     # create empty dictionary for JsonResponse data
     data = {}
@@ -190,7 +191,9 @@ def get_access(request):
     # if all parameters are correct then check order, instead return emtpy data dict
     if (access_code is None or
         purchase_key is None or
-        ref_code is None) is False:
+        ref_code is None):
+        data['message'] = 'Access denied. Wrong access code.'
+    else:
         try:
             order = Order.objects.get(ref_code=ref_code, id=oid, access_code=access_code)
         except Order.DoesNotExist:
@@ -207,7 +210,6 @@ def get_access(request):
                 new_order_access = OrderAccess(order=order, session_key=session)
                 new_order_access.save()
                 data['success'] = True
-                data['message'] = 'Access denied. Wrong access code.'
     return JsonResponse(data)
 
 

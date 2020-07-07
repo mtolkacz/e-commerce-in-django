@@ -17,7 +17,7 @@ from cart import functions as crt
 from cart.models import OrderItem
 from .serializers import ProductSerializer, BrandSerializer, \
     DepartmentSerializer, SubdepartmentSerializer, CategorySerializer
-from .models import Product, ProductImage, Subdepartment, Department, Category, Brand
+from .models import Product, ProductImage, Subdepartment, Department, Category, Brand, LastViewedProducts
 from gallop import functions as glp
 
 logger = logging.getLogger(__name__)
@@ -220,6 +220,15 @@ class ProductDetail(ListAPIView):
             pass
         return result
 
+    def add_product_to_viewed(self, user):
+        try:
+            already_reviewed = LastViewedProducts.objects.get(product=self.product, user=user)
+        except LastViewedProducts.DoesNotExist:
+            already_reviewed = None
+        if not already_reviewed:
+            new_review = LastViewedProducts(product=self.product, user=user)
+            new_review.save()
+
     def get(self, request, *args, **kwargs):
         if not self.get_product_hierarchy():
             raise Http404
@@ -230,6 +239,7 @@ class ProductDetail(ListAPIView):
             if request.user.is_authenticated:
                 user = glp.get_user_object(request)
                 favorite = self.product.check_if_favorite(user)
+                self.add_product_to_viewed(user)
 
             exist_in_cart = self.check_if_exist_in_cart(request, self.product)
             context = {

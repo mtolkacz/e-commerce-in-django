@@ -1,0 +1,20 @@
+{% load static %}
+{% if last_viewed_products %}
+<div class="container py-3">
+                <div class="col-12">
+                    <div class="section-heading text-center">
+                        <h2>    Last viewed products</h2>
+                    </div>
+                </div>
+<table class="table" style="text-align:center">
+  <tbody>
+    <tr>
+        {% for item in last_viewed_products %}
+      <td><a href="{{ item.product.get_absolute_url }}"><img src="{{ item.product.thumbnail.url }}" style="width:250px" alt="{{ item.product.name }}">
+          <br>{{ item.product.name }}</a></td>
+        {% endfor %}
+    </tr>
+  </tbody>
+</table>
+</div>
+{% endif %}

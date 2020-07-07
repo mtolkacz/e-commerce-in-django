@@ -297,6 +297,9 @@ function calculate_cart(cart_value, item_id) {
             'cart_value': cart_value,
             'item_id': item_id
         },
+        headers: {
+                    'X-CSRFTOKEN': getCookie('csrftoken')
+        },
         dataType: 'json',
         success: function(data) {
             if (data.success) {
@@ -413,13 +416,12 @@ function add_to_cart(item_id) {
 }
 
 function delete_from_cart(item_id) {
-    var CSRF_TOKEN = getCookie('csrftoken');
     add_loader();
     $.ajax({
         url: '/purchase/cart/delete_item/',
         type: 'POST',
         headers: {
-            'X-CSRFTOKEN': CSRF_TOKEN
+                    'X-CSRFTOKEN': getCookie('csrftoken')
         },
         data: {
             'item_id': item_id
@@ -491,6 +493,7 @@ function delete_from_cart(item_id) {
     });
 }
 
+
 function delete_cart() {
     var q = confirm("Do you want to delete shipping cart?");
     add_loader();
@@ -499,6 +502,9 @@ function delete_cart() {
             url: '/purchase/delete/',
             type: 'POST',
             dataType: 'json',
+            headers: {
+                    'X-CSRFTOKEN': getCookie('csrftoken')
+            },
             success: function(data) {
                 if (data.success) {
                     console.log("Success");

@@ -43,6 +43,7 @@
                 headers: {
                             'X-CSRFTOKEN': CSRF_TOKEN
                         },
+                type: 'POST',
                 data: {
                     'ref_code': ref_code,
                     'details': details
@@ -87,8 +88,15 @@
                     var payment_dict = JSON.stringify(details)
                     send_payment(payment_dict);
                 });
-            }
-
+            },
+            onError: function (err) {
+                alert("There's an error appeard during payment");
+                $("div.loading_contener").remove();
+              },
+            onCancel: function (err) {
+                alert('Payment canceled');
+                $("div.loading_contener").remove();
+              }
 
         }).render('#paypal-button-container');
     </script>

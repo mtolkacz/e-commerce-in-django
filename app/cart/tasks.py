@@ -2,8 +2,11 @@ import logging
 
 from django.conf import settings
 from django.db import IntegrityError
+from celery import shared_task
+
 from gallop.celery import app
 from cart.models import Shipment
+from cart.functions import get_saved_carts, saved_carts_email
 
 logger = logging.getLogger(__name__)
 
@@ -35,4 +38,12 @@ def save_payment_object(payment, retries=0):
                 shipment.save(update_fields=['status'], )
             except IntegrityError as ex:
                 logger.error('Problem during saving shipment after payment: {}'.format(shipment.id))
+
+
+@shared_task(bind=True, name='cart_reminder', max_retries=3, soft_time_limit=20)
+def cart_reminder(self):
+    orders = get_saved_carts()
+    if orders:
+        for order in orders:
+            saved_carts_email(order)
 

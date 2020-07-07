@@ -1,0 +1,13 @@
+Hi {{ user.first_name }},
+You have a products in a cart:
+{% if order %}
+<table>
+{% for item in order.get_cart_items %}
+    <tr>
+        <td>{{ item.product.name }}</td>
+    </tr>
+{% endfor %}
+</table>
+<br>
+{% endif %}
+<a href="https://localhost:8001{% url 'checkout' %}">Go to checkout</a>

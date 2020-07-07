@@ -3,131 +3,14 @@
 {% block content %}
 {% load static %}
 
-    <section class="welcome_area bg-img background-overlay" style="background-image: url({% static 'img/bg-img/bg-1.jpg' %});">
-        <div class="container h-100">
-            <div class="row h-100 align-items-center">
-                <div class="col-12">
-                    <div class="hero-content">
-                        <h6>asoss</h6>
-                        <h2>New Collection</h2>
-                        <a href="#"><button class="btn-primary btn">View collection</button></a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+    {% include "index/discounts.html" %}
 
-    <div class="top_catagory_area section-padding-80 clearfix">
-        <div class="container">
-            <div class="row justify-content-center">
-                <!-- Single Catagory -->
-                <div class="col-12 col-sm-6 col-md-4">
-                    <div class="single_catagory_area d-flex align-items-center justify-content-center bg-img" style="background-image: url({% static 'img/bg-img/bg-2.jpg' %});">
-                        <div class="catagory-content">
-                            <a href="#">Clothing</a>
-                        </div>
-                    </div>
-                </div>
-                <!-- Single Catagory -->
-                <div class="col-12 col-sm-6 col-md-4">
-                    <div class="single_catagory_area d-flex align-items-center justify-content-center bg-img" style="background-image: url({% static 'img/bg-img/bg-3.jpg' %});">
-                        <div class="catagory-content">
-                            <a href="#">Shoes</a>
-                        </div>
-                    </div>
-                </div>
-                <!-- Single Catagory -->
-                <div class="col-12 col-sm-6 col-md-4">
-                    <div class="single_catagory_area d-flex align-items-center justify-content-center bg-img" style="background-image: url({% static 'img/bg-img/bg-4.jpg' %});">
-                        <div class="catagory-content">
-                            <a href="#">Accessories</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+    {% include "index/popular_products.html" %}
 
-    <div class="cta-area">
-        <div class="container">
-            <div class="row">
-                <div class="col-12">
-                    <div class="cta-content bg-img background-overlay" style="background-image: url({% static 'img/bg-img/bg-5.jpg' %});">
-                        <div class="h-100 d-flex align-items-center justify-content-end">
-                            <div class="cta--text">
-                                <h6>-60%</h6>
-                                <h2>Global Sale</h2>
-                                <button class="btn-primary btn">Buy Now</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+    {% include "index/last_viewed_products.html" %}
 
+    {% include "index/brands.html" %}
 
-    <section class="new_arrivals_area section-padding-80 clearfix">
-        <div class="container">
-            <div class="row">
-                <div class="col-12">
-                    <div class="section-heading text-center">
-                        <h2>Popular Products</h2>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="container_fluid px-5">
-            <div class="row">
-                <div class="col-12" style="text-align:center;">
-                    <div class="popular-products-slides owl-carousel">
-                        {% for product in products %}
-                        <!-- Single Product -->
-                        <div class="single-product-wrapper">
-                            <!-- Product Image -->
-                            <div class="product-img">
-                                <a href="{{ product.get_absolute_url }}">
-                                    <img src="{{ product.thumbnail.url }}" alt="">
-                                </a>
-                                <!-- Hover Thumb -->
-                                <img class="hover-img" src="{{ product.get_first_image_url }}" alt="">
-                                <!-- Favourite -->
-                                {% if user.authenticated %}
-                                <div class="product-favourite">
-                                    <a href="#" class="favme fa fa-heart"></a>
-                                </div>
-                                {% endif %}
-                            </div> 
-                            <div class="product-description">
-                                <span>{{ product.subdepartment.name }}</span>
-                                <a href="{{ product.get_absolute_url }}">
-                                    <h6 style="height:55px;display:block;">{{ product.name }}</h6>
-                                </a>
-                                <p class="product-price">
-                                            {% if product.discounted_price %}<span class="old-price">{{ product.price }}</span>{% endif %}
-                                            {% if product.discounted_price %}<text style="font-size:20px;font-weight: 700;color: #dc0345;">{{ product.discounted_price }}</text>{% else %}{{ product.price }}{% endif %}</p>
-                                {% if product.stock > 0 %} <button onclick="add_to_cart({{ product.id }}); return false;" class="btn-primary btn-sm"><i class="fas fa-shopping-cart"></i> Add to cart</button>
-                                {% else %}
-                                <button class="btn btn-danger btn-sm" style="cursor:default">Not available</button>
-                                 {% endif %}
-                            </div>
-                        </div>
-                        {% endfor %}
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-{% if brands %}
-    <div class="brands-area d-flex align-items-center justify-content-between">
-        {% for brand in brands %}
-        <div  class="single-brands-logo">
-            <img src="{{ brand.image1.url }}" style="height:50px;-webkit-filter: grayscale(100%); filter: grayscale(100%);" alt="{{ brand.name }}">
-        </div>
-        {% endfor %}
-    </div>
-{% endif %}
+    {% include "index/blog.html" %}
 
 {% endblock %}
-// set_price_parameters

@@ -4,9 +4,9 @@ from .models import Post, Comment
 
 @admin.register(Comment)
 class CommentAdmin(admin.ModelAdmin):
-    list_display = ('name', 'body', 'post', 'created_on', 'active')
+    list_display = ('user', 'body', 'post', 'created_on', 'active')
     list_filter = ('active', 'created_on')
-    search_fields = ('name', 'email', 'body')
+    search_fields = ('body', )
     actions = ['approve_comments']
 
     def approve_comments(self, request, queryset):
