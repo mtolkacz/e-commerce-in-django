@@ -1,6 +1,7 @@
+from rest_framework.renderers import JSONRenderer
+
 from products.models import Product
 from products.serializers import ProductSerializer
-from rest_framework.renderers import JSONRenderer
 
 # This file is to run and test function from shell
 # from gallop.shell import *

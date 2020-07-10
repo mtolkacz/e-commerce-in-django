@@ -1,8 +1,9 @@
-from celery import shared_task
+import random
+
 from gallop.celery import app
+
 from .discount import DiscountManager
 from .models import Discount, Product
-import random
 
 
 @app.task(bind=True, ignore_result=False)
@@ -34,8 +35,3 @@ def generate_dummy_product_stock():
     for product in products:
         product.stock = random.randint(1, 150)
         product.save(update_fields=["stock"])
-
-
-
-
-

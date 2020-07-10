@@ -11,7 +11,6 @@ services:
       - ./app/:/usr/src/app/
     ports:
       - 8001:8001
-      - 587:587
     env_file: ./env/dev/.env
     depends_on:
       - db
@@ -19,15 +18,11 @@ services:
       - redis
   redis:
     image: redis:latest
-    ports:
-      - 6379:6379
     environment:
       - TZ=Europe/Warsaw
   flower:
     image: mher/flower
     command: ["flower", "--broker=amqp://rabbitmq", "--port=8888"]
-    ports:
-      - 8888:8888
     depends_on:
       - celery
   db:
@@ -35,7 +30,7 @@ services:
     image: postgres
     volumes:
       - postgres_data:/var/lib/postgresql/data/
-    env_file: ./env/dev/.envdb
+    env_file: ./env/dev/.env
   pgadmin:
     container_name: gallop_pgadmin
     image: dpage/pgadmin4
@@ -79,9 +74,6 @@ services:
     image: blacktop/elasticsearch:7.7
     environment:
       - TZ="Europe/Warsaw"
-    ports:
-      - "9200:9200"
-      - "9300:9300"
     volumes:
           - esdata:/usr/share/elasticsearch/data
 volumes:

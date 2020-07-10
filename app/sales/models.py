@@ -1,8 +1,9 @@
 from django.db import models
 from django.utils import timezone
 from djmoney.models.fields import MoneyField
-from products.models import Product
+
 from cart.models import PromoCode
+from products.models import Product
 
 
 class Sale(models.Model):

@@ -1,22 +1,22 @@
 import random
 from decimal import Decimal
 
-from django.db import models, transaction
-from django.conf import settings
-from django.urls import reverse
-from django.utils.encoding import force_bytes
-from django.utils.http import urlsafe_base64_encode
-from djmoney.money import Money
-from products.models import Product, Category
 from django.contrib.auth import get_user_model
 from django.contrib.sessions.models import Session
-from djmoney.models.fields import MoneyField
-from accounts.validators import ZipCodeValidator
-from accounts.models import Voivodeship, Country
-from django.utils import timezone
-
-from .signals import shipment_pre_save, order_pre_delete
+from django.db import models
 from django.db.models import signals
+from django.urls import reverse
+from django.utils import timezone
+from django.utils.encoding import force_bytes
+from django.utils.http import urlsafe_base64_encode
+from djmoney.models.fields import MoneyField
+
+from accounts.models import Country, Voivodeship
+from accounts.validators import ZipCodeValidator
+from djmoney.money import Money
+from products.models import Product
+
+from .signals import order_pre_delete, shipment_pre_save
 
 User = get_user_model()
 MAX_ITEMS_IN_CART = 30

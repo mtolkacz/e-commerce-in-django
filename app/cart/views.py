@@ -1,16 +1,16 @@
-from django.shortcuts import render, redirect
+from django.contrib import messages
 from django.contrib.auth import login as auth_login
+from django.shortcuts import redirect, render
 from django.utils.encoding import force_text
 from django.utils.http import urlsafe_base64_decode
-from django.contrib import messages
+
+from accounts.functions import send_activation_link
+from accounts.tokens import account_activation_token
 
 from . import functions as crt
-from .forms import ShipmentTypeForm
+from .checkout import Checkout
 from .models import *
 from .models import Order
-from accounts.tokens import account_activation_token
-from accounts.functions import send_activation_link
-from .checkout import Checkout
 from .summary import Summary
 
 User = get_user_model()
@@ -38,7 +38,6 @@ def checkout(request):
             checkout.check_shipment_form()
 
         a = checkout.check_delivery_form()
-        print(f"DJANGOTEST: {a}")
 
         if not checkout.user:
             if not checkout.check_billing_form():
@@ -147,5 +146,3 @@ def purchase_activate(request, uidb64, token, oidb64):
     else:
         messages.error(request, 'Invalid activation link!')
         return redirect('login')
-
-

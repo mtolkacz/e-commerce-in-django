@@ -1,7 +1,7 @@
 from django.urls import path
-from . import views
-from .api_views import *
+
 from . import ajax
+from .api_views import *
 
 urlpatterns = [
     path('api/<str:department>/',

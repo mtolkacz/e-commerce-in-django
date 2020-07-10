@@ -1,7 +1,8 @@
-from django.test import TestCase, SimpleTestCase
-from products.models import Product
-from . import tasks
 from time import sleep
+
+from django.test import SimpleTestCase
+
+from . import tasks
 
 
 class MailTestCase(SimpleTestCase):
@@ -29,5 +30,3 @@ class CeleryTestCase(SimpleTestCase):
         result_output = task.get()
         print(result_output)
         #self.assertEqual(len(result_output), 1)
-
-

@@ -1,8 +1,8 @@
 from django.contrib import admin
-from django.db.models import OneToOneField, ForeignKey, ManyToOneRel
+from django.db.models import ForeignKey, ManyToOneRel, OneToOneField
 
-from .models import (Shipment, ShipmentType, Order,
-                     OrderItem, Payment, PromoCodeUsage, PromoCode)
+from .models import (Order, OrderItem, Payment, PromoCode, PromoCodeUsage,
+                     Shipment, ShipmentType)
 
 MySpecialAdmin = lambda model: type('SubClass'+model.__name__, (admin.ModelAdmin,), {
     'list_display': [x.name for x in model._meta.fields],

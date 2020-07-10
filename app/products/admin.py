@@ -1,7 +1,9 @@
-from django.contrib import admin
-from .models import Product, Category, Subdepartment, Department, \
-    Brand, DiscountType, DiscountPriorityType, Discount, DiscountCustom, ProductRating
 from django.apps import apps
+from django.contrib import admin
+
+from .models import (Brand, Category, Department, Discount, DiscountCustom,
+                     DiscountPriorityType, DiscountType, Product,
+                     ProductRating, Subdepartment)
 
 
 class ProductAdmin(admin.ModelAdmin):
@@ -143,5 +145,3 @@ admin.site.register(Product, ProductAdmin)
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(Subdepartment, SubdepartmentAdmin)
 admin.site.register(Department)
-
-

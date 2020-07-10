@@ -1,7 +1,8 @@
 from django import forms
-from accounts.models import User, Country, Voivodeship
-from cart.models import Shipment,ShipmentType
 from django.contrib.auth.forms import UserCreationForm
+
+from accounts.models import Country, User, Voivodeship
+from cart.models import Shipment, ShipmentType
 
 
 class BillingForm(UserCreationForm):

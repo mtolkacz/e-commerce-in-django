@@ -1,12 +1,12 @@
 import logging
 
+from celery import shared_task
 from django.conf import settings
 from django.db import IntegrityError
-from celery import shared_task
 
-from gallop.celery import app
-from cart.models import Shipment
 from cart.functions import get_saved_carts, saved_carts_email
+from cart.models import Shipment
+from gallop.celery import app
 
 logger = logging.getLogger(__name__)
 
@@ -15,9 +15,7 @@ logger = logging.getLogger(__name__)
 def save_payment_object(payment, retries=0):
     try:
         payment.save()
-        print("DJANGOTEST: save")
         order_id = payment.order.id
-        print("DJANGOTEST: save payment order_id {}".format(order_id))
     except IntegrityError as ex:
         if retries < settings.DB_INTEGRITY_RETRIES:
             if payment:
@@ -46,4 +44,3 @@ def cart_reminder(self):
     if orders:
         for order in orders:
             saved_carts_email(order)
-

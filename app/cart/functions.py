@@ -1,20 +1,20 @@
-import string
-import random
-from datetime import date
 import datetime
+import random
+import string
+from datetime import date
 
 from django.contrib.sessions.models import Session
 from django.contrib.sites.shortcuts import get_current_site
 from django.shortcuts import get_object_or_404
 from django.template.loader import render_to_string
-from django.urls import reverse
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
-from django.conf import settings
-from .models import OrderItem, Order, Shipment
-from .views import User
+
 from accounts import tasks
 from accounts.tasks import send_email
+
+from .models import Order, OrderItem, Shipment
+from .views import User
 
 
 def save_order_item(order):

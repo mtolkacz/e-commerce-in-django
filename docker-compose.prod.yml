@@ -15,11 +15,6 @@ services:
     env_file: ./env/prod/.env
     depends_on:
       - db
-  db:
-    image: postgres:11.5-alpine
-    volumes:
-      - postgres_data:/var/lib/postgresql/data/
-    env_file: ./env/prod/.env.db
   nginx:
     build: ./nginx
     volumes:
@@ -29,18 +24,68 @@ services:
       - ./nginx/localhost.key:/etc/nginx/localhost.key
       - ./nginx/localhost.conf:/etc/nginx/localhost.conf
       - ./nginx/dhparam.pem:/etc/nginx/dhparam.pem
-      #- ./data/certbot/conf:/etc/letsencrypt
-      #- ./data/certbot/www:/var/www/certbot
     ports:
       - "80:80"
-      - "443:443"
     depends_on:
       - web
-  elasticsearch:
-    image: launcher.gcr.io/google/elasticsearch2
+  redis:
+    image: redis:latest
+    environment:
+      - TZ=Europe/Warsaw
+  flower:
+    image: mher/flower
+    command: ["flower", "--broker=amqp://rabbitmq", "--port=8888"]
+    depends_on:
+      - celery
+  db:
+    container_name: gallop_db
+    image: postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    env_file: ./env/dev/.env
+  pgadmin:
+    container_name: gallop_pgadmin
+    image: dpage/pgadmin4
+    depends_on:
+      - db
+    env_file: ./env/dev/.pgadmin
+    volumes:
+      - pgadmin:/root/.pgadmin
     ports:
-      - "9200:9200"
-      - "9300:9300"
+      - "5050:8000"
+  celery:
+    build: ./app
+    command: celery -A gallop worker -l debug
+    links:
+      - redis
+    env_file: ./env/dev/.env
+    volumes:
+      - ./app/:/usr/src/app/
+    depends_on:
+      - db
+      - redis
+      - rabbitmq
+  celery-beat:
+    build: ./app
+    command: celery -A gallop beat -l debug --pidfile=
+    volumes:
+      - ./app/:/usr/src/app/
+    links:
+      - redis
+    env_file: ./env/dev/.env
+    depends_on:
+      - db
+      - redis
+      - rabbitmq
+  rabbitmq:
+    image: rabbitmq:latest
+    environment:
+      - TZ=Europe/Warsaw
+  elasticsearch:
+    container_name: gallop_elasticsearch
+    image: blacktop/elasticsearch:7.7
+    environment:
+      - TZ="Europe/Warsaw"
     volumes:
           - esdata:/usr/share/elasticsearch/data
 volumes:

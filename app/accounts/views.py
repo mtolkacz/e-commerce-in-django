@@ -1,21 +1,22 @@
+from django.contrib.auth import authenticate
+from django.contrib.auth import login as auth_login
+from django.contrib.auth import logout as auth_logout
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import FieldDoesNotExist
 from django.http import HttpResponseRedirect
-from django.shortcuts import render, redirect
-from django.utils.http import urlsafe_base64_decode
+from django.shortcuts import redirect, render
 from django.utils.encoding import force_text
-from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
-from django.contrib import messages
+from django.utils.http import urlsafe_base64_decode
 from django.views.decorators.http import require_http_methods
 
-from .forms import LoginForm, RegisterForm
-from . import functions as act
-from .tokens import account_activation_token
-from .models import User
 from accounts.forms import ProfileForm
-from cart.models import Order
 from gallop import functions as glp
-from products.models import Product, Favorites, ProductRating
+from products.models import Favorites, Product, ProductRating
+
+from . import functions as act
+from .forms import LoginForm, RegisterForm
+from .models import User
+from .tokens import account_activation_token
 
 
 @require_http_methods(["GET", "POST"])
@@ -137,15 +138,11 @@ def update_obj_from_form(obj, form):
 @login_required
 def profile(request):
     user = request.user
-    print(f'DJANGOTEST: test')
     if request.method == 'POST':
         form = ProfileForm(request.POST, request.FILES, instance=user)
         if form.is_valid():
-            print(f'DJANGOTEST: fgfgfg')
             messages.success(request, 'Data saved') if form.save() else None
             return HttpResponseRedirect(request.path)
-        else:
-            print(f'DJANGOTEST: ff')
     else:
         form = ProfileForm(instance=user)
 

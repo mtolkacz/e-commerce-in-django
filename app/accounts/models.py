@@ -1,11 +1,12 @@
-from django.db import models
+from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from django.contrib.auth.models import PermissionsMixin
-from django.contrib.auth.base_user import BaseUserManager, AbstractBaseUser
 from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.core.mail import send_mail
+from django.db import models
 from django.utils import timezone
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
+
 from .validators import ZipCodeValidator
 
 
@@ -148,6 +149,3 @@ class User(AbstractBaseUser, PermissionsMixin):
                         self.country is None or
                         self.zip_code is None or
                         self.zip_code == '') else True
-
-
-

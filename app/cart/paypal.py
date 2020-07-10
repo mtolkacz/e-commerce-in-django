@@ -1,15 +1,16 @@
-from decimal import Decimal
 import logging
+import sys
+from decimal import Decimal
+
+from dateutil import parser
+from django.conf import settings
 from django.db import IntegrityError
+
 from moneyed import Money
 from paypalcheckoutsdk.core import PayPalHttpClient, SandboxEnvironment
 from paypalcheckoutsdk.orders import OrdersGetRequest
-import sys
-from django.conf import settings
-from dateutil import parser
-from dateutil.tz import tzutc
-from .models import Payment, Shipment
-from .tasks import save_payment_object
+
+from .models import Payment
 
 logger = logging.getLogger(__name__)
 
@@ -90,15 +91,8 @@ class PaypalManager(PayPalClient):
         except KeyError:
             order_id = None
         if order_id:
-            print("DJANGOTEST: {}".format(order_id))
             request = OrdersGetRequest(order_id)
-            print("DJANGOTEST: request {}".format(request))
-            print("DJANGOTEST: client {}".format(self.client))
             response = self.client.execute(request)
-            print('DJANGOTEST: Status Code: {}'.format(response.status_code))
-            print('DJANGOTEST: Status: {}'.format(response.result.status))
-            print('DJANGOTEST: Order ID: {}'.format(response.result.id))
-            print('DJANGOTEST: Intent: {}'.format(response.result.intent))
             return response.result.id
         else:
             return None
@@ -179,4 +173,3 @@ class PaypalManager(PayPalClient):
            logger.error('Problem during saving payment: {}'.format(paypal_payment_id))
            payment = None
         return payment if payment else False
-

@@ -1,12 +1,6 @@
-from django_elasticsearch_dsl import (
-    Document,
-    fields,
-    Index,
-)
+from django_elasticsearch_dsl import Document, Index, fields
 
-from .models import (
-    Product
-)
+from .models import Product
 
 product_index = Index('products')
 

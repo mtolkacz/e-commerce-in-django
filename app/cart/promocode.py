@@ -1,9 +1,11 @@
 from decimal import Decimal
 
-from .models import PromoCodeUsage, PromoCode
 from django.contrib.auth import get_user_model
-from djmoney.money import Money
+
 from gallop.functions import get_user_object
+
+from .models import PromoCode, PromoCodeUsage
+
 User = get_user_model()
 
 

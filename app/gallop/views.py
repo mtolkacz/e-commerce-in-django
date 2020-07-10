@@ -1,14 +1,14 @@
-from products.models import Product, ProductImage, Department, Category
+import logging
 
-from .database import get_popular_products, get_popular_brands
-from .error_views import *
 from django.contrib.auth import get_user_model
 from django.shortcuts import render_to_response
-import logging
-from products.documents import ProductDocument
 
 from blog.models import Post
+from products.documents import ProductDocument
 from products.models import Discount, LastViewedProducts
+
+from .database import get_popular_brands, get_popular_products
+from .error_views import *
 
 logger = logging.getLogger(__name__)
 User = get_user_model()

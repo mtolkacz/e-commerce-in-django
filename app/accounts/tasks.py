@@ -1,11 +1,10 @@
 from __future__ import absolute_import, unicode_literals
-from gallop.celery import app
-from django.core.mail import send_mail
-from django.conf import settings
 
 from celery import shared_task
+from django.conf import settings
+from django.core.mail import send_mail
 
-from .email import Email
+from gallop.celery import app
 from products.models import Product
 
 

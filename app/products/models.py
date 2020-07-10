@@ -1,17 +1,21 @@
 from datetime import datetime
-from django.core.exceptions import ValidationError
-from django.db import models, transaction, IntegrityError
-from djmoney.models.fields import MoneyField
-from django.utils.html import mark_safe
-from django.core.validators import MaxValueValidator, MinValueValidator
-from accounts.models import User
-from ckeditor.fields import RichTextField
-from django.shortcuts import reverse
-from django.utils.text import slugify
-from .validators import ProductIDsValidator
-from django.db.models import signals
 from decimal import *
+
+from ckeditor.fields import RichTextField
+from django.core.exceptions import ValidationError
+from django.core.validators import MaxValueValidator, MinValueValidator
+from django.db import models
+from django.db.models import signals
+from django.shortcuts import reverse
 from django.utils import timezone
+from django.utils.html import mark_safe
+from django.utils.text import slugify
+from djmoney.models.fields import MoneyField
+
+from accounts.models import User
+
+from .signals import discount_post_save, discount_pre_save
+from .validators import ProductIDsValidator
 
 
 class Department(models.Model):
@@ -340,18 +344,13 @@ class Discount(models.Model):
         try:
             already_exists = Discount.objects.get(id=self.id)
         except Discount.DoesNotExist:
-            print('DJANGOTEST: Exception - {}'.format(self.name))
-            pass
-        else:
-            if already_exists:
-                raise ValidationError('Cannot modify already created discount')
+            already_exists = None
+        if already_exists:
+            raise ValidationError('Cannot modify already created discount')
         if self.enddate <= self.startdate:
             raise ValidationError('End date must be greater than start date')
         if self.enddate <= timezone.now():
             raise ValidationError('End date must be greater than current datetime')
-
-    def __unicode__(self):
-        return '%s' % self.name
 
     def __str__(self):
         return '{}, {}'.format(self.id, self.name)
@@ -412,6 +411,5 @@ class LastViewedProducts(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, null=False)
 
 
-from .signals import discount_post_save, discount_pre_save
 signals.pre_save.connect(discount_pre_save, sender=Discount)
 signals.post_save.connect(discount_post_save, sender=Discount)

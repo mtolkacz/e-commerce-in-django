@@ -1,6 +1,6 @@
-from .discount import DiscountManager
-from django.core.exceptions import ValidationError
 import logging
+
+from .discount import DiscountManager
 from .tasks import finish_discount, process_discount
 
 logger = logging.getLevelName(__name__)
@@ -21,6 +21,3 @@ def discount_post_save(sender, instance, signal, *args, **kwargs):
 
 def discount_pre_save(sender, instance, signal, *args, **kwargs):
     pass
-
-
-

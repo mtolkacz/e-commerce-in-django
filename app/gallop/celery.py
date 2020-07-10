@@ -1,10 +1,9 @@
 from __future__ import absolute_import, unicode_literals
 
 import os
-from celery import Celery
-from celery.schedules import crontab
-from celery import shared_task
 
+from celery import Celery, shared_task
+from celery.schedules import crontab
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'gallop.settings')
 
@@ -41,5 +40,3 @@ def debug_task(self):
 def add(self, x, y):
     print("Test add {}".format(x+y))
     return x + y
-
-

@@ -1,14 +1,16 @@
-from collections import defaultdict
-from random import random
-from django.db import models
-from django.db.models import Count
-from django.apps import apps
-from django.utils import timezone
 import datetime as dt
 import random
 from calendar import monthrange
-from products.models import Product, Brand
+from collections import defaultdict
+from random import random
+
+from django.apps import apps
+from django.db import models
+from django.db.models import Count
+from django.utils import timezone
+
 from cart.models import PromoCode
+from products.models import Brand, Product
 from sales.models import Sale
 
 

@@ -1,6 +1,7 @@
 from django.utils import timezone
 
-from .models import DiscountLine, Discount, Product, DiscountProductList, DiscountCustom
+from .models import (Discount, DiscountCustom, DiscountLine,
+                     DiscountProductList, Product)
 
 
 class DiscountManager:

@@ -3,11 +3,11 @@ from django.contrib.sessions.models import Session
 from django.utils.encoding import force_text
 from django.utils.http import urlsafe_base64_decode
 
-from accounts.models import User
-from .models import Order, OrderAccess, Shipment, Payment
 from gallop import settings
 from gallop.functions import get_user_object
+
 from . import functions as crt
+from .models import Order, OrderAccess, Payment, Shipment
 
 
 class Summary:

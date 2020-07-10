@@ -1,12 +1,7 @@
-from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
 
-from cart import functions as crt
-from cart.models import PromoCodeUsage
-
-from gallop import functions as glp
 from products.models import Favorites, Product
 
 

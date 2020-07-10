@@ -28,10 +28,8 @@ def update_user_from_form(form, user, request=False):
             user.address_1 = form.cleaned_data['address_1']
             fields_to_update.append('address_1')
         if user.address_2 != form.cleaned_data['address_2']:
-            print(f'DJANGOTEST: 1 {user.address_2}, {form.cleaned_data["address_2"]}')
             user.address_2 = form.cleaned_data['address_2']
             fields_to_update.append('address_2')
-            print(f'DJANGOTEST: {fields_to_update}')
         if user.country != form.cleaned_data['country']:
             user.country = form.cleaned_data['country']
             fields_to_update.append('country')
@@ -48,13 +46,9 @@ def update_user_from_form(form, user, request=False):
             user.picture = request.FILES['picture']
             fields_to_update.append('picture')
 
-        print(f'DJANGOTEST: {len(fields_to_update)}')
-
         if len(fields_to_update):
             user.save(update_fields=fields_to_update)
             return True
-        else:
-            False
 
 
 def create_user_from_form(form):

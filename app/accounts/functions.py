@@ -16,7 +16,6 @@ def send_activation_link(request, user, **kwargs):
     # # Create Email object, prepare mail content and generate user token
     # # Email class includes custom predefined SMTP settings
 
-    print('DJANGOTEST: Username = {}, mail = {}'.format(user.username, user.email))
     # receiver = form.cleaned_data.get('email')
     receiver = user.email
     subject = 'Activate your Gallop account'
@@ -32,7 +31,6 @@ def send_activation_link(request, user, **kwargs):
             # Generate user token
             'oid': urlsafe_base64_encode(force_bytes(kwargs['order'].id)),
         }
-        print('DJANGOTEST: kwargs = {}'.format(kwargs['order'].id))
         message = render_to_string('accounts/purchase_activate.html', context)
     else:
         context = {
@@ -45,7 +43,6 @@ def send_activation_link(request, user, **kwargs):
             'token': account_activation_token.make_token(user)
         }
         message = render_to_string('accounts/activate.html', context)
-    print('DJANGOTEST: next')
     # Celery sending mail
     send_email.apply_async((receiver, subject, message), countdown=0)
     messages.success(request, 'Please confirm your email address to complete the registration.')

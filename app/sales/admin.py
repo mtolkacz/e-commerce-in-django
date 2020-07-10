@@ -1,7 +1,6 @@
 from django.contrib import admin
-from django.db.models import OneToOneField, ForeignKey, ManyToOneRel
 
-from .models import (Sale)
+from .models import Sale
 
 
 class SaleAdmin(admin.ModelAdmin):

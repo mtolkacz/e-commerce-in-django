@@ -1,6 +1,7 @@
-from django.conf import settings
 import smtplib
 import ssl
+
+from django.conf import settings
 
 
 class Email:

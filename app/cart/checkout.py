@@ -3,12 +3,13 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.template.loader import render_to_string
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
-from accounts.models import Voivodeship, Country
-from .models import Shipment, Order, ShipmentType
-from .forms import BillingForm, ShipmentForm, ShipmentTypeForm
+
+from accounts.models import Country, Voivodeship
 from accounts.tasks import send_email
-from accounts import functions as glp
 from gallop import functions as glp
+
+from .forms import BillingForm, ShipmentForm, ShipmentTypeForm
+from .models import Order, Shipment
 
 
 class Checkout:
@@ -38,9 +39,7 @@ class Checkout:
     # need to pass form or user key and object
     def create_shipment(self, **kwargs):
         shipment = None
-        print(f"DJANGOTEST: {self.shipmenttype_form.cleaned_data['delivery']}")
         shipment_type = self.shipmenttype_form.cleaned_data['delivery']
-        print(f"DJANGOTEST: {shipment_type}")
         if shipment_type:
             if 'form' in kwargs:
                 source = kwargs['form']
@@ -181,5 +180,3 @@ class Checkout:
             glp.update_user_from_form(self.billing_form, self.user)
         else:
             self.valid_forms = False
-
-

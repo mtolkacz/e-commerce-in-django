@@ -1,8 +1,9 @@
+from crispy_forms.helper import FormHelper
+from crispy_forms.layout import Column, Layout, Row, Submit
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
-from .models import User, Country, Voivodeship
-from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout, Submit, Row, Column
+
+from .models import Country, User, Voivodeship
 
 
 class LoginForm(forms.Form):
@@ -103,5 +104,3 @@ class ProfileForm(forms.ModelForm):
         model = User
         fields = ('first_name', 'last_name', 'address_1', 'address_2',
                   'country', 'voivodeship', 'city', 'zip_code', 'picture', )
-
-

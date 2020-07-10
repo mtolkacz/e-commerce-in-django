@@ -11,8 +11,6 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 """
 
 import os
-from celery.schedules import crontab
-
 import socket
 
 hostname, _, ips = socket.gethostbyname_ex(socket.gethostname())

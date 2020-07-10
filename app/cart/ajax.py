@@ -1,6 +1,5 @@
 import json
 
-import paypalhttp
 from django.contrib import messages
 from django.contrib.sessions.models import Session
 from django.http import JsonResponse
@@ -9,11 +8,14 @@ from django.urls import reverse
 from django.utils.encoding import force_text
 from django.utils.http import urlsafe_base64_decode
 from django.views.decorators.http import require_http_methods
+
+import paypalhttp
 from products.models import Product
 from sales.sale import SaleManager
 
 from .functions import generate_order_id, get_pending_cart
-from .models import OrderItem, Order, MAX_ITEMS_IN_CART, OrderAccess, Shipment, PromoCodeUsage
+from .models import (MAX_ITEMS_IN_CART, Order, OrderAccess, OrderItem,
+                     PromoCodeUsage, Shipment)
 from .paypal import PaypalManager
 from .promocode import PromoCodeManager
 from .views import User
@@ -132,7 +134,6 @@ def delete_item_from_cart(request):
 def calculate_item_in_cart(request):
     item_id = request.POST.get('item_id', None)
     new_cart_value = request.POST.get('cart_value', None)
-    print(f'DJANGOTEST: print {item_id}, {new_cart_value}')
 
     # create empty dictionary for JsonResponse data
     data = {}

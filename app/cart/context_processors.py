@@ -1,5 +1,6 @@
-from cart.models import Order
 from django.contrib.auth import get_user_model
+
+from cart.models import Order
 
 User = get_user_model()
 

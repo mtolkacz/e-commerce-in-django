@@ -1,13 +1,13 @@
-from django.views import generic
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import get_object_or_404, render
 from rest_framework.generics import ListAPIView
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.renderers import TemplateHTMLRenderer
 from rest_framework.response import Response
 
-from .serializers import PostSerializer
-from .models import Post
 from comments.forms import CommentForm
+
+from .models import Post
+from .serializers import PostSerializer
 
 
 def post_detail(request, slug):
@@ -44,4 +44,3 @@ class Posts(ListAPIView):
 
     def get(self, request, *args, **kwargs):
         return self.list(request, *args, **kwargs)
-
