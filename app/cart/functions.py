@@ -3,6 +3,7 @@ import random
 import string
 from datetime import date
 
+from django.contrib.auth import get_user_model
 from django.contrib.sessions.models import Session
 from django.contrib.sites.shortcuts import get_current_site
 from django.shortcuts import get_object_or_404
@@ -14,7 +15,8 @@ from accounts import tasks
 from accounts.tasks import send_email
 
 from .models import Order, OrderItem, Shipment
-from .views import User
+
+User = get_user_model()
 
 
 def save_order_item(order):

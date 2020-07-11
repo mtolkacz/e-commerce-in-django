@@ -6,12 +6,11 @@ from django.utils.http import urlsafe_base64_decode
 
 from accounts.functions import send_activation_link
 from accounts.tokens import account_activation_token
-
-from . import functions as crt
-from .checkout import Checkout
-from .models import *
-from .models import Order
-from .summary import Summary
+from cart import functions as crt
+from cart.checkout import Checkout
+from cart.models import *
+from cart.models import Order
+from cart.summary import Summary
 
 User = get_user_model()
 

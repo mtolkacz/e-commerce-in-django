@@ -14,7 +14,6 @@ from djmoney.models.fields import MoneyField
 
 from accounts.models import User
 
-from .signals import discount_post_save, discount_pre_save
 from .validators import ProductIDsValidator
 
 
@@ -410,6 +409,8 @@ class LastViewedProducts(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=False)
     product = models.ForeignKey(Product, on_delete=models.CASCADE, null=False)
 
+
+from .signals import discount_post_save, discount_pre_save
 
 signals.pre_save.connect(discount_pre_save, sender=Discount)
 signals.post_save.connect(discount_post_save, sender=Discount)

@@ -16,12 +16,12 @@ from cart import functions as crt
 from cart.models import OrderItem
 from gallop import functions as glp
 from gallop.database import get_popular_products
+from products.models import (Brand, Category, Department, LastViewedProducts,
+                             Product, ProductImage, Subdepartment)
+from products.serializers import (BrandSerializer, CategorySerializer,
+                                  DepartmentSerializer, ProductSerializer,
+                                  SubdepartmentSerializer)
 
-from .models import (Brand, Category, Department, LastViewedProducts, Product,
-                     ProductImage, Subdepartment)
-from .serializers import (BrandSerializer, CategorySerializer,
-                          DepartmentSerializer, ProductSerializer,
-                          SubdepartmentSerializer)
 
 logger = logging.getLogger(__name__)
 

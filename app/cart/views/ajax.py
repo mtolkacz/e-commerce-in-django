@@ -1,6 +1,7 @@
 import json
 
 from django.contrib import messages
+from django.contrib.auth import get_user_model
 from django.contrib.sessions.models import Session
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
@@ -10,15 +11,16 @@ from django.utils.http import urlsafe_base64_decode
 from django.views.decorators.http import require_http_methods
 
 import paypalhttp
+
 from products.models import Product
 from sales.sale import SaleManager
+from cart.functions import generate_order_id, get_pending_cart
+from cart.models import (MAX_ITEMS_IN_CART, Order, OrderAccess, OrderItem,
+                             PromoCodeUsage, Shipment)
+from cart.paypal import PaypalManager
+from cart.promocode import PromoCodeManager
 
-from .functions import generate_order_id, get_pending_cart
-from .models import (MAX_ITEMS_IN_CART, Order, OrderAccess, OrderItem,
-                     PromoCodeUsage, Shipment)
-from .paypal import PaypalManager
-from .promocode import PromoCodeManager
-from .views import User
+User = get_user_model()
 
 
 @require_http_methods(['POST'])

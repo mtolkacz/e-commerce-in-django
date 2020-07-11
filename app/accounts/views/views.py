@@ -1,3 +1,4 @@
+from django.contrib import messages
 from django.contrib.auth import authenticate
 from django.contrib.auth import login as auth_login
 from django.contrib.auth import logout as auth_logout
@@ -9,14 +10,13 @@ from django.utils.encoding import force_text
 from django.utils.http import urlsafe_base64_decode
 from django.views.decorators.http import require_http_methods
 
-from accounts.forms import ProfileForm
 from gallop import functions as glp
 from products.models import Favorites, Product, ProductRating
-
-from . import functions as act
-from .forms import LoginForm, RegisterForm
-from .models import User
-from .tokens import account_activation_token
+from accounts import functions as act
+from accounts.forms import LoginForm, RegisterForm
+from accounts.forms import ProfileForm
+from accounts.models import User
+from accounts.tokens import account_activation_token
 
 
 @require_http_methods(["GET", "POST"])
