@@ -4,12 +4,9 @@ from django.template.loader import render_to_string
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 
-from accounts.models import Country, Voivodeship
-from accounts.tasks import send_email
-from gallop import functions as glp
-
-from .forms import BillingForm, ShipmentForm, ShipmentTypeForm
-from .models import Order, Shipment
+from cart.forms import BillingForm, ShipmentForm, ShipmentTypeForm
+from cart.models import Shipment, Order
+from accounts.utils import create_user_from_form
 
 
 class Checkout:
@@ -154,7 +151,7 @@ class Checkout:
 
                 # create user if user set checkbox
                 if self.account_checkbox:
-                    self.user = glp.create_user_from_form(self.billing_form)
+                    self.user = create_user_from_form(self.billing_form)
 
                     # pin existing cart to newly created user and clean session_key
                     self.cart.owner = self.user
@@ -177,6 +174,6 @@ class Checkout:
     def update_user(self):
         self.billing_form = BillingForm(self.request.POST, without_new_account=True)
         if self.billing_form.is_valid():
-            glp.update_user_from_form(self.billing_form, self.user)
+            app.accounts.utils.update_user_from_form(self.billing_form, self.user)
         else:
             self.valid_forms = False

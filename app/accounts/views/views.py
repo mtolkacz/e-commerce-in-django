@@ -1,7 +1,6 @@
 from django.contrib import messages
 from django.contrib.auth import authenticate
 from django.contrib.auth import login as auth_login
-from django.contrib.auth import logout as auth_logout
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import FieldDoesNotExist
 from django.http import HttpResponseRedirect
@@ -10,13 +9,10 @@ from django.utils.encoding import force_text
 from django.utils.http import urlsafe_base64_decode
 from django.views.decorators.http import require_http_methods
 
-from gallop import functions as glp
 from products.models import Favorites, Product, ProductRating
-from accounts import functions as act
-from accounts.forms import LoginForm, RegisterForm
-from accounts.forms import ProfileForm
+from accounts.forms import LoginForm, RegisterForm, ProfileForm
 from accounts.models import User
-from accounts.tokens import account_activation_token
+from accounts.utils import create_user_from_form, send_activation_link, account_activation_token
 
 
 @require_http_methods(["GET", "POST"])
@@ -92,21 +88,14 @@ def login(request):
             # Return True if the form has no errors, or False otherwise
             if registration_form.is_valid():
 
-                user = glp.create_user_from_form(registration_form)
+                user = create_user_from_form(registration_form)
 
-                act.send_activation_link(request, user)
+                send_activation_link(request, user)
 
     # Load login view with forms and display form messages
     return render(request, 'accounts/login.html',
                   {'login_form': login_form,
                    'registration_form': registration_form})
-
-
-# Logout and load logout information or redirect to index view if user is not signed in
-def logout(request):
-    if request.user.is_authenticated:
-        auth_logout(request)
-    return redirect('index')
 
 
 def update_obj_from_form(obj, form):

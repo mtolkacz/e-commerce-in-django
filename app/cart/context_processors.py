@@ -5,6 +5,7 @@ from cart.models import Order
 User = get_user_model()
 
 
+# get information of the order in cart context data
 def cart_context_processor(request):
     cart_dict = {}
 

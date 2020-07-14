@@ -1,22 +1,20 @@
 from django.contrib import messages
+from django.contrib.auth import get_user_model
 from django.contrib.auth import login as auth_login
 from django.shortcuts import redirect, render
-from django.utils.encoding import force_text
-from django.utils.http import urlsafe_base64_decode
+from django.urls import reverse
+from django.utils.encoding import force_bytes, force_text
+from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 
-from accounts.functions import send_activation_link
-from accounts.tokens import account_activation_token
-from cart import functions as crt
-from cart.checkout import Checkout
-from cart.models import *
+from accounts.utils import account_activation_token, send_activation_link
 from cart.models import Order
-from cart.summary import Summary
+
 
 User = get_user_model()
 
 
 def cart(request):
-    order = crt.get_pending_cart(request)
+    order = get_pending_cart(request)
 
     context = {
         'order': order,
@@ -25,7 +23,7 @@ def cart(request):
 
 
 def checkout(request):
-    cart = crt.get_pending_cart(request)
+    cart = get_pending_cart(request)
     if not cart:
         return redirect(reverse('index'))
     checkout = Checkout(request, cart)
@@ -71,7 +69,7 @@ def checkout(request):
                 # if saved shipment then go to finalize
                 if checkout.shipment:
                     checkout.update_cart(user=checkout.user)
-                    crt.send_purchase_link(request, cart)
+                    send_purchase_link(request, cart)
                     # save shipment only when everything else finished successfully
                     checkout.shipment.save()
                     # go to checkout
@@ -133,7 +131,6 @@ def purchase_activate(request, uidb64, token, oidb64):
             oid = None
         if oid:
             try:
-                from .models import Order
                 order = Order.objects.get(id=oid)
             except Order.DoesNotExist:
                 messages.error(request, 'Unable to find purchase. Contact with administrator.')

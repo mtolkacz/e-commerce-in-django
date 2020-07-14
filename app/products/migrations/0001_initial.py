@@ -6,7 +6,7 @@ import ckeditor.fields
 import django.core.validators
 import django.db.models.deletion
 import djmoney.models.fields
-import products.validators
+import products.utils
 from django.conf import settings
 from django.db import migrations, models
 
@@ -65,7 +65,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('name', models.CharField(default='Custom product list', max_length=150)),
-                ('value', models.TextField(validators=[products.validators.ProductIDsValidator])),
+                ('value', models.TextField(validators=[products.utils.validate_product_ids])),
             ],
         ),
         migrations.CreateModel(

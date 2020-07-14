@@ -1,13 +1,12 @@
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.sessions.models import Session
 from django.utils.encoding import force_text
 from django.utils.http import urlsafe_base64_decode
 
-from gallop import settings
-from gallop.functions import get_user_object
-
-from . import functions as crt
-from .models import Order, OrderAccess, Payment, Shipment
+from accounts.utils import get_user_object
+from cart.models import Order, OrderAccess, Payment, Shipment
+from cart.utils import send_purchase_link
 
 
 class Summary:
@@ -130,7 +129,7 @@ class Summary:
 
     def send_link_with_access_code(self):
         if self.order:
-            sent = crt.send_purchase_link(self.request, self.order)
+            sent = send_purchase_link(self.request, self.order)
             if sent:
                 messages.success(self.request, "Access code has been sent to your e-mail")
             else:

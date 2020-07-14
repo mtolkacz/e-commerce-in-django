@@ -1,8 +1,5 @@
 from django.utils import timezone
 
-from .models import (Discount, DiscountCustom, DiscountLine,
-                     DiscountProductList, Product)
-
 
 class DiscountManager:
     queryset = None

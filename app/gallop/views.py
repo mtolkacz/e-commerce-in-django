@@ -7,8 +7,7 @@ from blog.models import Post
 from products.documents import ProductDocument
 from products.models import Discount, LastViewedProducts
 
-from .database import get_popular_brands, get_popular_products
-from .error_views import *
+from .utils.database import get_popular_brands, get_popular_products
 
 logger = logging.getLogger(__name__)
 User = get_user_model()

@@ -2,8 +2,8 @@ import random
 
 from gallop.celery import app
 
-from .discount import DiscountManager
 from .models import Discount, Product
+from .utils import DiscountManager
 
 
 @app.task(bind=True, ignore_result=False)

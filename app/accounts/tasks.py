@@ -5,7 +5,6 @@ from django.conf import settings
 from django.core.mail import send_mail
 
 from gallop.celery import app
-from products.models import Product
 
 
 @app.task(bind=True, ignore_result=False)

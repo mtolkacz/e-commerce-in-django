@@ -1,2 +1,2 @@
-from .ajax import *
-from .views import *
+from . import ajax
+from . import views

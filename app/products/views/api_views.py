@@ -12,10 +12,10 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.renderers import TemplateHTMLRenderer
 from rest_framework.response import Response
 
-from cart import functions as crt
+from accounts.utils import get_user_object
 from cart.models import OrderItem
-from gallop import functions as glp
-from gallop.database import get_popular_products
+from cart.utils import get_pending_cart
+from gallop.utils import get_popular_products
 from products.models import (Brand, Category, Department, LastViewedProducts,
                              Product, ProductImage, Subdepartment)
 from products.serializers import (BrandSerializer, CategorySerializer,
@@ -215,7 +215,7 @@ class ProductDetail(ListAPIView):
     @staticmethod
     def check_if_exist_in_cart(request, prod):
         result = None
-        cart = crt.get_pending_cart(request)
+        cart = get_pending_cart(request)
         try:
             result = OrderItem.objects.get(order=cart, product=prod).id if cart else False
         except OrderItem.DoesNotExist:
@@ -239,7 +239,7 @@ class ProductDetail(ListAPIView):
 
             favorite = None
             if request.user.is_authenticated:
-                user = glp.get_user_object(request)
+                user = get_user_object(request)
                 favorite = self.product.check_if_favorite(user)
                 self.add_product_to_viewed(user)
 

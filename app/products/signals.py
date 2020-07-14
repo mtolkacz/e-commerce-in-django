@@ -1,6 +1,6 @@
 import logging
 
-from .discount import DiscountManager
+from .utils import DiscountManager
 from .tasks import finish_discount, process_discount
 
 logger = logging.getLevelName(__name__)

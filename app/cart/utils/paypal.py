@@ -2,15 +2,12 @@ import logging
 import sys
 from decimal import Decimal
 
-from dateutil import parser
 from django.conf import settings
 from django.db import IntegrityError
-
-from moneyed import Money
-from paypalcheckoutsdk.core import PayPalHttpClient, SandboxEnvironment
+from paypalcheckoutsdk.core import SandboxEnvironment, PayPalHttpClient
 from paypalcheckoutsdk.orders import OrdersGetRequest
 
-from .models import Payment
+from cart.models import Payment
 
 logger = logging.getLogger(__name__)
 

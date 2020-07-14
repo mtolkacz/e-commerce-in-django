@@ -7,19 +7,31 @@ from django.utils import timezone
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 
-from .validators import ZipCodeValidator
+from .utils import validate_zip_code
 
 
 class Country(models.Model):
-    name = models.CharField(max_length=30, null=False, blank=False)
+    name = models.CharField(
+        max_length=30,
+        null=False,
+        blank=False
+    )
 
     def __str__(self):
         return '{}'.format(self.name)
 
 
 class Voivodeship(models.Model):
-    country = models.ForeignKey(Country, on_delete=models.CASCADE, null=False)
-    name = models.CharField(max_length=30, null=False, blank=False)
+    country = models.ForeignKey(
+        Country,
+        on_delete=models.CASCADE,
+        null=False
+    )
+    name = models.CharField(
+        max_length=30,
+        null=False,
+        blank=False
+    )
 
     def __str__(self):
         return '{}'.format(self.name)
@@ -60,6 +72,7 @@ class UserManager(BaseUserManager):
 
 class User(AbstractBaseUser, PermissionsMixin):
     username_validator = UnicodeUsernameValidator()
+
     username = models.CharField(
         _('username'),
         max_length=150,
@@ -70,16 +83,63 @@ class User(AbstractBaseUser, PermissionsMixin):
             'unique': _("A user with that username already exists."),
         },
     )
-    first_name = models.CharField(_('first name'), max_length=50, blank=False, null=False)
-    last_name = models.CharField(_('last name'), max_length=150, blank=False, null=False)
-    email = models.EmailField(_('email address'), unique=True, null=False)
-    city = models.CharField(max_length=50, blank=False, null=False)
-    voivodeship = models.ForeignKey(Voivodeship, on_delete=models.SET_NULL, blank=False, null=True)
-    country = models.ForeignKey(Country, on_delete=models.SET_NULL, blank=False, null=True)
-    zip_code = models.CharField(max_length=6, validators=[ZipCodeValidator], blank=False, null=False)
-    address_1 = models.CharField(max_length=100, blank=False, null=False)
-    address_2 = models.CharField(max_length=100, blank=True, null=True)
-    picture = models.ImageField(upload_to='users/', default="avatar.png", null=True, blank=True)
+
+    first_name = models.CharField(
+        _('first name'),
+        max_length=50,
+        blank=False,
+        null=False
+    )
+    last_name = models.CharField(
+        _('last name'),
+        max_length=150,
+        blank=False,
+        null=False
+    )
+    email = models.EmailField(
+        _('email address'),
+        unique=True,
+        null=False
+    )
+    city = models.CharField(
+        max_length=50,
+        blank=False,
+        null=False
+    )
+    voivodeship = models.ForeignKey(
+        Voivodeship,
+        on_delete=models.SET_NULL,
+        blank=False,
+        null=True
+    )
+    country = models.ForeignKey(
+        Country,
+        on_delete=models.SET_NULL,
+        blank=False,
+        null=True
+    )
+    zip_code = models.CharField(
+        max_length=6,
+        validators=[validate_zip_code],
+        blank=False,
+        null=False
+    )
+    address_1 = models.CharField(
+        max_length=100,
+        blank=False,
+        null=False
+    )
+    address_2 = models.CharField(
+        max_length=100,
+        blank=True,
+        null=True
+    )
+    picture = models.ImageField(
+        upload_to='users/',
+        default="avatar.png",
+        null=True,
+        blank=True
+    )
 
     def image_tag(self):
         return mark_safe('<img src="/media/%s" width="80" height="80" />' % self.picture)

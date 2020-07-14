@@ -1,12 +1,7 @@
 from decimal import Decimal
 
-from django.contrib.auth import get_user_model
-
-from gallop.functions import get_user_object
-
-from .models import PromoCode, PromoCodeUsage
-
-User = get_user_model()
+from cart.models import PromoCode, PromoCodeUsage
+from accounts.utils import get_user_object
 
 
 class PromoCodeManager:

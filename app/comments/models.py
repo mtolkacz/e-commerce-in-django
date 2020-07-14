@@ -7,11 +7,23 @@ User = get_user_model()
 
 
 class Comment(models.Model):
-    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments')
-    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
+    post = models.ForeignKey(
+        Post,
+        on_delete=models.CASCADE,
+        related_name='comments'
+    )
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        null=True
+    )
     body = models.TextField()
-    created_on = models.DateTimeField(auto_now_add=True)
-    active = models.BooleanField(default=False)
+    created_on = models.DateTimeField(
+        auto_now_add=True
+    )
+    active = models.BooleanField(
+        default=False
+    )
 
     class Meta:
         ordering = ['created_on']

@@ -3,7 +3,6 @@ import random
 import string
 from datetime import date
 
-from django.contrib.auth import get_user_model
 from django.contrib.sessions.models import Session
 from django.contrib.sites.shortcuts import get_current_site
 from django.shortcuts import get_object_or_404
@@ -11,18 +10,8 @@ from django.template.loader import render_to_string
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 
-from accounts import tasks
-from accounts.tasks import send_email
-
-from .models import Order, OrderItem, Shipment
-
-User = get_user_model()
-
-
-def save_order_item(order):
-    order_item = OrderItem.objects.get_or_create(order=order)
-    order_item.save()
-    return order_item
+from cart.models import Order, Shipment
+from cart.views import User
 
 
 def generate_order_id():
@@ -31,8 +20,6 @@ def generate_order_id():
     return date_str + rand_str
 
 
-# cart saving
-# - get orders in cart older than one week
 def get_saved_carts():
     week_ago = datetime.datetime.now() - datetime.timedelta(days=7)
     return Order.objects.filter(date_ordered__lt=week_ago, status=1)
@@ -55,7 +42,6 @@ def saved_carts_email(order):
         send_email.apply_async((receiver, subject, message, message,), countdown=0)
 
 
-# return user/anonymous order object in cart if exists
 def get_pending_cart(request):
     order = None
     if request.user.id:

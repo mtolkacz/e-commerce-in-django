@@ -13,12 +13,10 @@ from django.views.decorators.http import require_http_methods
 import paypalhttp
 
 from products.models import Product
-from sales.sale import SaleManager
-from cart.functions import generate_order_id, get_pending_cart
+from sales.utils import SaleManager
 from cart.models import (MAX_ITEMS_IN_CART, Order, OrderAccess, OrderItem,
                              PromoCodeUsage, Shipment)
-from cart.paypal import PaypalManager
-from cart.promocode import PromoCodeManager
+from cart import utils as cart_utils
 
 User = get_user_model()
 
@@ -33,7 +31,7 @@ def add_item_to_cart(request):
     product = Product.objects.filter(id=item_id).first()
 
     if item_id and product:
-        existing_cart = get_pending_cart(request)
+        existing_cart = cart_utils.get_pending_cart(request)
         data['new_item'] = True
         if existing_cart:
             order_item = existing_cart.items.filter(product=product).first()
@@ -62,7 +60,7 @@ def add_item_to_cart(request):
                     request.session.save()
                 session = get_object_or_404(Session, session_key=request.session.session_key)
                 cart, status = Order.objects.get_or_create(session_key=session, is_ordered=False)
-            cart.ref_code = generate_order_id()
+            cart.ref_code = cart_utils.generate_order_id()
             if status:
                 order_item = OrderItem.objects.create(product=product)
                 cart.items.add(order_item)
@@ -87,7 +85,7 @@ def add_item_to_cart(request):
 
 def delete_purchase(request):
     data = {}
-    existing_cart = get_pending_cart(request)
+    existing_cart = cart_utils.get_pending_cart(request)
     cart_deleted = existing_cart.delete()
     if cart_deleted:
         data['success'] = cart_deleted
@@ -101,7 +99,7 @@ def delete_item_from_cart(request):
     # create empty dictionary for JsonResponse data
     data = {}
 
-    existing_cart = get_pending_cart(request)
+    existing_cart = cart_utils.get_pending_cart(request)
 
     # return if parameters not passed
     if item_id is None or existing_cart is None:
@@ -145,7 +143,7 @@ def calculate_item_in_cart(request):
         return JsonResponse(data)
 
     # get current logged-in user order
-    existing_cart = get_pending_cart(request)
+    existing_cart = cart_utils.get_pending_cart(request)
 
     try:
         # check if new cart value and item_id are integers
@@ -223,7 +221,7 @@ def process_payment(request):
     details_string = request.POST.get('details', 0)
     payment_details = json.loads(details_string)
     if payment_details and isinstance(payment_details, dict):
-        payment_manager = PaypalManager(payment_details)
+        payment_manager = cart_utils.PaypalManager(payment_details)
         try:
             payment_confirmed = payment_manager.confirm_payment()
         except paypalhttp.http_error.HttpError:
@@ -257,8 +255,8 @@ def process_promo_code(request):
     if not code:
         data['message'] = 'Promo code not provided'
     else:
-        order = get_pending_cart(request)
-        manager = PromoCodeManager(request, order, code)
+        order = cart_utils.get_pending_cart(request)
+        manager = cart_utils.PromoCodeManager(request, order, code)
         if not manager.promo_code:
             data['message'] = 'Incorrect promo code'
         else:
@@ -273,7 +271,7 @@ def process_promo_code(request):
                 else:
                     order.apply_promo_code(manager.promo_code)
                     manager.save_code_usage()
-                    order = get_pending_cart(request)
+                    order = cart_utils.get_pending_cart(request)
                     data = manager.get_context_data(order)
     return JsonResponse(data)
 
@@ -281,7 +279,7 @@ def process_promo_code(request):
 @require_http_methods(['POST'])
 def delete_promo_code(request):
     data = {}
-    order = get_pending_cart(request)
+    order = cart_utils.get_pending_cart(request)
     code = request.POST.get('cart_id', None)
     if order and code:
         order.promo_code = None

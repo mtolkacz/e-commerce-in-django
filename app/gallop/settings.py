@@ -27,13 +27,10 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'foooooooooooooooooooo')
 
 # ADMINS = [('Michal', os.getenv('EMAIL_HOST_USER')), ]
 
-# Custom user model
-AUTH_USER_MODEL = 'accounts.User'
-
 LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'index'
 LOGOUT_URL = 'logout'
-LOGOUT_REDIRECT_URL = 'logout'
+LOGOUT_REDIRECT_URL = 'index'
 
 # HTTPS and cookies
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
@@ -129,16 +126,19 @@ THIRD_PARTY_APPS = (
     'debug_toolbar',
 )
 LOCAL_APPS = (
+    'products',
     'accounts',
     'blog',
     'articles',
     'cart',
     'comments',
-    'products',
     'sales',
 )
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
+
+# Custom user model
+AUTH_USER_MODEL = 'accounts.User'
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
