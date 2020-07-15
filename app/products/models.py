@@ -26,22 +26,11 @@ class Department(models.Model):
         max_length=100
     )
     image1 = models.ImageField(
-        upload_to='pic_folder/',
-        default='pic_folder/None/no-img.jpg'
+        upload_to='pic_folder/'
     )
     image2 = models.ImageField(
-        upload_to='pic_folder/',
-        default='pic_folder/None/no-img.jpg'
+        upload_to='pic_folder/'
     )
-
-    def image_tag1(self):
-        return mark_safe('<img src="/media/%s" width="80" height="80" />' % self.image1)
-
-    def image_tag2(self):
-        return mark_safe('<img src="/media/%s" width="80" height="80" />' % self.image2)
-
-    image_tag1.short_description = 'Image1'
-    image_tag2.short_description = 'Image2'
 
     def __str__(self):
         return self.name
@@ -66,22 +55,11 @@ class Subdepartment(models.Model):
         max_length=100
     )
     image1 = models.ImageField(
-        upload_to='pic_folder/',
-        default='pic_folder/None/no-img.jpg'
+        upload_to='pic_folder/'
     )
     image2 = models.ImageField(
-        upload_to='pic_folder/',
-        default='pic_folder/None/no-img.jpg'
+        upload_to='pic_folder/'
     )
-
-    def image_tag1(self):
-        return mark_safe('<img src="/media/%s" width="80" height="80" />' % self.image1)
-
-    def image_tag2(self):
-        return mark_safe('<img src="/media/%s" width="80" height="80" />' % self.image2)
-
-    image_tag1.short_description = 'Image1'
-    image_tag2.short_description = 'Image2'
 
     def __str__(self):
         return self.name
@@ -110,21 +88,11 @@ class Category(models.Model):
         max_length=100
     )
     image1 = models.ImageField(
-        upload_to='pic_folder/',
-        default='pic_folder/None/no-img.jpg')
-    image2 = models.ImageField(
-        upload_to='pic_folder/',
-        default='pic_folder/None/no-img.jpg'
+        upload_to='pic_folder/'
     )
-
-    def image_tag1(self):
-        return mark_safe('<img src="/media/%s" width="80" height="80" />' % self.image1)
-
-    def image_tag2(self):
-        return mark_safe('<img src="/media/%s" width="80" height="80" />' % self.image2)
-
-    image_tag1.short_description = 'Image1'
-    image_tag2.short_description = 'Image2'
+    image2 = models.ImageField(
+        upload_to='pic_folder/'
+    )
 
     def __str__(self):
         return self.name
@@ -144,14 +112,8 @@ class Brand(models.Model):
         max_length=100
     )
     image1 = models.ImageField(
-        upload_to='pic_folder/brands/',
-        default='pic_folder/None/no-img.jpg'
+        upload_to='pic_folder/brands/'
     )
-
-    def image_tag1(self):
-        return mark_safe('<img src="/media/%s" width="160" height="80" />' % self.image1)
-
-    image_tag1.short_description = 'Image1'
 
     def __str__(self):
         return self.name
@@ -180,16 +142,14 @@ class Product(models.Model):
     price = MoneyField(
         max_digits=6,
         decimal_places=2,
-        default_currency='USD',
-        null=False
+        default_currency='USD'
     )
     discounted_price = MoneyField(
         max_digits=14,
         decimal_places=2,
         default_currency='USD',
         editable=False,
-        null=True,
-        blank=True
+        null=True
     )
     department = models.ForeignKey(
         Department,
@@ -207,28 +167,20 @@ class Product(models.Model):
         null=True
     )
     thumbnail = models.ImageField(
-        upload_to='pic_folder/',
-        default='pic_folder/None/no-img.jpg'
+        upload_to='pic_folder/'
     )
     slug = models.SlugField(
         max_length=150
     )  # todo check max product name length
     stock = models.SmallIntegerField(
-        default=0,
-        null=False
+        default=0
     )
     booked = models.PositiveSmallIntegerField(
-        default=0,
-        null=False
+        default=0
     )
     creationdate = models.DateTimeField(
         auto_now_add=True
     )
-
-    def image_tag(self):
-        return mark_safe('<img src="/media/%s" width="80" height="80" />' % self.thumbnail)
-
-    image_tag.short_description = 'Image'
 
     def get_price_in_string(self):
         return str(self.price)
@@ -342,14 +294,8 @@ class ProductImage(models.Model):
         related_name="images"
     )
     image = models.ImageField(
-        upload_to='pic_folder/',
-        default='pic_folder/None/no-img.jpg'
+        upload_to='pic_folder/'
     )
-
-    def image_tag(self):
-        return mark_safe('<img src="/media/%s" width="80" height="80" />' % self.image)
-
-    image_tag.short_description = 'Image'
 
 
 class ProductRating(models.Model):
@@ -382,13 +328,11 @@ class ProductRating(models.Model):
 class Favorites(models.Model):
     product = models.ForeignKey(
         Product,
-        on_delete=models.CASCADE,
-        null=False
+        on_delete=models.CASCADE
     )
     user = models.ForeignKey(
         User,
-        on_delete=models.CASCADE,
-        null=False
+        on_delete=models.CASCADE
     )
 
     class Meta:
@@ -398,8 +342,7 @@ class Favorites(models.Model):
 class DiscountPriorityType(models.Model):
     name = models.CharField(
         max_length=150,
-        default='Priority name',
-        blank=True
+        default='Priority name'
     )
     value = models.IntegerField(
         default=100,
@@ -409,7 +352,6 @@ class DiscountPriorityType(models.Model):
         ])
     description = models.CharField(
         max_length=300,
-        null=True,
         blank=True
     )
 
@@ -421,8 +363,7 @@ class DiscountType(models.Model):
     name = models.CharField(
         max_length=150,
         default='Discount type name',
-        unique=True,
-        blank=False
+        unique=True
     )
     model = models.CharField(
         max_length=50,
@@ -450,50 +391,39 @@ class Discount(models.Model):
     )
     name = models.CharField(
         max_length=150,
-        default='Discount name',
-        null=False,
-        blank=False
+        default='Discount name'
     )
     type = models.ForeignKey(
         DiscountType,
-        on_delete=models.PROTECT,
-        null=False,
-        blank=False
+        on_delete=models.PROTECT
     )
     # e.g. id of department, subdepartment, category and other levels or None if global for all products
     set_id = models.IntegerField(
-        null=False,
-        blank=False,
         validators=[
             MinValueValidator(1)
         ])
     value = models.IntegerField(
-        null=False,
         validators=[
             MaxValueValidator(99),
             MinValueValidator(1)
         ])
-    startdate = models.DateTimeField(
-        null=False
-    )
-    enddate = models.DateTimeField(
-        null=False
-    )
+    startdate = models.DateTimeField()
+    enddate = models.DateTimeField()
     description = models.CharField(
         max_length=300,
-        null=True,
         blank=True
     )
     priority = models.ForeignKey(
         DiscountPriorityType,
         on_delete=models.PROTECT,
-        null=False
     )
     status = models.PositiveSmallIntegerField(
         choices=STATUS,
         default=INACTIVE,
     )
-    image = models.ImageField(upload_to='pic_folder/', default='pic_folder/None/no-img.jpg')
+    image = models.ImageField(
+        upload_to='pic_folder/'
+    )
 
     def update_status(self, status):
         self.status = status
@@ -523,8 +453,13 @@ class Discount(models.Model):
 
 
 class DiscountProductList(models.Model):
-    discount = models.ForeignKey(Discount, on_delete=models.CASCADE, null=False)
-    ids = models.TextField(null=True)
+    discount = models.ForeignKey(
+        Discount,
+        on_delete=models.CASCADE
+    )
+    ids = models.TextField(
+        null=True
+    )
 
     def get_product_list(self):
         return [int(x) for x in str(self.ids).split(';')]
@@ -541,13 +476,11 @@ class DiscountLine(models.Model):
     )
     discount = models.ForeignKey(
         Discount,
-        on_delete=models.CASCADE,
-        null=False
+        on_delete=models.CASCADE
     )
     product = models.ForeignKey(
         Product,
-        on_delete=models.CASCADE,
-        null=False
+        on_delete=models.CASCADE
     )
     status = models.PositiveSmallIntegerField(
         choices=STATUS,
@@ -565,16 +498,12 @@ class DiscountLine(models.Model):
 class DiscountCustom(models.Model):
     name = models.CharField(
         max_length=150,
-        default='Custom product list',
-        null=False,
-        blank=False
+        default='Custom product list'
     )
     value = models.TextField(
-        null=False,
         validators=[
             validate_product_ids
-        ],
-        blank=False
+        ]
     )
 
     def clean(self):
@@ -594,13 +523,11 @@ class DiscountCustom(models.Model):
 class LastViewedProducts(models.Model):
     user = models.ForeignKey(
         User,
-        on_delete=models.CASCADE,
-        null=False
+        on_delete=models.CASCADE
     )
     product = models.ForeignKey(
         Product,
-        on_delete=models.CASCADE,
-        null=False
+        on_delete=models.CASCADE
     )
 
 

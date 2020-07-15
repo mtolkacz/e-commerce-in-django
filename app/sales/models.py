@@ -10,14 +10,12 @@ class Sale(models.Model):
     product = models.ForeignKey(
         Product,
         on_delete=models.PROTECT,
-        null=False,
         editable=False)
 
     price = MoneyField(
         max_digits=14,
         decimal_places=2,
         default_currency='USD',
-        null=False,
         editable=False)
 
     date = models.DateTimeField(

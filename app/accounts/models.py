@@ -12,9 +12,7 @@ from .utils import validate_zip_code
 
 class Country(models.Model):
     name = models.CharField(
-        max_length=30,
-        null=False,
-        blank=False
+        max_length=30
     )
 
     def __str__(self):
@@ -25,12 +23,9 @@ class Voivodeship(models.Model):
     country = models.ForeignKey(
         Country,
         on_delete=models.CASCADE,
-        null=False
     )
     name = models.CharField(
-        max_length=30,
-        null=False,
-        blank=False
+        max_length=30
     )
 
     def __str__(self):
@@ -86,63 +81,47 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     first_name = models.CharField(
         _('first name'),
-        max_length=50,
-        blank=False,
-        null=False
+        max_length=50
     )
     last_name = models.CharField(
         _('last name'),
-        max_length=150,
-        blank=False,
-        null=False
+        max_length=150
     )
     email = models.EmailField(
         _('email address'),
         unique=True,
-        null=False
+        null=True
     )
     city = models.CharField(
-        max_length=50,
-        blank=False,
-        null=False
+        max_length=50
     )
     voivodeship = models.ForeignKey(
         Voivodeship,
         on_delete=models.SET_NULL,
-        blank=False,
         null=True
     )
     country = models.ForeignKey(
         Country,
         on_delete=models.SET_NULL,
-        blank=False,
         null=True
     )
     zip_code = models.CharField(
         max_length=6,
-        validators=[validate_zip_code],
-        blank=False,
-        null=False
+        validators=[validate_zip_code]
     )
     address_1 = models.CharField(
-        max_length=100,
-        blank=False,
-        null=False
+        max_length=100
     )
     address_2 = models.CharField(
         max_length=100,
         blank=True,
-        null=True
+        default=''
     )
     picture = models.ImageField(
         upload_to='users/',
-        default="avatar.png",
         null=True,
         blank=True
     )
-
-    def image_tag(self):
-        return mark_safe('<img src="/media/%s" width="80" height="80" />' % self.picture)
 
     @property
     def get_picture_url(self):

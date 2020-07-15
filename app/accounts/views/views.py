@@ -13,6 +13,7 @@ from products.models import Favorites, Product, ProductRating
 from accounts.forms import LoginForm, RegisterForm, ProfileForm
 from accounts.models import User
 from accounts.utils import create_user_from_form, send_activation_link, account_activation_token
+from cart.models import Order
 
 
 @require_http_methods(["GET", "POST"])

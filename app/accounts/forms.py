@@ -8,7 +8,7 @@ from .models import Country, User, Voivodeship
 
 class LoginForm(forms.Form):
     username = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Email or Login'}))
-    password = forms.CharField(widget=forms.PasswordInput(attrs={'placeholder': '******'}))
+    password = forms.CharField(widget=forms.PasswordInput(attrs={'placeholder': 'Password'}))
     fields = ['username', 'password']
 
     def __init__(self, *args, **kwargs):

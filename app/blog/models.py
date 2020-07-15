@@ -25,8 +25,7 @@ class Post(models.Model):
         related_name='blog_posts'
     )
     thumbnail = models.ImageField(
-        upload_to='pic_folder/',
-        default='pic_folder/None/no-img.jpg'
+        upload_to='pic_folder/'
     )
     updated_on = models.DateTimeField(
         auto_now=True

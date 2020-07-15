@@ -32,7 +32,7 @@
 
     <script>
 
-        var total_cost = '{{ order.get_cart_total_str }}';
+        var total_cost = '{{ order.get_cart_total }}';
         var CSRF_TOKEN = getCookie('csrftoken');
         var ref_code = '{{ order.ref_code }}'
         var currency_code = '{{ order.get_cart_currency }}'

@@ -1,5 +1,6 @@
 from django.apps import apps
 from django.contrib import admin
+from django.utils.safestring import mark_safe
 
 from .models import (Brand, Category, Department, Discount, DiscountCustom,
                      DiscountPriorityType, DiscountType, Product,
@@ -49,6 +50,11 @@ class ProductAdmin(admin.ModelAdmin):
     get_category_name.admin_order_field = 'category'
     get_category_name.short_description = 'Category Name'
 
+    def image_tag(self, obj):
+        return mark_safe('<img src="/media/%s" width="80" height="80" />' % obj.thumbnail)
+
+    image_tag.short_description = 'Image'
+
 
 class SubdepartmentAdmin(admin.ModelAdmin):
     model = Subdepartment
@@ -59,20 +65,57 @@ class SubdepartmentAdmin(admin.ModelAdmin):
     get_department_name.admin_order_field = 'department'
     get_department_name.short_description = 'Department Name'
 
+    def image_tag1(self, obj):
+        return mark_safe('<img src="/media/%s" width="80" height="80" />' % obj.image1)
+
+    def image_tag2(self, obj):
+        return mark_safe('<img src="/media/%s" width="80" height="80" />' % obj.image2)
+
+    image_tag1.short_description = 'Image1'
+    image_tag2.short_description = 'Image2'
+
 
 class CategoryAdmin(admin.ModelAdmin):
     model = Category
-    list_display = ['id', 'name', 'get_subdepartment_name', 'image_tag1', 'image_tag2', ]  # 71FS38eUaoL._SX425_.jpg
+    list_display = ['id', 'name', 'get_subdepartment_name', 'image_tag1', 'image_tag2', ]
 
     def get_subdepartment_name(self, obj):
         return obj.subdepartment.name
     get_subdepartment_name.admin_order_field = 'subdepartment'
     get_subdepartment_name.short_description = 'Subdepartment Name'
 
+    def image_tag1(self, obj):
+        return mark_safe('<img src="/media/%s" width="80" height="80" />' % obj.image1)
+
+    def image_tag2(self, obj):
+        return mark_safe('<img src="/media/%s" width="80" height="80" />' % obj.image2)
+
+    image_tag1.short_description = 'Image1'
+    image_tag2.short_description = 'Image2'
+
+
+class DepartmentAdmin(admin.ModelAdmin):
+    model = Department
+    list_display = ['id', 'name', 'image_tag1', 'image_tag2', ]
+
+    def image_tag1(self, obj):
+        return mark_safe('<img src="/media/%s" width="80" height="80" />' % obj.image1)
+
+    def image_tag2(self, obj):
+        return mark_safe('<img src="/media/%s" width="80" height="80" />' % obj.image2)
+
+    image_tag1.short_description = 'Image1'
+    image_tag2.short_description = 'Image2'
+
 
 class BrandAdmin(admin.ModelAdmin):
     model = Brand
     list_display = ['id', 'name', 'image_tag1', ]
+
+    def image_tag1(self, obj):
+        return mark_safe('<img src="/media/%s" width="80" height="80" />' % obj.image1)
+
+    image_tag1.short_description = 'Image1'
 
 
 class ProductRatingAdmin(admin.ModelAdmin):
@@ -144,4 +187,4 @@ admin.site.register(ProductRating, ProductRatingAdmin)
 admin.site.register(Product, ProductAdmin)
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(Subdepartment, SubdepartmentAdmin)
-admin.site.register(Department)
+admin.site.register(Department, DepartmentAdmin)

@@ -9,7 +9,6 @@ from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from accounts.utils import account_activation_token, send_activation_link
 from cart.models import Order
 
-
 User = get_user_model()
 
 

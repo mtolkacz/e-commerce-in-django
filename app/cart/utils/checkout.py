@@ -6,7 +6,8 @@ from django.utils.http import urlsafe_base64_encode
 
 from cart.forms import BillingForm, ShipmentForm, ShipmentTypeForm
 from cart.models import Shipment, Order
-from accounts.utils import create_user_from_form
+from accounts.utils import create_user_from_form, update_user_from_form
+from accounts.tasks import send_email
 
 
 class Checkout:
@@ -174,6 +175,6 @@ class Checkout:
     def update_user(self):
         self.billing_form = BillingForm(self.request.POST, without_new_account=True)
         if self.billing_form.is_valid():
-            app.accounts.utils.update_user_from_form(self.billing_form, self.user)
+            update_user_from_form(self.billing_form, self.user)
         else:
             self.valid_forms = False

@@ -100,9 +100,7 @@ def get_user_object(request):
 
 
 def update_user_from_form(form, user, request=False):
-    if not form.is_valid():
-        return False
-    else:
+    if form.is_valid():
         fields_to_update = []
 
         # todo probably not to elegant approach, but potentially save time on db operations

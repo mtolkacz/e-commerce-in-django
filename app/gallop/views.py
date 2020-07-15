@@ -1,7 +1,7 @@
 import logging
 
 from django.contrib.auth import get_user_model
-from django.shortcuts import render_to_response
+from django.shortcuts import render_to_response, render
 
 from blog.models import Post
 from products.documents import ProductDocument

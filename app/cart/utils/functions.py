@@ -12,6 +12,7 @@ from django.utils.http import urlsafe_base64_encode
 
 from cart.models import Order, Shipment
 from cart.views import User
+from accounts.tasks import send_email
 
 
 def generate_order_id():
@@ -27,9 +28,7 @@ def get_saved_carts():
 
 def saved_carts_email(order):
     # to avoid sending e-mail to order with different status than "in cart"
-    if order.status != 1:
-        return
-    else:
+    if order.status == Order.IN_CART:
         user = order.owner
         receiver = user.email
         subject = 'Gallop - You have products in cart'
@@ -89,7 +88,7 @@ def send_purchase_link(request, order):
     message = render_to_string('cart/access_link.html', context)
 
     # Celery sending mail
-    tasks.send_email.apply_async((receiver, subject, message), countdown=0)
-    tasks.send_email.apply_async(('michal.tolkacz@gmail.com', subject, message), countdown=0)
+    send_email.apply_async((receiver, subject, message), countdown=0)
+    send_email.apply_async(('michal.tolkacz@gmail.com', subject, message), countdown=0)
 
     return True

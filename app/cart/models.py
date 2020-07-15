@@ -29,17 +29,13 @@ class PromoCode(models.Model):
         (VALUE, 'Value cart discount'),
     )
     code = models.CharField(
-        max_length=15,
-        blank=False,
-        null=False
+        max_length=15
     )
     type = models.PositiveSmallIntegerField(
         choices=TYPE,
         default=PERCENTAGE,
     )
-    value = models.PositiveSmallIntegerField(
-        null=False
-    )
+    value = models.PositiveSmallIntegerField()
     minimum_order_value = models.PositiveSmallIntegerField(
         null=True
     )
@@ -73,8 +69,7 @@ class OrderItem(models.Model):
         null=True
     )
     booked = models.BooleanField(
-        default=False,
-        null=False
+        default=False
     )
 
     def __str__(self):
@@ -127,7 +122,6 @@ class Order(models.Model):
     )
     access_code = models.SmallIntegerField(
         null=True,
-        blank=False,
         editable=False
     )
     promo_code = models.ForeignKey(
@@ -179,9 +173,6 @@ class Order(models.Model):
                 promo_value = Decimal(cart_total.amount) - Decimal(cart_total.amount * Decimal((100 - self.promo_code.value) / 100))
         promo = Money(promo_value, str(cart_total.currency))
         return promo
-
-    def get_promo_code_value_str(self):
-        return str(self.get_promo_code_value())
 
     def get_cart_total(self):
         cart_total = sum([(item.product.discounted_price if item.product.discounted_price else item.product.price)
@@ -242,32 +233,26 @@ signals.pre_delete.connect(order_pre_delete, sender=Order)
 class PromoCodeUsage(models.Model):
     user = models.ForeignKey(
         User,
-        on_delete=models.CASCADE,
-        null=False
+        on_delete=models.CASCADE
     )
     order = models.ForeignKey(
         Order,
-        on_delete=models.CASCADE,
-        null=False
+        on_delete=models.CASCADE
     )
     promocode = models.ForeignKey(
         PromoCode,
-        on_delete=models.CASCADE,
-        null=False
+        on_delete=models.CASCADE
     )
 
 
 class ShipmentType(models.Model):
     name = models.CharField(
-        max_length=50,
-        blank=False,
-        null=False
+        max_length=50
     )
     cost = MoneyField(
         max_digits=14,
         decimal_places=2,
-        default_currency='USD',
-        null=False
+        default_currency='USD'
     )
 
     def __str__(self):
@@ -303,51 +288,38 @@ class Shipment(models.Model):
         default_currency='USD'
     )
     email = models.EmailField(
-        null=True,
-        blank=True
+        null=True
     )
     first_name = models.CharField(
-        max_length=50,
-        blank=False,
-        null=False
+        max_length=50
     )
     last_name = models.CharField(
-        max_length=150,
-        blank=False,
-        null=False
+        max_length=150
     )
     city = models.CharField(
-        max_length=50,
-        blank=False,
-        null=False
+        max_length=50
     )
     voivodeship = models.ForeignKey(
         Voivodeship,
         on_delete=models.SET_NULL,
-        blank=False,
         null=True
     )
     country = models.ForeignKey(
         Country,
         on_delete=models.SET_NULL,
-        blank=False,
         null=True
     )
     zip_code = models.CharField(
         max_length=6,
-        validators=[validate_zip_code],
-        blank=False,
-        null=False
+        validators=[validate_zip_code]
     )
     address_1 = models.CharField(
-        max_length=100,
-        blank=False,
-        null=False
+        max_length=100
     )
     address_2 = models.CharField(
         max_length=100,
         blank=True,
-        null=True
+        default=''
     )
     status = models.PositiveSmallIntegerField(
         choices=STATUS,
@@ -359,17 +331,14 @@ class Shipment(models.Model):
     )
     preparationdate = models.DateTimeField(
         null=True,
-        blank=True,
         editable=False
     )
     sentdate = models.DateTimeField(
         null=True,
-        blank=True,
         editable=False
     )
     delivereddate = models.DateTimeField(
         null=True,
-        blank=True,
         editable=False
     )
 
@@ -430,8 +399,6 @@ class OrderAccess(models.Model):
 class Payment(models.Model):
     id = models.CharField(
         max_length=17,
-        blank=False,
-        null=False,
         editable=False,
         primary_key=True
     )
@@ -443,18 +410,14 @@ class Payment(models.Model):
     )
     createdate = models.DateTimeField(
         null=True,
-        blank=True,
         editable=False
     )
     updatedate = models.DateTimeField(
         null=True,
-        blank=True,
         editable=False
     )
     status = models.CharField(
         max_length=10,
-        blank=False,
-        null=False,
         editable=False
     )
     value = MoneyField(
@@ -465,23 +428,16 @@ class Payment(models.Model):
     )
     payer_id = models.CharField(
         max_length=15,
-        blank=False,
-        null=False,
         editable=False
     )
     email = models.EmailField(
-        null=False,
         editable=False
     )
     given_name = models.CharField(
         max_length=30,
-        blank=False,
-        null=False,
         editable=False
     )
     surname = models.CharField(
         max_length=30,
-        blank=False,
-        null=False,
         editable=False
     )
