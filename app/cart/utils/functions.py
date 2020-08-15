@@ -33,8 +33,8 @@ def saved_carts_email(order):
         receiver = user.email
         subject = 'Gallop - You have products in cart'
         context = {
-                'user': user,
-                'order': order,
+            'user': user,
+            'order': order,
         }
         message = render_to_string('cart/save_cart.html', context)
         # Celery sending mail
@@ -72,23 +72,22 @@ def send_purchase_link(request, order):
         try:
             shipment = Shipment.objects.get(order=order)
         except Shipment.DoesNotExist:
-            return False
-        else:
-            first_name = shipment.first_name
+            shipment = None
+    if shipment:
+        first_name = shipment.first_name
+        receiver = order.email
+        subject = 'Gallop purchase - {}'.format(order.ref_code)
+        context = {
+            'domain': current_site.domain,
+            'oidb64': urlsafe_base64_encode(force_bytes(order.id)),
+            'order': order,
+            'first_name': first_name
+        }
 
-    receiver = order.email
-    subject = 'Gallop purchase - {}'.format(order.ref_code)
-    context = {
-        'domain': current_site.domain,
-        'oidb64': urlsafe_base64_encode(force_bytes(order.id)),
-        'order': order,
-        'first_name': first_name
-    }
+        message = render_to_string('cart/access_link.html', context)
 
-    message = render_to_string('cart/access_link.html', context)
+        # Celery sending mail
+        send_email.apply_async((receiver, subject, message), countdown=0)
+        send_email.apply_async(('michal.tolkacz@gmail.com', subject, message), countdown=0)
 
-    # Celery sending mail
-    send_email.apply_async((receiver, subject, message), countdown=0)
-    send_email.apply_async(('michal.tolkacz@gmail.com', subject, message), countdown=0)
-
-    return True
+        return True

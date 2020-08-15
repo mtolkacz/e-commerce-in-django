@@ -11,8 +11,8 @@ def process_discount(self, instance_id):
     try:
         discount = Discount.objects.get(id=instance_id)
     except Discount.DoesNotExist:
-        return False
-    else:
+        discount = None
+    if discount:
         discount_manager = DiscountManager(discount)
         discount_manager.process()
         return True
@@ -23,8 +23,8 @@ def finish_discount(self, instance_id):
     try:
         discount = Discount.objects.get(id=instance_id)
     except Discount.DoesNotExist:
-        return False
-    else:
+        discount = None
+    if discount:
         discount_manager = DiscountManager(discount)
         discount_manager.finish()
         return True

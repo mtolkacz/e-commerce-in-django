@@ -14,7 +14,7 @@ from rest_framework.response import Response
 
 from accounts.utils import get_user_object
 from cart.models import OrderItem
-from cart.utils import get_pending_cart
+from cart import utils
 from gallop.utils import get_popular_products
 from products.models import (Brand, Category, Department, LastViewedProducts,
                              Product, ProductImage, Subdepartment)
@@ -215,7 +215,7 @@ class ProductDetail(ListAPIView):
     @staticmethod
     def check_if_exist_in_cart(request, prod):
         result = None
-        cart = get_pending_cart(request)
+        cart = utils.get_pending_cart(request)
         try:
             result = OrderItem.objects.get(order=cart, product=prod).id if cart else False
         except OrderItem.DoesNotExist:

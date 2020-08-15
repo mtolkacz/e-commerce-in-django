@@ -4,7 +4,7 @@ from celery import shared_task
 from django.conf import settings
 from django.db import IntegrityError
 
-from cart.functions import get_saved_carts, saved_carts_email
+from cart import utils
 from cart.models import Shipment
 from gallop.celery import app
 
@@ -40,7 +40,7 @@ def save_payment_object(payment, retries=0):
 
 @shared_task(bind=True, name='cart_reminder', max_retries=3, soft_time_limit=20)
 def cart_reminder(self):
-    orders = get_saved_carts()
+    orders = utils.get_saved_carts()
     if orders:
         for order in orders:
-            saved_carts_email(order)
+            utils.saved_carts_email(order)

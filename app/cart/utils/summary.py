@@ -6,7 +6,7 @@ from django.utils.http import urlsafe_base64_decode
 
 from accounts.utils import get_user_object
 from cart.models import Order, OrderAccess, Payment, Shipment
-from cart.utils import send_purchase_link
+from cart import utils
 
 
 class Summary:
@@ -129,7 +129,7 @@ class Summary:
 
     def send_link_with_access_code(self):
         if self.order:
-            sent = send_purchase_link(self.request, self.order)
+            sent = utils.send_purchase_link(self.request, self.order)
             if sent:
                 messages.success(self.request, "Access code has been sent to your e-mail")
             else:

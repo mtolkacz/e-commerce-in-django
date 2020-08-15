@@ -18,7 +18,6 @@ class DiscountManager:
     # return current most important product discount line or False if does not exist
     def get_current_discount_of(self, **kwargs):
         try:
-            current_discount = None
             for key, value in kwargs.items():
                 product_discount = DiscountLine.objects. \
                     exclude(discount=self.discount).exclude(status=Discount.FINISHED). \
@@ -27,9 +26,8 @@ class DiscountManager:
                     first()
                 current_discount = Discount.objects.get(id=product_discount.discount.id) if product_discount else False
         except Discount.DoesNotExist:
-            return False
-        else:
-            return current_discount
+            current_discount = None
+        return current_discount
 
     # compare priorities of current and new discount
     # lower priority = more important to choose

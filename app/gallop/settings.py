@@ -126,11 +126,11 @@ THIRD_PARTY_APPS = (
     'debug_toolbar',
 )
 LOCAL_APPS = (
+    'cart',
     'products',
     'accounts',
     'blog',
     'articles',
-    'cart',
     'comments',
     'sales',
 )

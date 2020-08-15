@@ -29,7 +29,7 @@ class PromoCodeManager:
         return already_used
 
     def meets_requirements(self, total):
-        return False if Decimal(self.promo_code.minimum_order_value) > total.amount else True
+        return total.amount > Decimal(self.promo_code.minimum_order_value)
 
     def get_context_data(self, order):
         data = {}

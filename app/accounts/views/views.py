@@ -121,8 +121,6 @@ def update_obj_from_form(obj, form):
     if fields_to_update:
         obj.save(update_fields=fields_to_update)
         return True
-    else:
-        return False
 
 
 @login_required

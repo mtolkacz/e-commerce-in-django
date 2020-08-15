@@ -25,6 +25,8 @@ services:
     command: ["flower", "--broker=amqp://rabbitmq", "--port=8888"]
     depends_on:
       - celery
+    ports:
+      - 8888:8888
   db:
     container_name: gallop_db
     image: postgres

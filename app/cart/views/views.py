@@ -8,12 +8,13 @@ from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 
 from accounts.utils import account_activation_token, send_activation_link
 from cart.models import Order
+from cart import utils
 
 User = get_user_model()
 
 
 def cart(request):
-    order = get_pending_cart(request)
+    order = utils.get_pending_cart(request)
 
     context = {
         'order': order,
@@ -22,10 +23,10 @@ def cart(request):
 
 
 def checkout(request):
-    cart = get_pending_cart(request)
+    cart = utils.get_pending_cart(request)
     if not cart:
         return redirect(reverse('index'))
-    checkout = Checkout(request, cart)
+    checkout = utils.Checkout(request, cart)
     checkout.set_context_data()
 
     if request.method == 'POST':

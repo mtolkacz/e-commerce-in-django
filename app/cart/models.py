@@ -347,7 +347,7 @@ class Shipment(models.Model):
             try:
                 self.type = ShipmentType.objects.get(name='DHL')
             except ShipmentType.DoesNotExist:
-                self.type = ShipmentType.objects.first()  # not sure if acceptable such approach
+                self.type = ShipmentType.objects.first()
 
         if self.cost is None:
             self.cost = self.type.cost
@@ -358,7 +358,7 @@ class Shipment(models.Model):
         if self.order is None:
             self.order = kwargs['order'] if 'order' in kwargs else None
 
-        if self.order is None:
+        if self.order:
             return False  # todo add exception
 
         now = timezone.now()

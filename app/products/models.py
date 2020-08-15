@@ -8,13 +8,12 @@ from django.db import models
 from django.db.models import signals
 from django.shortcuts import reverse
 from django.utils import timezone
-from django.utils.html import mark_safe
 from django.utils.text import slugify
 from djmoney.models.fields import MoneyField
 
-User = get_user_model()
-
 from .utils import validate_product_ids
+
+User = get_user_model()
 
 
 class Department(models.Model):
@@ -200,8 +199,6 @@ class Product(models.Model):
             self.stock += 1
             self.save(update_fields=['booked', 'stock'])
             return True
-        else:
-            return False
 
     def add_stock(self):
         self.stock += 1
@@ -232,8 +229,6 @@ class Product(models.Model):
     def get_discounted_price(self, discount_value):
         if isinstance(discount_value, int):
             return Decimal(((100 - discount_value) * self.price.amount) / 100)
-        else:
-            return False
 
     def get_absolute_url(self):
         return reverse('product',
