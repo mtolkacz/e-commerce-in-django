@@ -74,7 +74,6 @@ $('#decrease_cart').click(function() {
     return false;
 });
 
-
 function decreaseValue(item_id) {
     var cart_value = parseInt(document.getElementById('item' + item_id).value, 10);
     cart_value = isNaN(cart_value) ? 1 : cart_value;
@@ -287,7 +286,6 @@ function rateProduct(prod_id) {
     } else { alert('You need to choose number to rate')}
 }
 
-
 function calculate_cart(cart_value, item_id) {
     add_loader();
     $.ajax({
@@ -492,7 +490,6 @@ function delete_from_cart(item_id) {
         error: errorAjax
     });
 }
-
 
 function delete_cart() {
     var q = confirm("Do you want to delete shipping cart?");

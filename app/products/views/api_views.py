@@ -100,7 +100,7 @@ class ProductCategoryDetail(ListAPIView):
             self.subdepartment = get_object_or_404(Subdepartment, slug=self.kwargs[self.lookup_fields[1]])
             self.category = get_object_or_404(Category, slug=self.kwargs[self.lookup_fields[2]])
         except(Department.DoesNotExist, Subdepartment.DoesNotExist, Category.DoesNotExist):
-            return False
+            pass
         else:
             return True
 
@@ -208,7 +208,7 @@ class ProductDetail(ListAPIView):
                                              pk=self.kwargs[self.lookup_fields[3]],
                                              slug=self.kwargs[self.lookup_fields[4]])
         except(Department.DoesNotExist, Subdepartment.DoesNotExist, Category.DoesNotExist, Product.DoesNotExist):
-            return False
+            pass
         else:
             return True
 

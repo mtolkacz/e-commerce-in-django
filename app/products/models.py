@@ -43,7 +43,7 @@ class Department(models.Model):
 class Subdepartment(models.Model):
     department = models.ForeignKey(
         Department,
-        on_delete=models.PROTECT,
+        on_delete=models.SET_NULL,
         null=True
     )
     name = models.CharField(
@@ -63,19 +63,19 @@ class Subdepartment(models.Model):
     def __str__(self):
         return self.name
 
-    def get_categories(self):
-        return Category.objects.filter(subdepartment=self.id).distinct('name').order_by('name')
-
     def save(self, *args, **kwargs):
         value = self.name
         self.slug = slugify(value, allow_unicode=True)
         super().save(*args, **kwargs)
 
+    def get_categories(self):
+        return Category.objects.filter(subdepartment=self.id).distinct('name').order_by('name')
+
 
 class Category(models.Model):
     subdepartment = models.ForeignKey(
         Subdepartment,
-        on_delete=models.PROTECT,
+        on_delete=models.SET_NULL,
         null=True,
         related_name="sub"
     )
@@ -134,7 +134,7 @@ class Product(models.Model):
     )
     brand = models.ForeignKey(
         Brand,
-        on_delete=models.PROTECT,
+        on_delete=models.SET_NULL,
         null=True
     )
     description = RichTextField()
@@ -152,17 +152,17 @@ class Product(models.Model):
     )
     department = models.ForeignKey(
         Department,
-        on_delete=models.PROTECT,
+        on_delete=models.SET_NULL,
         null=True
     )
     subdepartment = models.ForeignKey(
         Subdepartment,
-        on_delete=models.PROTECT,
+        on_delete=models.SET_NULL,
         null=True
     )
     category = models.ForeignKey(
         Category,
-        on_delete=models.PROTECT,
+        on_delete=models.SET_NULL,
         null=True
     )
     thumbnail = models.ImageField(
@@ -180,6 +180,23 @@ class Product(models.Model):
     creationdate = models.DateTimeField(
         auto_now_add=True
     )
+
+    def __str__(self):
+        return '{}, {}'.format(self.id, self.name)
+
+    def save(self, *args, **kwargs):
+        value = self.short_name
+        self.slug = slugify(value, allow_unicode=True)
+        super().save(*args, **kwargs)
+
+    def get_absolute_url(self):
+        return reverse('product',
+                       kwargs={
+                           'department': self.department.slug,
+                           'subdepartment': self.subdepartment.slug,
+                           'category': self.category.slug,
+                           'pk': self.pk,
+                           'slug': self.slug, })
 
     def get_price_in_string(self):
         return str(self.price)
@@ -209,9 +226,6 @@ class Product(models.Model):
             self.stock -= 1
             self.save(update_fields=['stock'])
 
-    def get_discounted_price_in_string(self):
-        return str(self.discounted_price) if self.discounted_price else ''
-
     def get_discount_value(self):
         if self.discounted_price:
             try:
@@ -230,39 +244,13 @@ class Product(models.Model):
         if isinstance(discount_value, int):
             return Decimal(((100 - discount_value) * self.price.amount) / 100)
 
-    def get_absolute_url(self):
-        return reverse('product',
-                       kwargs={
-                           'department': self.department.slug,
-                           'subdepartment': self.subdepartment.slug,
-                           'category': self.category.slug,
-                           'pk': self.pk,
-                           'slug': self.slug, })
-
-    def get_absolute_url_str(self):
-        return str(reverse('product',
-                           kwargs={
-                               'department': self.department.slug,
-                               'subdepartment': self.subdepartment.slug,
-                               'category': self.category.slug,
-                               'pk': self.pk,
-                               'slug': self.slug, }))
-
     def get_add_to_cart_url(self):
         return reverse("add_item_to_cart", kwargs={
             'item_id': self.id
         })
 
-    def save(self, *args, **kwargs):
-        value = self.short_name
-        self.slug = slugify(value, allow_unicode=True)
-        super().save(*args, **kwargs)
-
     def get_first_image_url(self):
         return ProductImage.objects.filter(product=self).order_by('id')[0].image.url
-
-    def __str__(self):
-        return '{}, {}'.format(self.id, self.name)
 
     def check_if_favorite(self, user):
         try:
@@ -390,7 +378,8 @@ class Discount(models.Model):
     )
     type = models.ForeignKey(
         DiscountType,
-        on_delete=models.PROTECT
+        on_delete=models.SET_NULL,
+        null=True,
     )
     # e.g. id of department, subdepartment, category and other levels or None if global for all products
     set_id = models.IntegerField(
@@ -410,7 +399,8 @@ class Discount(models.Model):
     )
     priority = models.ForeignKey(
         DiscountPriorityType,
-        on_delete=models.PROTECT,
+        on_delete=models.SET_NULL,
+        null=True,
     )
     status = models.PositiveSmallIntegerField(
         choices=STATUS,
@@ -420,13 +410,8 @@ class Discount(models.Model):
         upload_to='pic_folder/'
     )
 
-    def update_status(self, status):
-        self.status = status
-        self.save(update_fields=['status'])
-
-    def get_top_products(self):
-        ids = DiscountLine.objects.filter(discount=self).values_list('product', flat=True)
-        return Product.objects.filter(id__in=ids)[:3]
+    def __str__(self):
+        return '{}, {}'.format(self.id, self.name)
 
     def clean(self):
         super().clean()
@@ -443,8 +428,13 @@ class Discount(models.Model):
         if self.enddate <= timezone.now():
             raise ValidationError('End date must be greater than current datetime')
 
-    def __str__(self):
-        return '{}, {}'.format(self.id, self.name)
+    def update_status(self, status):
+        self.status = status
+        self.save(update_fields=['status'])
+
+    def get_top_products(self):
+        ids = DiscountLine.objects.filter(discount=self).values_list('product', flat=True)
+        return Product.objects.filter(id__in=ids)[:3]
 
 
 class DiscountProductList(models.Model):

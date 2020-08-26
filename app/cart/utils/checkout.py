@@ -36,43 +36,26 @@ class Checkout:
     # create shipment from form, user or from request (looking for user)
     # need to pass form or user key and object
     def create_shipment(self, **kwargs):
-        shipment = None
-        shipment_type = self.shipmenttype_form.cleaned_data['delivery']
-        if shipment_type:
-            if 'form' in kwargs:
-                source = kwargs['form']
-                if source:
-                    try:
-                        voivodeship = Voivodeship.objects.get(name=source.cleaned_data['voivodeship'])
-                        country = Country.objects.get(name=source.cleaned_data['country'])
-                    except (Voivodeship.DoesNotExist, Country.DoesNotExist):
-                        pass
-                    else:
-                        shipment = Shipment(order=self.cart,
-                                            type=shipment_type,
-                                            first_name=source.cleaned_data['first_name'],
-                                            last_name=source.cleaned_data['last_name'],
-                                            city=source.cleaned_data['city'],
-                                            voivodeship=voivodeship,
-                                            country=country,
-                                            zip_code=source.cleaned_data['zip_code'],
-                                            address_1=source.cleaned_data['address_1'],
-                                            address_2=source.cleaned_data['address_2'], )
-            else:
-                source = self.user
-                if source:
-                    shipment = Shipment(order=self.cart,
-                                        type=shipment_type,
-                                        first_name=source.first_name,
-                                        last_name=source.last_name,
-                                        city=source.city,
-                                        voivodeship=source.voivodeship,
-                                        country=source.country,
-                                        zip_code=source.zip_code,
-                                        address_1=source.address_1,
-                                        address_2=source.address_2, )
-        result = shipment if shipment else None
-        return result
+        form = kwargs['form'] if 'form' in kwargs else None
+
+        if form:
+            try:
+                voivodeship = Voivodeship.objects.get(name=form.cleaned_data['voivodeship'])
+                country = Country.objects.get(name=form.cleaned_data['country'])
+            except (Voivodeship.DoesNotExist, Country.DoesNotExist):
+                voivodeship = self.user.voivodeship
+                country = self.user.country
+
+        return Shipment(order=self.cart,
+                        type=self.shipmenttype_form.cleaned_data['delivery'],
+                        first_name=form.cleaned_data['first_name'] if form else self.user.first_name,
+                        last_name=form.cleaned_data['last_name'] if form else self.user.last_name,
+                        city=form.cleaned_data['city'] if form else self.user.city,
+                        voivodeship=voivodeship,
+                        country=country,
+                        zip_code=form.cleaned_data['zip_code'] if form else self.user.zip_code,
+                        address_1=form.cleaned_data['address_1'] if form else self.user.address_1,
+                        address_2=form.cleaned_data['address_2'] if form else self.user.address_2, )
 
     def set_context_data(self):
         self.context['checkout'] = True

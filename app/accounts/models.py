@@ -123,13 +123,6 @@ class User(AbstractBaseUser, PermissionsMixin):
         blank=True
     )
 
-    @property
-    def get_picture_url(self):
-        if self.picture and hasattr(self.picture, 'url'):
-            return self.picture.url
-        else:
-            return "/media/avatar.png"
-
     # phone = models.IntegerField(default=0)
     is_staff = models.BooleanField(
         _('staff status'),
@@ -152,6 +145,9 @@ class User(AbstractBaseUser, PermissionsMixin):
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = ['email']
 
+    """ Billing data - required fields to complete order. """
+    BILLING_DATA = [first_name, last_name, address_1, city, voivodeship, country, zip_code]
+
     class Meta:
         verbose_name = _('user')
         verbose_name_plural = _('users')
@@ -164,27 +160,25 @@ class User(AbstractBaseUser, PermissionsMixin):
         super().clean()
         self.email = self.__class__.objects.normalize_email(self.email)
 
+    def get_picture_url(self):
+        if self.picture and hasattr(self.picture, 'url'):
+            return self.picture.url
+        else:
+            return "/media/avatar.png"
+
     def get_full_name(self):
-        """
-        Return the first_name plus the last_name, with a space in between.
-        """
+        """ Return the first_name plus the last_name, with a space in between. """
         full_name = '%s %s' % (self.first_name, self.last_name)
         return full_name.strip()
 
     def get_short_name(self):
-        """Return the short name for the user."""
+        """ Return the short name for the user. """
         return self.first_name
 
     def email_user(self, subject, message, from_email=None, **kwargs):
-        """Send an email to this user."""
+        """ Send an email to this user. """
         send_mail(subject, message, from_email, [self.email], **kwargs)
 
     def has_all_billing_data(self):
-        return False if (self.address_1 is None or
-                        self.address_1 == '' or
-                        self.city is None or
-                        self.city == '' or
-                        self.voivodeship is None or
-                        self.country is None or
-                        self.zip_code is None or
-                        self.zip_code == '') else True
+        """ Check if user object contains all required billing data. """
+        return any(field is None or field == '' for field in self.BILLING_DATA)

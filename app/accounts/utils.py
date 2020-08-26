@@ -23,7 +23,6 @@ def send_activation_link(request, user, **kwargs):
     # # Create Email object, prepare mail content and generate user token
     # # Email class includes custom predefined SMTP settings
 
-    # receiver = form.cleaned_data.get('email')
     receiver = user.email
     subject = 'Activate your Gallop account'
     if 'order' in kwargs:
@@ -99,42 +98,13 @@ def get_user_object(request):
     return user
 
 
-def update_user_from_form(form, user, request=False):
-    if form.is_valid():
-        fields_to_update = []
+def update_user_from_form(form, user):
+    if form.has_changed():
+        fields_to_update = form.changed_data
+        for field in form.changed_data:
+            setattr(user, field, form.cleaned_data[field])
 
-        # todo probably not to elegant approach, but potentially save time on db operations
-        if user.first_name != form.cleaned_data['first_name']:
-            user.first_name = form.cleaned_data['first_name']
-            fields_to_update.append('first_name')
-        if user.last_name != form.cleaned_data['last_name']:
-            user.last_name = form.cleaned_data['last_name']
-            fields_to_update.append('last_name')
-        if user.address_1 != form.cleaned_data['address_1']:
-            user.address_1 = form.cleaned_data['address_1']
-            fields_to_update.append('address_1')
-        if user.address_2 != form.cleaned_data['address_2']:
-            user.address_2 = form.cleaned_data['address_2']
-            fields_to_update.append('address_2')
-        if user.country != form.cleaned_data['country']:
-            user.country = form.cleaned_data['country']
-            fields_to_update.append('country')
-        if user.voivodeship != form.cleaned_data['voivodeship']:
-            user.voivodeship = form.cleaned_data['voivodeship']
-            fields_to_update.append('voivodeship')
-        if user.city != form.cleaned_data['city']:
-            user.city = form.cleaned_data['city']
-            fields_to_update.append('city')
-        if user.zip_code != form.cleaned_data['zip_code']:
-            user.zip_code = form.cleaned_data['zip_code']
-            fields_to_update.append('zip_code')
-        if request and 'picture' in request.FILES:
-            user.picture = request.FILES['picture']
-            fields_to_update.append('picture')
-
-        if len(fields_to_update):
-            user.save(update_fields=fields_to_update)
-            return True
+        user.save(update_fields=fields_to_update)
 
 
 def create_user_from_form(form):

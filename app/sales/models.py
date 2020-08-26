@@ -9,20 +9,25 @@ from products.models import Product
 class Sale(models.Model):
     product = models.ForeignKey(
         Product,
-        on_delete=models.PROTECT,
-        editable=False)
+        on_delete=models.SET_NULL,
+        editable=False,
+        null=True,
+    )
 
     price = MoneyField(
         max_digits=14,
         decimal_places=2,
         default_currency='USD',
-        editable=False)
+        editable=False
+    )
 
     date = models.DateTimeField(
-        default=timezone.now)
+        default=timezone.now
+    )
 
     promo_code = models.ForeignKey(
         PromoCode,
-        on_delete=models.PROTECT,
+        on_delete=models.SET_NULL,
         null=True,
-        editable=False)
+        editable=False
+    )

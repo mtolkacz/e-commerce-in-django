@@ -100,7 +100,7 @@ class Order(models.Model):
     )
     owner = models.ForeignKey(
         User,
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
         null=True
     )
     ref_code = models.CharField(
@@ -139,7 +139,10 @@ class Order(models.Model):
         null=True
     )
 
-    def get_summary_url(self):
+    def __str__(self):
+        return '{}'.format(self.ref_code)
+
+    def get_order_url(self):
         return reverse('summary', kwargs={'ref_code': self.ref_code,
                                           'oidb64': urlsafe_base64_encode(force_bytes(self.id)), })
 
@@ -206,9 +209,6 @@ class Order(models.Model):
             item.booked = True
             item.save(update_fields=['booked'])
         self.update_status(self.BOOKED)
-
-    def __str__(self):
-        return '{}'.format(self.ref_code)
 
     def update_status(self, status):
         self.status = status
@@ -278,7 +278,7 @@ class Shipment(models.Model):
     )
     type = models.ForeignKey(
         ShipmentType,
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
         null=True
     )
     cost = MoneyField(
@@ -342,6 +342,9 @@ class Shipment(models.Model):
         editable=False
     )
 
+    def __str__(self):
+        return '{} - {}'.format(self.order.ref_code, self.get_status_display())
+
     def save(self, *args, **kwargs):
         if self.type is None:
             try:
@@ -358,21 +361,15 @@ class Shipment(models.Model):
         if self.order is None:
             self.order = kwargs['order'] if 'order' in kwargs else None
 
-        if self.order:
-            return False  # todo add exception
-
         now = timezone.now()
         if self.status == self.IN_PREPARATION:
             self.preparationdate = now
         elif self.status == self.SENT:
-            self.sentdate == now
+            self.sentdate = now
         elif self.status == self.DELIVERED:
-            self.delivereddate == now
+            self.delivereddate = now
 
         super().save(*args, **kwargs)
-
-    def __str__(self):
-        return '{} - {}'.format(self.order.ref_code, self.get_status_display())
 
     def update_status(self, status):
         self.status = status

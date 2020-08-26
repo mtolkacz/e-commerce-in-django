@@ -36,7 +36,7 @@ class ProductSerializer(serializers.ModelSerializer):
     url = serializers.CharField(source='get_absolute_url')
     price = serializers.CharField(source='get_price_in_string')
     discount = serializers.CharField(source='get_discount_value')
-    discounted_price = serializers.CharField(source='get_discounted_price_in_string')
+    discounted_price = serializers.CharField(source='get_discounted_price')
 
     class Meta:
         model = Product

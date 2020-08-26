@@ -99,30 +99,6 @@ def login(request):
                    'registration_form': registration_form})
 
 
-def update_obj_from_form(obj, form):
-    fields_to_update = []
-    for form_field in form.fields:
-        try:
-            obj_field = obj._meta.get_field(form_field)
-        except FieldDoesNotExist:
-            obj_field = None
-        if obj_field:
-            if obj_field.many_to_one:
-                new_model = getattr(obj, form_field)._meta.model
-                new_object = new_model.objects.get(id=obj_field.value_from_object(obj))
-                obj_field_value = str(new_object)
-            else:
-                obj_field_value = obj_field.value_from_object(obj)
-                obj_field_value = None if obj_field_value == "" else obj_field_value
-            cleaned = str(form.cleaned_data[form_field]) if form.cleaned_data[form_field] else None
-            if obj_field_value != cleaned:
-                setattr(obj, form_field, form.cleaned_data[form_field])
-                fields_to_update.append(form_field)
-    if fields_to_update:
-        obj.save(update_fields=fields_to_update)
-        return True
-
-
 @login_required
 def profile(request):
     user = request.user

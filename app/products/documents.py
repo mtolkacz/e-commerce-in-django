@@ -13,7 +13,7 @@ class ProductDocument(Document):
             'suggest': fields.Completion(),
         }
     )
-    url = fields.TextField(attr='get_absolute_url_str')
+    url = fields.TextField(attr='get_absolute_url')
 
     class Django:
         model = Product

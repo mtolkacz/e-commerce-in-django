@@ -91,8 +91,6 @@ class PaypalManager(PayPalClient):
             request = OrdersGetRequest(order_id)
             response = self.client.execute(request)
             return response.result.id
-        else:
-            return None
 
     def get_value(self):
         try:

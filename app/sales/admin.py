@@ -15,8 +15,5 @@ class SaleAdmin(admin.ModelAdmin):
         return obj.promo_code.code if obj.promo_code else '-'
     get_promo_code_name.short_description = 'Promo code'
 
-    def has_add_permission(self, request, obj=None):
-        return False
-
 
 admin.site.register(Sale, SaleAdmin)
