@@ -8,6 +8,7 @@ commands="$(cat commands.txt)"
 
 while [ ! $number -eq 0 ]; do
 	clear
+	echo "0.build all container"
 	echo "1.up containers"
 	echo "2.stop containters"
 	echo "3.build web container"
@@ -46,6 +47,8 @@ while [ ! $number -eq 0 ]; do
 	printf "\nChoose: "
     read number
     case "$number" in
+	0)  docker-compose up -d --build
+	    ;;
 	1)  sh $(dirname $PWD)/start.sh -e dev
 	    ;;
 	2)  docker-compose stop
