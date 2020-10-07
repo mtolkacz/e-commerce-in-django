@@ -9,7 +9,6 @@ from products.models import Favorites, Product
 @login_required
 def add_favorite(request):
     data = {}
-    # user = glp.get_user_object(request)
     prod_id = request.POST.get('prod_id', None)
     if prod_id:
         try:

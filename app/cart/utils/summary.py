@@ -4,7 +4,6 @@ from django.contrib.sessions.models import Session
 from django.utils.encoding import force_text
 from django.utils.http import urlsafe_base64_decode
 
-from accounts.utils import get_user_object
 from cart.models import Order, OrderAccess, Payment, Shipment
 from cart import utils
 
@@ -32,8 +31,7 @@ class Summary:
         self.request = request
         self.ref_code = ref_code
         self.oidb64 = oidb64
-        self.user_authenticated = request.user.is_authenticated
-        self.user = get_user_object(self.request)
+        self.user = self.request.user
         self.session = self.get_or_create_user_session()
         self.context = {}
         self.order = None
@@ -109,8 +107,8 @@ class Summary:
             pass
         else:
             dict = {
-                'key': 'owner' if self.user_authenticated else 'owner__isnull',
-                'value': self.user if self.user_authenticated else True,
+                'key': 'owner' if self else 'owner__isnull',
+                'value': self.user if self.user.is_authenticated else True,
             }
             try:
                 order = Order.objects.get(**{dict['key']: dict['value']}, id=oid, ref_code=self.ref_code)

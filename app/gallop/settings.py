@@ -78,8 +78,8 @@ SOCIAL_AUTH_PIPELINE = (
 SOCIAL_AUTH_FACEBOOK_FIELD_SELECTORS = ['email', ]
 
 # Celery configuration
-CELERY_BROKER_URL = 'amqp://rabbitmq'  # todo go back to this when fix problem with redis
-CELERY_RESULT_BACKEND = 'redis://redis'  # todo go back to this when fix problem with redis
+CELERY_BROKER_URL = 'amqp://rabbitmq'
+CELERY_RESULT_BACKEND = 'redis://redis'
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'

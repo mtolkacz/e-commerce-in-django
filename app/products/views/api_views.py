@@ -12,7 +12,6 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.renderers import TemplateHTMLRenderer
 from rest_framework.response import Response
 
-from accounts.utils import get_user_object
 from cart.models import OrderItem
 from cart import utils
 from gallop.utils import get_popular_products
@@ -239,7 +238,7 @@ class ProductDetail(ListAPIView):
 
             favorite = None
             if request.user.is_authenticated:
-                user = get_user_object(request)
+                user = request.user
                 favorite = self.product.check_if_favorite(user)
                 self.add_product_to_viewed(user)
 

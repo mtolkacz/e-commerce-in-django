@@ -4,10 +4,9 @@ from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.core.mail import send_mail
 from django.db import models
 from django.utils import timezone
-from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 
-from .utils import validate_zip_code
+from .utils import *
 
 
 class Country(models.Model):

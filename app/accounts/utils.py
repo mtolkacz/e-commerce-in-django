@@ -13,6 +13,7 @@ from django.utils.http import urlsafe_base64_encode
 from django.utils import six
 
 from .tasks import send_email
+from cart.models import *
 
 
 def send_activation_link(request, user, **kwargs):
@@ -86,16 +87,6 @@ class Email:
             server.starttls(context=context)
             server.login(self.sender_email, self.password)
             server.sendmail(self.sender_email, receiver, message)
-
-
-def get_user_object(request):
-    user = None
-    if request:
-        try:
-            user = User.objects.get(id=request.user.id)
-        except User.DoesNotExist:
-            pass
-    return user
 
 
 def update_user_from_form(form, user):

@@ -1,13 +1,12 @@
 from decimal import Decimal
 
 from cart.models import PromoCode, PromoCodeUsage
-from accounts.utils import get_user_object
 
 
 class PromoCodeManager:
     def __init__(self, request, order, code):
         self.request = request
-        self.user = get_user_object(self.request)
+        self.user = request.user
         self.code = code
         self.promo_code = self.get_promo_code_object()
         self.order = order

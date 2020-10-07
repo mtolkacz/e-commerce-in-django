@@ -69,7 +69,7 @@ def checkout(request):
                 # if saved shipment then go to finalize
                 if checkout.shipment:
                     checkout.update_cart(user=checkout.user)
-                    send_purchase_link(request, cart)
+                    utils.send_purchase_link(request, cart)
                     # save shipment only when everything else finished successfully
                     checkout.shipment.save()
                     # go to checkout
@@ -77,7 +77,6 @@ def checkout(request):
                                                                'oidb64': urlsafe_base64_encode(
                                                                    force_bytes(checkout.cart.id)), }))
                 else:
-                    # todo track errors and inform administrator
                     messages.error(request,
                                    'There was a problem creating the shipment. Administrator has been informed.')
                 return redirect(reverse('index'))
@@ -90,7 +89,7 @@ def checkout(request):
 
 
 def summary(request, ref_code, oidb64):
-    summary = Summary(request, ref_code, oidb64)
+    summary = utils.Summary(request, ref_code, oidb64)
 
     if summary.set_order():
         if summary.set_shipment():

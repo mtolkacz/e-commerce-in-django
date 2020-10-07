@@ -185,16 +185,10 @@ class Order(models.Model):
 
         return cart_total
 
-    def get_cart_total_str(self):
-        return str(self.get_cart_total().amount)
-
     def get_cart_total_no_promo(self):
         cart_total = sum([(item.product.discounted_price if item.product.discounted_price else item.product.price)
                           * item.amount for item in self.items.all()])
         return cart_total
-
-    def get_cart_total_no_promo_str(self):
-        return str(self.get_cart_total_no_promo().amount)
 
     def get_cart_currency(self):
         return self.get_cart_total().currency if self.get_cart_total().currency else 'USD'

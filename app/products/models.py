@@ -170,7 +170,7 @@ class Product(models.Model):
     )
     slug = models.SlugField(
         max_length=150
-    )  # todo check max product name length
+    )
     stock = models.SmallIntegerField(
         default=0
     )
@@ -416,7 +416,6 @@ class Discount(models.Model):
     def clean(self):
         super().clean()
 
-        # todo stop execution if already exists Discount/should we allow to edit already created Discount?
         try:
             already_exists = Discount.objects.get(id=self.id)
         except Discount.DoesNotExist:

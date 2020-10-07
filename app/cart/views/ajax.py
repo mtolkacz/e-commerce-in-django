@@ -161,7 +161,7 @@ def calculate_item_in_cart(request):
     # check if value is in the right range
     if 0 < value <= MAX_ITEMS_IN_CART:
         updated_item.amount = value
-        updated_item.save(update_fields=['amount'])  # todo how to make sure save was sucessfull?
+        updated_item.save(update_fields=['amount'])
         data['success'] = True
 
         # after successful update more data for JsonResponse
