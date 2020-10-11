@@ -2,12 +2,12 @@ from django.contrib import messages
 from django.contrib.auth import authenticate
 from django.contrib.auth import login as auth_login
 from django.contrib.auth.decorators import login_required
-from django.core.exceptions import FieldDoesNotExist
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseRedirect
 from django.shortcuts import redirect, render
 from django.utils.encoding import force_text
 from django.utils.http import urlsafe_base64_decode
-from django.views.decorators.http import require_http_methods
+from django.views.generic.base import View
 
 from products.models import Favorites, Product, ProductRating
 from accounts.forms import LoginForm, RegisterForm, ProfileForm
@@ -16,19 +16,31 @@ from accounts.utils import create_user_from_form, send_activation_link, account_
 from cart.models import Order
 
 
-@require_http_methods(["GET", "POST"])
-def login(request):
+class LoginRegistrationView(View):
+    """ User login and registration view"""
 
-    # If user is already singed in redirect to index view
-    if request.user.is_authenticated:
-        return redirect('index')
+    template_name = 'accounts/login.html'
 
-    # Create multiple forms for signing in and registration
-    login_form = LoginForm()
-    registration_form = RegisterForm()
+    # Redirect the logged in user to the following page
+    page_to_redirect = 'index'
 
-    # Go to login and register logic section if method is POST
-    if request.method == 'POST':
+    @staticmethod
+    def get_context_data(**kwargs):
+        if 'login' not in kwargs:
+            kwargs['login_form'] = LoginForm()
+        if 'register' not in kwargs:
+            kwargs['registration_form'] = RegisterForm()
+        return kwargs
+
+    def get(self, request, *args, **kwargs):
+        # If user is already singed in then redirect to index view
+        if request.user.is_authenticated:
+            return redirect(self.page_to_redirect)
+
+        return render(request, self.template_name, self.get_context_data())
+
+    def post(self, request, *args, **kwargs):
+        ctxt = {}
 
         # Check if login button is clicked
         if 'login' in request.POST:
@@ -37,35 +49,19 @@ def login(request):
 
             # Return True if the form has no errors, or False otherwise
             if login_form.is_valid():
-
-                # Normalize form fields to consistent format
-                login = login_form.cleaned_data.get('username')
-                raw_password = login_form.cleaned_data.get('password')
-
-                username = login
-                if username.find('@') >= 0:
-                    try:
-                        username = User.objects.get(email=login).username
-                    except User.DoesNotExist:
-                        messages.error(request, 'Incorrect login')
-
-                # If the given credentials are valid, return a User object.
-                user = authenticate(username=username, password=raw_password)
+                user = self.authenticate_from_form(request, login_form)
 
                 # Check if credentials are valid and User object exist
-                if user is not None:
-
-                    # Check if user is active
-                    if user.is_active:
-
+                if not user:
+                    messages.error(request, 'Invalid login details given.')
+                else:
+                    # Report error if user is not active
+                    if not user.is_active:
+                        messages.error(request, 'Your account is inactive.')
+                    else:
                         # Log in user
-                        auth_login(request, user, backend='django.contrib.auth.backends.ModelBackend')
-
-                        # Check if remember me checkbox is selected
-                        if not request.POST.get('remember_me', None):
-                            # Set a custom expiration for the session to 0.
-                            # The session will expire on browser close.
-                            request.session.set_expiry(0)
+                        auth_login(request, user)
+                        self.set_session_expiration(request)
 
                         next_url = request.GET.get('next')
                         if next_url:
@@ -74,13 +70,8 @@ def login(request):
                         hello = user.first_name if user.first_name else user.username
                         messages.success(request, 'Welcome {}'.format(hello))
                         # Go to index view
-                        return redirect('index')
-                    else:
-                        messages.error(request, 'Your account is inactive.')
-                else:
-                    messages.error(request, 'Invalid login details given.')
+                        return redirect(self.page_to_redirect)
 
-        # Check if register button is clicked
         elif 'register' in request.POST:
 
             # Assign register form fields to variable
@@ -88,51 +79,87 @@ def login(request):
 
             # Return True if the form has no errors, or False otherwise
             if registration_form.is_valid():
-
                 user = create_user_from_form(registration_form)
-
                 send_activation_link(request, user)
+            else:
+                ctxt['registration_form'] = registration_form
 
-    # Load login view with forms and display form messages
-    return render(request, 'accounts/login.html',
-                  {'login_form': login_form,
-                   'registration_form': registration_form})
+        return render(request, self.template_name, self.get_context_data(**ctxt))
+
+    @staticmethod
+    def authenticate_from_form(request, form):
+        # Normalize form fields to consistent format
+        login = form.cleaned_data.get('username')
+        raw_password = form.cleaned_data.get('password')
+
+        username = login
+        if username.find('@') >= 0:
+            try:
+                username = User.objects.get(email=login).username
+            except User.DoesNotExist:
+                messages.error(request, 'Incorrect login')
+
+        # If the given credentials are valid, return a User object.
+        return authenticate(username=username, password=raw_password)
+
+    @staticmethod
+    def set_session_expiration(request):
+        # Check if remember me checkbox is selected
+        if not request.POST.get('remember_me', None):
+            # Set a custom expiration for the session to 0.
+            # The session will expire on browser close.
+            request.session.set_expiry(0)
 
 
-@login_required
-def profile(request):
-    user = request.user
-    if request.method == 'POST':
-        form = ProfileForm(request.POST, request.FILES, instance=user)
+class ProfileView(LoginRequiredMixin, View):
+    template_name = 'accounts/profile.html'
+
+    @staticmethod
+    def get_context_data(request, **kwargs):
+        if 'form' not in kwargs:
+            kwargs['form'] = ProfileForm(instance=request.user)
+
+        orders = Order.objects.filter(owner=request.user)
+        favorites = Favorites.objects.filter(user=request.user)
+        # todo to rewrite below especially queries
+        product_ids = []
+        for order in orders:
+            if order.status == Order.COMPLETED:
+                product_ids += order.items.all().values_list('product__id', flat=True)
+
+        product_ids = list(set(product_ids))
+        rated_products = ProductRating.objects \
+            .filter(product__in=product_ids, user=request.user)
+
+        products_to_rate = Product.objects \
+            .exclude(id__in=[rating.product.id for rating in rated_products]) \
+            .filter(id__in=product_ids)
+
+        context = {
+            'orders': orders,
+            'favorites': favorites,
+            'rated_products': rated_products,
+            'products_to_rate': products_to_rate,
+        }
+        kwargs = {**kwargs, **context}
+
+        return kwargs
+
+    def get(self, request, *args, **kwargs):
+        return render(request, self.template_name, self.get_context_data(request))
+
+    def post(self, request, *args, **kwargs):
+        ctxt = {}
+
+        form = ProfileForm(request.POST, request.FILES, instance=request.user)
         if form.is_valid():
-            messages.success(request, 'Data saved') if form.save() else None
+            if form.save():
+                messages.success(request, 'Data saved')
             return HttpResponseRedirect(request.path)
-    else:
-        form = ProfileForm(instance=user)
+        else:
+            ctxt['form'] = form
 
-    orders = Order.objects.filter(owner=user)
-
-    product_ids = []
-    for order in orders:
-        if order.status == Order.COMPLETED:
-            product_ids += order.items.all().values_list('product__id', flat=True)
-
-    product_ids = list(set(product_ids))
-    rated_products = ProductRating.objects\
-        .filter(product__in=product_ids, user=user)
-
-    products_to_rate = Product.objects\
-        .exclude(id__in=[rating.product.id for rating in rated_products])\
-        .filter(id__in=product_ids)
-
-    context = {
-        'form': form,
-        'favorites': Favorites.objects.filter(user=user),
-        'orders': orders,
-        'rated_products': rated_products,
-        'products_to_rate': products_to_rate,
-    }
-    return render(request, 'accounts/profile.html', context)
+        return render(request, self.template_name, self.get_context_data(request, **ctxt))
 
 
 def activate(request, uidb64, token):
