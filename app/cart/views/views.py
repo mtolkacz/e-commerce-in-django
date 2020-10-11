@@ -69,7 +69,7 @@ def checkout(request):
                 # if saved shipment then go to finalize
                 if checkout.shipment:
                     checkout.update_cart(user=checkout.user)
-                    utils.send_purchase_link(request, cart)
+                    utils.send_purchase_link(request, cart, checkout.shipment)
                     # save shipment only when everything else finished successfully
                     checkout.shipment.save()
                     # go to checkout

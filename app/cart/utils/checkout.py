@@ -41,10 +41,15 @@ class Checkout:
         if form:
             try:
                 voivodeship = Voivodeship.objects.get(name=form.cleaned_data['voivodeship'])
+            except Voivodeship.DoesNotExist:
+                voivodeship = None
+            try:
                 country = Country.objects.get(name=form.cleaned_data['country'])
-            except (Voivodeship.DoesNotExist, Country.DoesNotExist):
-                voivodeship = self.user.voivodeship
-                country = self.user.country
+            except Country.DoesNotExist:
+                country = None
+        else:
+            voivodeship = self.user.voivodeship
+            country = self.user.country
 
         return Shipment(order=self.cart,
                         type=self.shipmenttype_form.cleaned_data['delivery'],
@@ -66,6 +71,7 @@ class Checkout:
             else:
                 billing_form = BillingForm(instance=self.user, without_new_account=True)
                 self.context['billing_form'] = billing_form
+                print(self.user.email)
         else:
             self.context['billing_form'] = self.billing_form
 

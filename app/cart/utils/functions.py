@@ -63,31 +63,24 @@ def get_pending_cart(request):
     return order
 
 
-def send_purchase_link(request, order):
+def send_purchase_link(request, order, shipment):
     # Look up the current site based on request.get_host() if the SITE_ID setting is not defined
     current_site = get_current_site(request)
 
-    first_name = order.owner.first_name if order.owner else None
-    if not first_name:
-        try:
-            shipment = Shipment.objects.get(order=order)
-        except Shipment.DoesNotExist:
-            shipment = None
-    if shipment:
-        first_name = shipment.first_name
-        receiver = order.email
-        subject = 'Gallop purchase - {}'.format(order.ref_code)
-        context = {
-            'domain': current_site.domain,
-            'oidb64': urlsafe_base64_encode(force_bytes(order.id)),
-            'order': order,
-            'first_name': first_name
-        }
+    first_name = order.owner.first_name if order.owner else shipment.first_name
+    receiver = order.email
+    subject = 'Gallop purchase - {}'.format(order.ref_code)
+    context = {
+        'domain': current_site.domain,
+        'oidb64': urlsafe_base64_encode(force_bytes(order.id)),
+        'order': order,
+        'first_name': first_name
+    }
 
-        message = render_to_string('cart/access_link.html', context)
+    message = render_to_string('cart/access_link.html', context)
 
-        # Celery sending mail
-        send_email.apply_async((receiver, subject, message), countdown=0)
-        send_email.apply_async(('michal.tolkacz@gmail.com', subject, message), countdown=0)
+    # Celery sending mail
+    send_email.apply_async((receiver, subject, message), countdown=0)
+    send_email.apply_async(('michal.tolkacz@gmail.com', subject, message), countdown=0)
 
-        return True
+    return True
