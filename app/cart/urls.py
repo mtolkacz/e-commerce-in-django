@@ -5,7 +5,7 @@ from .views import ajax, views
 urlpatterns = [
     # Standard django views
     path('cart', views.cart, name='cart'),
-    path('checkout', views.checkout, name='checkout'),
+    path('checkout', views.CheckoutView.as_view(), name='checkout'),
     re_path('^activate/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/(?P<oidb64>[0-9A-Za-z_\-]+)/$', views.purchase_activate, name='purchase_activate'),
     path('summary/<str:ref_code>/<str:oidb64>/', views.summary, name='summary'),
 

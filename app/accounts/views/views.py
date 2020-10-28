@@ -118,14 +118,14 @@ class ProfileView(LoginRequiredMixin, View):
         if 'form' not in kwargs:
             kwargs['form'] = ProfileForm(instance=request.user)
 
-        orders = Order.objects.filter(owner=request.user) # .values_list('ref_code', 'status', 'date_ordered')
+        orders = Order.objects.filter(owner=request.user)
         favorites = Favorites.objects.filter(user=request.user)
-        # rated_products = ProductRating.objects.filter(user=request.user).defer('user')
 
-        # todo to rewrite below especially queries
+        # todo how rewrite below especially queries
         product_ids = []
         for order in orders:
             if order.status == Order.COMPLETED:
+                # get list of products in orders
                 product_ids += order.items.all().values_list('product__id', flat=True)
 
         product_ids = list(set(product_ids))
@@ -169,7 +169,7 @@ def activate(request, uidb64, token):
         user = User.objects.get(pk=uid)
     except(TypeError, ValueError, OverflowError, User.DoesNotExist):
         user = None
-    if user is not None and account_activation_token.check_token(user, token):
+    if user and account_activation_token.check_token(user, token):
         # Activate user and save
         user.is_active = True
         user.save()

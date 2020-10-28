@@ -172,7 +172,7 @@ $('#delete-filter').click(function() {
         $('#essenceNav').classyNav();
     }
 
-    $('#same-address').change(function() {
+    $('#same_address').change(function() {
         var shippment_address = document.getElementById('shippment_address');
         if(shippment_address){
             if(shippment_address.style.display=='block'){
@@ -185,8 +185,8 @@ $('#delete-filter').click(function() {
 
         }
     });
-    $('#account-checkbox').change(function() {
-        var create_account = document.getElementById('create-account');
+    $('#create_account').change(function() {
+        var create_account = document.getElementById('create_account');
         if(create_account){
             if(create_account.style.display=='block'){
                 create_account.style.display='none';

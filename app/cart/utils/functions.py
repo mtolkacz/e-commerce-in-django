@@ -3,6 +3,7 @@ import random
 import string
 from datetime import date
 
+from django.contrib.auth import get_user_model
 from django.contrib.sessions.models import Session
 from django.contrib.sites.shortcuts import get_current_site
 from django.shortcuts import get_object_or_404
@@ -11,8 +12,9 @@ from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 
 from cart.models import Order, Shipment
-from cart.views import User
 from accounts.tasks import send_email
+
+User = get_user_model()
 
 
 def generate_order_id():

@@ -1,4 +1,3 @@
-import logging
 import math
 from decimal import Decimal
 
@@ -13,16 +12,12 @@ from rest_framework.renderers import TemplateHTMLRenderer
 from rest_framework.response import Response
 
 from cart.models import OrderItem
-from cart import utils
 from gallop.utils import get_popular_products
 from products.models import (Brand, Category, Department, LastViewedProducts,
                              Product, ProductImage, Subdepartment)
 from products.serializers import (BrandSerializer, CategorySerializer,
                                   DepartmentSerializer, ProductSerializer,
                                   SubdepartmentSerializer)
-
-
-logger = logging.getLogger(__name__)
 
 
 class ProductDepartmentDetail(ListAPIView):
@@ -213,8 +208,9 @@ class ProductDetail(ListAPIView):
 
     @staticmethod
     def check_if_exist_in_cart(request, prod):
+        from cart.utils import get_pending_cart
         result = None
-        cart = utils.get_pending_cart(request)
+        cart = get_pending_cart(request)
         try:
             result = OrderItem.objects.get(order=cart, product=prod).id if cart else False
         except OrderItem.DoesNotExist:

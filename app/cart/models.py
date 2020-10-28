@@ -197,20 +197,22 @@ class Order(models.Model):
         return sum(item.amount for item in self.items.all())
 
     def book(self):
-        items = self.items.all()
-        for item in items:
-            item.product.book(amount=item.amount)
-            item.booked = True
-            item.save(update_fields=['booked'])
-        self.update_status(self.BOOKED)
+        """ Book order lines and products, change status of card to booked """
+        if self.status != self.BOOKED:
+            items = self.items.all()
+            for item in items:
+                item.product.book(amount=item.amount)
+                item.booked = True
+                item.save(update_fields=['booked'])
+            self.update_status(self.BOOKED)
 
     def update_status(self, status):
         self.status = status
         self.save(update_fields=['status', ])
 
-    def create_access_code(self):
-        self.access_code = random.randint(1000, 9999)
-        self.save(update_fields=['access_code'])
+    @staticmethod
+    def get_access_code():
+        return random.randint(1000, 9999)
 
     def delete_access_code(self):
         self.access_code = None

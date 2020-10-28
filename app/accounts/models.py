@@ -180,4 +180,6 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def has_all_billing_data(self):
         """ Check if user object contains all required billing data. """
-        return any(field is None or field == '' for field in self.BILLING_DATA)
+        return not any(getattr(self, field.name) is None
+                       or getattr(self, field.name) == '' for field in self.BILLING_DATA)
+

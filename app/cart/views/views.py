@@ -3,18 +3,23 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth import login as auth_login
 from django.shortcuts import redirect, render
 from django.urls import reverse
+from django.utils.decorators import method_decorator
 from django.utils.encoding import force_bytes, force_text
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
+from django.views.generic.base import View
 
-from accounts.utils import account_activation_token, send_activation_link
+from accounts.utils import account_activation_token, send_activation_link, create_user_from_form, update_user_from_form
 from cart.models import Order
-from cart import utils
+from cart.utils import send_purchase_link, get_pending_cart, Summary
+from cart.decorators import cart_required
+from cart.viewmixins import BaseCheckoutMixin, PrepareCheckoutMixin, CheckoutFormsMixin, ShipmentMixin, CheckoutEmailMixin, \
+    CartUpdateMixin, CheckoutContextMixin
 
 User = get_user_model()
 
 
 def cart(request):
-    order = utils.get_pending_cart(request)
+    order = get_pending_cart(request)
 
     context = {
         'order': order,
@@ -22,74 +27,60 @@ def cart(request):
     return render(request, 'cart/cart.html', context)
 
 
-def checkout(request):
-    cart = utils.get_pending_cart(request)
-    if not cart:
-        return redirect(reverse('index'))
-    checkout = utils.Checkout(request, cart)
-    checkout.set_context_data()
+@method_decorator(cart_required(), name='dispatch')
+class CheckoutView(
+    CheckoutContextMixin,
+    PrepareCheckoutMixin,
+    ShipmentMixin,
+    CheckoutEmailMixin,
+    CartUpdateMixin,
+    View,
+):
+    template_name = 'cart/checkout.html'
 
-    if request.method == 'POST':
-        # shipment_type = request.POST.get('prod_id', None)
-        if not checkout.same_address:
-            checkout.check_shipment_form()
+    def get(self, request, *args, **kwargs):
+        return render(request, self.template_name, PrepareCheckoutMixin().get_context_data(request, **kwargs))
 
-        a = checkout.check_delivery_form()
+    def post(self, request, *args, **kwargs):
 
-        if not checkout.user:
-            if not checkout.check_billing_form():
-                checkout.update_context_when_billing_form_failed()
-            else:
-                checkout.shipment = checkout.get_shipment()
-                if checkout.shipment:
-                    checkout.cart.book()
-                    checkout.update_cart()
-                    if checkout.account_checkbox:
-                        # method from accounts app to confirm new user and redirect to purchase
-                        send_activation_link(checkout.request, checkout.user, order=checkout.cart)
+        kwargs = super().get_context_data(request, **kwargs)
 
-                    else:
-                        # send link to purchase with access key
-                        checkout.send_access_link()
-
-                    # save shipment only when everything else finished successfully
-                    checkout.shipment.save()
-                else:
-                    messages.error(request,
-                                   'There was a problem creating the shipment. Administrator has been informed.')
-                return redirect(reverse('index'))
-        # if user logged in
+        # Stop proceeding if any of form is incorrectly completed
+        if self.invalid_forms:
+            return render(request, self.template_name, kwargs)
         else:
-            # if user had to fill billing form then update new personal data
-            if 'billing_form' in checkout.context:
-                checkout.update_user()
-            if checkout.valid_forms:
-                checkout.cart.book()
-                checkout.shipment = checkout.get_shipment(user=checkout.user)
-                # if saved shipment then go to finalize
-                if checkout.shipment:
-                    checkout.update_cart(user=checkout.user)
-                    utils.send_purchase_link(request, cart, checkout.shipment)
-                    # save shipment only when everything else finished successfully
-                    checkout.shipment.save()
-                    # go to checkout
-                    return redirect(reverse('summary', kwargs={'ref_code': checkout.cart.ref_code,
+            if not self.has_all_billing_data:
+                update_user_from_form(self.billing_form, self.user)
+            elif self.create_account:
+                self.user = create_user_from_form(self.billing_form)
+
+            self.cart.book()
+            self.shipment = self.assign_new_shipment()
+
+            if self.shipment:
+                self.update_cart_after_shipment_creating(request)
+                self.send_checkout_email(request)
+
+                # Save user and shipment after successful updating cart and sending checkout email
+                if self.create_account:
+                    self.user.save()
+
+                self.shipment.save()
+
+                if request.user.is_authenticated:
+                    return redirect(reverse('summary', kwargs={'ref_code': self.cart.ref_code,
                                                                'oidb64': urlsafe_base64_encode(
-                                                                   force_bytes(checkout.cart.id)), }))
-                else:
-                    messages.error(request,
-                                   'There was a problem creating the shipment. Administrator has been informed.')
-                return redirect(reverse('index'))
-            checkout.context['billing_form'] = checkout.billing_form
+                                                                   force_bytes(self.cart.id)), }))
+            else:
+                messages.error(request,
+                               'There was a problem creating the shipment. Administrator has been informed.')
 
-    checkout.context['shipment_form'] = checkout.shipment_form
-    checkout.context['delivery_type_form'] = checkout.shipmenttype_form
-
-    return render(request, 'cart/checkout.html', checkout.context)
+            # Redirect newly created user or user without account to index page and display proper message
+            return redirect(reverse('index'))
 
 
 def summary(request, ref_code, oidb64):
-    summary = utils.Summary(request, ref_code, oidb64)
+    summary = Summary(request, ref_code, oidb64)
 
     if summary.set_order():
         if summary.set_shipment():

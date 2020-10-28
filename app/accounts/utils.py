@@ -106,4 +106,4 @@ def create_user_from_form(form):
     user.is_active = False
 
     # Create new user
-    return user.save()
+    return user

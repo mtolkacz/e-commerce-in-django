@@ -73,7 +73,7 @@
 
       <form method="post" class="needs-validation" novalidate>
         {% csrf_token %}
-        {% if user_data %}
+        {% if has_all_billing_data %}
         <h4 class="mb-3">Billing address</h4>
         <table class="table table-striped">
             <tbody>
@@ -90,36 +90,29 @@
             </tbody>
         </table>
           <hr class="mb-2">
-          <!-- Shippment address chechbox-->
-          <div class="custom-control custom-checkbox pb-4">
-              <input type="checkbox" class="custom-control-input" autocomplete="off" name="same-address" value="same-address" {% if same_address %}{{ same_address }}{% endif %} id="same-address">
-              <label class="custom-control-label" for="same-address">Shipping address is the same as my billing address</label>
-          </div>
-
-          {% include "cart/checkout/shipment_address.html" %}
 
         {% else %}
 
           {% include "cart/checkout/billing_address.html" %}
           {% if not user.username %}
           <div class="custom-control custom-checkbox">
-              <input type="checkbox" name="account-checkbox" value="account_checkbox" {% if account_checkbox %}{{ account_checkbox }}{% endif %} class="custom-control-input" id="account-checkbox">
-              <label class="custom-control-label" for="account-checkbox">Save information for future and create account</label>
+              <input type="checkbox" name="create_account" value="create_account" {% if create_account %}{{ create_account }}{% endif %} class="custom-control-input" id="create_account">
+              <label class="custom-control-label" for="create_account">Save information for future and create account</label>
           </div>
 
           {% include "cart/checkout/create_account.html" %}
           {% endif %}
-          <div class="custom-control custom-checkbox">
-              <input type="checkbox" name="same-address" value="same-address" {% if same_address %}{{ same_address }}{% endif %} class="custom-control-input" id="same-address">
-              <label class="custom-control-label" for="same-address">Shipping address is the same as my billing address</label>
+        {% endif %}
+           <!-- Shippment address chechbox-->
+          <div class="custom-control custom-checkbox pb-4">
+              <input type="checkbox" class="custom-control-input" autocomplete="off" name="same_address" value="same_address" {% if same_address %}{{ same_address }}{% endif %} id="same_address">
+              <label class="custom-control-label" for="same_address">Shipping address is the same as my billing address</label>
           </div>
 
           {% include "cart/checkout/shipment_address.html" %}
-
-        {% endif %}
           <hr class="mb-2">
           <h4 class="mb-3">Delivery method</h4>
-          {{ delivery_type_form.delivery|as_crispy_field }}<br>
+          {{ shipmenttype_form.delivery|as_crispy_field }}<br>
           <hr class="mb-2">
          <button type="submit" class="btn btn-success btn-lg mt-3"><i class="fas fa-shopping-bag"></i> Go to Payment</button>
         </form>
