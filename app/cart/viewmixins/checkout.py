@@ -5,7 +5,6 @@ from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 
 from accounts.models import Country, Voivodeship, send_email
-from accounts.utils import send_activation_link
 from cart.forms import ShipmentTypeForm, ShipmentForm, BillingForm
 from cart.models import Shipment, Order
 from cart.utils import send_purchase_link
@@ -53,6 +52,9 @@ class CheckoutFormsMixin(BaseCheckoutMixin):
         context[form_name] = form_object
         if not form_object.is_valid():
             self.invalid_forms = True
+
+    def get_billing_form_email(self):
+        return self.billing_form.cleaned_data['email']
 
     def manage_billing_form(self, request, context):
         if not self.has_all_billing_data:
@@ -176,42 +178,10 @@ class CheckoutEmailMixin(BaseCheckoutMixin):
         if request.user.is_authenticated:
             send_purchase_link(request, self.cart, self.shipment)
         elif self.create_account:
-            send_activation_link(request, self.cart.owner, order=self.cart)
+            self.cart.owner.send_activation_link(request, order=self.cart)
+            messages.success(request, 'Please confirm your email address to complete the registration.')
         else:
             self.send_access_email()
-
-
-class CartUpdateMixin(BaseCheckoutMixin):
-
-    def update_cart_after_shipment_creating(self, request):
-
-        self.cart.is_ordered = True
-        fields_to_update = ['is_ordered', ]
-
-        if request.user.is_authenticated:
-            self.cart.email = self.user.email
-            self.cart.status = Order.CONFIRMED
-            fields_to_update.append('status')
-        else:
-            # Not authenticated user has deleted connection to Django session
-            self.cart.session_key = None
-            fields_to_update.append('session_key')
-
-            if self.user:
-                # Update owner and email fields in cart for newly created user
-                self.cart.owner = self.user
-                self.cart.email = self.user.email
-                fields_to_update.append('owner')
-            else:
-                # User without account needs access code to display checkout
-                self.cart.access_code = self.cart.get_access_code()
-                self.cart.email = self.billing_form.cleaned_data['email']
-                fields_to_update.append('access_code')
-
-        # Email address is updated for every scenario
-        fields_to_update.append('email')
-
-        self.cart.save(update_fields=fields_to_update)
 
 
 class CheckoutContextMixin(CheckoutFormsMixin):

@@ -7,8 +7,8 @@ from django.db import models
 from django.db.models import signals
 from django.urls import reverse
 from django.utils import timezone
-from django.utils.encoding import force_bytes
-from django.utils.http import urlsafe_base64_encode
+from django.utils.encoding import force_bytes, force_text
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from djmoney.models.fields import MoneyField
 from djmoney.money import Money
 
@@ -214,13 +214,46 @@ class Order(models.Model):
     def get_access_code():
         return random.randint(1000, 9999)
 
-    def delete_access_code(self):
-        self.access_code = None
-        self.save(update_fields=['access_code'])
-
     def apply_promo_code(self, promo_code):
         self.promo_code = promo_code
         self.save(update_fields=['promo_code'])
+        
+    def update_after_shipment_creating(self, user, billing_form_email):
+
+        self.is_ordered = True
+        fields_to_update = ['is_ordered', ]
+
+        if user.is_authenticated:
+            self.email = user.email
+            self.status = Order.CONFIRMED
+            fields_to_update.append('status')
+        else:
+            # Not authenticated user has deleted connection to Django session
+            self.session_key = None
+            fields_to_update.append('session_key')
+
+            if user:
+                # Update owner and email fields in cart for newly created user
+                self.owner = user
+                self.email = user.email
+                fields_to_update.append('owner')
+            else:
+                # User without account needs access code to display checkout
+                self.access_code = self.get_access_code()
+                self.email = billing_form_email
+                fields_to_update.append('access_code')
+
+        # Email address is updated for every scenario
+        fields_to_update.append('email')
+
+        self.save(update_fields=fields_to_update)
+
+    @staticmethod
+    def get_decrypted_object(oidb64):
+        try:
+            return Order.objects.get(id=int(force_text(urlsafe_base64_decode(oidb64))))
+        except(TypeError, ValueError, OverflowError, Order.DoesNotExist):
+            pass
 
 
 signals.pre_delete.connect(order_pre_delete, sender=Order)

@@ -1,5 +1,4 @@
 from django.contrib import messages
-from django.contrib.auth import authenticate
 from django.contrib.auth import login as auth_login
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseRedirect
@@ -10,9 +9,10 @@ from django.views.generic.base import View
 
 from products.models import Favorites, Product, ProductRating
 from accounts.forms import LoginForm, RegisterForm, ProfileForm
-from accounts.models import User
-from accounts.utils import create_user_from_form, send_activation_link, account_activation_token
+from accounts.models.User import authenticate_from_form
+from accounts.models.UserManager import create_from_form
 from cart.models import Order
+from accounts.models import User, account_activation_token
 
 
 class LoginRegistrationView(View):
@@ -41,73 +41,43 @@ class LoginRegistrationView(View):
     def post(self, request, *args, **kwargs):
         ctxt = {}
 
-        # Check if login button is clicked
-        if 'login' in request.POST:
-            # Assign login form fields to variable
-            login_form = LoginForm(request.POST)
+        if 'login' in request.POST:  # Check if login button is clicked
+            login_form = LoginForm(request.POST)  # Assign login form fields to variable
 
-            # Return True if the form has no errors, or False otherwise
-            if login_form.is_valid():
-                user = self.authenticate_from_form(request, login_form)
+            if login_form.is_valid():  # Return True if the form has no errors, or False otherwise
+                try:
+                    user = authenticate_from_form(login_form)
+                except User.DoesNotExist:
+                    messages.error(request, 'Incorrect login')
 
-                # Check if credentials are valid and User object exist
-                if not user:
+                if not user:  # Check if credentials are valid and User object exist
                     messages.error(request, 'Invalid login details given.')
                 else:
-                    # Report error if user is not active
-                    if not user.is_active:
+                    if not user.is_active:  # Report error if user is not active
                         messages.error(request, 'Your account is inactive.')
                     else:
-                        # Log in user
-                        auth_login(request, user)
-                        self.set_session_expiration(request)
-
+                        auth_login(request, user)  # Log in user
+                        user.set_session_expiration(request)
                         next_url = request.GET.get('next')
                         if next_url:
                             return HttpResponseRedirect(next_url)
 
                         hello = user.first_name if user.first_name else user.username
                         messages.success(request, 'Welcome {}'.format(hello))
-                        # Go to index view
-                        return redirect(self.page_to_redirect)
+                        return redirect(self.page_to_redirect)  # Go to index view
 
         elif 'register' in request.POST:
 
-            # Assign register form fields to variable
-            registration_form = RegisterForm(request.POST)
+            registration_form = RegisterForm(request.POST)  # Assign register form fields to variable
 
-            # Return True if the form has no errors, or False otherwise
-            if registration_form.is_valid():
-                user = create_user_from_form(registration_form)
-                send_activation_link(request, user)
+            if registration_form.is_valid():  # Return True if the form has no errors, or False otherwise
+                user = create_from_form(registration_form)
+                user.send_activation_link(request)
+                messages.success(request, 'Please confirm your email address to complete the registration.')
             else:
                 ctxt['registration_form'] = registration_form
 
         return render(request, self.template_name, self.get_context_data(**ctxt))
-
-    @staticmethod
-    def authenticate_from_form(request, form):
-        # Normalize form fields to consistent format
-        login = form.cleaned_data.get('username')
-        raw_password = form.cleaned_data.get('password')
-
-        username = login
-        if username.find('@') >= 0:
-            try:
-                username = User.objects.get(email=login).username
-            except User.DoesNotExist:
-                messages.error(request, 'Incorrect login')
-
-        # If the given credentials are valid, return a User object.
-        return authenticate(username=username, password=raw_password)
-
-    @staticmethod
-    def set_session_expiration(request):
-        # Check if remember me checkbox is selected
-        if not request.POST.get('remember_me', None):
-            # Set a custom expiration for the session to 0.
-            # The session will expire on browser close.
-            request.session.set_expiry(0)
 
 
 class ProfileView(LoginRequiredMixin, View):

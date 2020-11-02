@@ -83,6 +83,5 @@ def send_purchase_link(request, order, shipment):
 
     # Celery sending mail
     send_email.apply_async((receiver, subject, message), countdown=0)
-    send_email.apply_async(('michal.tolkacz@gmail.com', subject, message), countdown=0)
 
     return True
