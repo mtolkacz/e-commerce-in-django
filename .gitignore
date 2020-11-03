@@ -210,3 +210,4 @@ dmypy.json
 /app/static/ckeditor/
 /app/static/debug_toolbar/
 /app/static/rest_framework/
+/test.py

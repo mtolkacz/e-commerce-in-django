@@ -4,8 +4,8 @@ from django.contrib.auth import login as auth_login
 from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.utils.decorators import method_decorator
-from django.utils.encoding import force_bytes, force_text
-from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
+from django.utils.encoding import force_bytes
+from django.utils.http import urlsafe_base64_encode
 from django.views.generic.base import View
 
 from accounts.models import account_activation_token
@@ -14,7 +14,7 @@ from cart.utils import get_pending_cart
 from cart.decorators import cart_required, order_required
 from cart.viewmixins import PrepareCheckoutMixin, ShipmentMixin, CheckoutEmailMixin, \
      CheckoutContextMixin, SummaryContextMixing
-from accounts.models.UserManager import create_from_form
+from accounts.models import UserManager
 
 User = get_user_model()
 
@@ -47,7 +47,7 @@ class CheckoutView(
             if not self.has_all_billing_data:
                 self.user.update_from_form(self.billing_form)
             elif self.create_account:
-                self.user = create_from_form(self.billing_form)
+                self.user = UserManager.create_from_form(self.billing_form)
 
             self.cart.book()
             self.shipment = self.assign_new_shipment()

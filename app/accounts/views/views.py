@@ -9,10 +9,8 @@ from django.views.generic.base import View
 
 from products.models import Favorites, Product, ProductRating
 from accounts.forms import LoginForm, RegisterForm, ProfileForm
-from accounts.models.User import authenticate_from_form
-from accounts.models.UserManager import create_from_form
 from cart.models import Order
-from accounts.models import User, account_activation_token
+from accounts.models import User, UserManager, account_activation_token
 
 
 class LoginRegistrationView(View):
@@ -46,7 +44,7 @@ class LoginRegistrationView(View):
 
             if login_form.is_valid():  # Return True if the form has no errors, or False otherwise
                 try:
-                    user = authenticate_from_form(login_form)
+                    user = User.authenticate_from_form(login_form)
                 except User.DoesNotExist:
                     messages.error(request, 'Incorrect login')
 
@@ -71,7 +69,7 @@ class LoginRegistrationView(View):
             registration_form = RegisterForm(request.POST)  # Assign register form fields to variable
 
             if registration_form.is_valid():  # Return True if the form has no errors, or False otherwise
-                user = create_from_form(registration_form)
+                user = UserManager.create_from_form(registration_form)
                 user.send_activation_link(request)
                 messages.success(request, 'Please confirm your email address to complete the registration.')
             else:

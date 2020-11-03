@@ -14,12 +14,12 @@ key=""
 
 if [ "$ENV" = "prod" ]
 then
-  # docker-compose -f $(dirname $PWD)/docker-compose.prod.yml up -d
+  # docker-compose -f $(dirname $PWD)/production.yml up -d
   sleep 10
   # sh $(dirname $PWD)/scripts/restore.sh -e prod -u michal -d ctdb
 elif [ "$ENV" = "dev" ]
 then
-  docker-compose up -d
+  docker-compose -f $(dirname $PWD)/local.yml up -d
   # sleep 10
   # sh $(dirname $PWD)/scripts/restore.sh -e dev -u michal -d ctdbdev
 else

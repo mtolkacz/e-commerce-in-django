@@ -47,43 +47,43 @@ while [ ! $number -eq 0 ]; do
 	printf "\nChoose: "
     read number
     case "$number" in
-	0)  docker-compose up -d --build
+	0)  docker-compose -f $(dirname $PWD)/local.yml up -d --build
 	    ;;
 	1)  sh $(dirname $PWD)/start.sh -e dev
 	    ;;
 	2)  docker-compose stop
 	    ;;
-	3)  docker-compose up -d --build web
+	3)  docker-compose -f $(dirname $PWD)/local.yml up -d --build web
 	    ;;
 	4)  docker container ls
 	   ;;
-	5)  docker-compose exec web python manage.py makemigrations
+	5)  docker-compose -f $(dirname $PWD)/local.yml exec web python manage.py makemigrations
 	   ;;
-	6)  docker-compose exec web python manage.py migrate
+	6)  docker-compose -f $(dirname $PWD)/local.yml exec web python manage.py migrate
 	   ;;
 	7)  sh backup.sh -e dev -u michal
 	   ;;
 	8)  sh restore.sh -e dev -u michal -d ctdbdev
 	   ;;
-	9)  docker-compose exec web python manage.py shell
+	9)  docker-compose -f $(dirname $PWD)/local.yml exec web python manage.py shell
 	   ;;
-	10) docker-compose exec web python manage.py createsuperuser
+	10) docker-compose -f $(dirname $PWD)/local.yml exec web python manage.py createsuperuser
 	   ;;
 	11) docker network ls
 	   ;;
 	12) docker network inspect gallop | grep 'Name\|IPv4'
 	   ;;
-	13) docker-compose exec web pip list
+	13) docker-compose -f $(dirname $PWD)/local.yml exec web pip list
 	   ;;
 	14) git status
 	   ;;
   	15) gnome-terminal
 	   ;;	
-	16) docker-compose logs --tail="100" | grep -Ev "Found another file|pgadmin|elasticsearch"
+	16) docker-compose -f $(dirname $PWD)/local.yml logs --tail="100" | grep -Ev "Found another file|pgadmin|elasticsearch"
 	   ;;
 	17) echo $commands
 	   ;;
-	18) docker-compose down -v
+	18) docker-compose -f $(dirname $PWD)/local.yml down -v
 	   ;;
 	19) docker image prune -a
 	   ;;
@@ -91,33 +91,33 @@ while [ ! $number -eq 0 ]; do
 	   ;;
 	21) docker network inspect gallop
 	   ;;
-	22) docker-compose logs --tail="100" | grep -E "DJANGOTEST:"
+	22) docker-compose -f $(dirname $PWD)/local.yml logs --tail="100" | grep -E "DJANGOTEST:"
 	   ;;
-	23) docker-compose exec web python manage.py clearsessions
+	23) docker-compose -f $(dirname $PWD)/local.yml exec web python manage.py clearsessions
 	   ;;
 	24) cp -r /home/michal/MEGAsync/GitHub/gallop '/home/michal/MEGAsync/GitHub/gallop backup/gallop_'`date +'%d-%m-%Y_%H_%M_%S'`
 	   ;;
-	25) docker-compose logs --tail="100" | grep -E "celery"
+	25) docker-compose -f $(dirname $PWD)/local.yml logs --tail="100" | grep -E "celery"
 	   ;;
-	26) docker-compose logs --tail="100" | grep -E "web"
+	26) docker-compose -f $(dirname $PWD)/local.yml logs --tail="100" | grep -E "web"
 	   ;;
-	27) docker-compose logs --tail="100" | grep -E "redis"
+	27) docker-compose -f $(dirname $PWD)/local.yml logs --tail="100" | grep -E "redis"
 	   ;;
 	28) docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' gallop_redis_1
 	   ;;
-	29) docker-compose logs --tail="100" | grep -E "mail"
+	29) docker-compose -f $(dirname $PWD)/local.yml logs --tail="100" | grep -E "mail"
            ;;
-	30) docker-compose up -d --build celery | docker-compose up -d --build celery-beat
+	30) docker-compose -f $(dirname $PWD)/local.yml up -d --build celery | docker-compose -f $(dirname $PWD)/local.yml up -d --build celery-beat
            ;;
 	31) docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' gallop_db
 	   ;;
-	32) docker-compose logs --tail="100" | grep -E "elastic"
+	32) docker-compose -f $(dirname $PWD)/local.yml logs --tail="100" | grep -E "elastic"
 	   ;;
-	33) docker-compose exec web python manage.py search_index --rebuild
+	33) docker-compose -f $(dirname $PWD)/local.yml exec web python manage.py search_index --rebuild
 	   ;;
 	34) gnome-terminal -- sudo "$(dirname $PWD)"/kaizen/jre/bin/java -jar "$(dirname $PWD)"/kaizen/kaizen.jar -Xms128M -Xmx2g
 	   ;;
-	35) docker-compose logs --tail="300" | grep -E "worker"
+	35) docker-compose -f $(dirname $PWD)/local.yml logs --tail="300" | grep -E "worker"
            ;;
 	0) exit 0
 	   ;;
